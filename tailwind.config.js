@@ -5,8 +5,23 @@ module.exports = {
     './app/assets/stylesheets/**/*.css',
     './app/javascript/**/*.js'
   ],
+  theme: {
+    extend: {
+      // Tailwind CSSのテーマカスタマイズ
+      colors: {
+        customblue: '#174397',
+        customred: "#FF5758",
+      },
+      spacing: {
+        '72': '18rem',           // カスタムの余白サイズの追加
+      },
+      borderRadius: {
+        'xl': '1.5rem',          // カスタムのボーダー半径
+      },
+    },
+  },
   plugins: [require("daisyui")],
   daisyui: {
-    darkTheme: false, // ダークモードをONにする場合は削除
+    themes: false,
   },
 }
