@@ -3,14 +3,15 @@ module.exports = {
     './app/views/**/*.html.erb',
     './app/helpers/**/*.rb',
     './app/assets/stylesheets/**/*.css',
-    './app/javascript/**/*.js'
+    './app/javascript/**/*.js',
   ],
   theme: {
     extend: {
-      // Tailwind CSSのテーマカスタマイズ
       colors: {
         customblue: '#174397',
-        customred: "#FF5758",
+        customred: '#FF5758',
+        header: '#65BBE9',
+        footer: '#E5E7EB',
       },
       spacing: {
         '72': '18rem',           // カスタムの余白サイズの追加
@@ -20,8 +21,8 @@ module.exports = {
       },
     },
   },
-  plugins: [require("daisyui")],
+  plugins: [require('daisyui')],
   daisyui: {
     themes: false,
   },
-}
+};
