@@ -1,0 +1,10 @@
+<% if object.errors.any? %>
+  <div id="error-messages" class="alert alert-danger">
+    <h2><%= pluralize(object.errors.count, "エラー") %>が発生しました:</h2>
+    <ul>
+      <% object.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
