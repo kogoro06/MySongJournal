@@ -29,6 +29,16 @@ ja:
         updated_at: 更新日
     models:
       user: ユーザー
+    errors:
+      models:
+        user:
+          attributes:
+            email:
+              blank: "Eメールを入力してください。"
+              invalid: "有効なEメールアドレスを入力してください。"
+              taken: "このEメールは既に登録されています。"
+            password:
+              too_short: "パスワードは%{count}文字以上で入力してください。"
   devise:
     confirmations:
       confirmed: メールアドレスが確認できました。
@@ -84,7 +94,15 @@ ja:
       send_instructions: アカウントのロック解除方法を数分以内にメールでご連絡します。
   errors:
     messages:
-      not_found: は見つかりませんでした。
+      taken: "既に使用されています。"
+      blank: "入力してください。"
+      invalid: "無効な値です。"
+      too_short: "%{count}文字以上で入力してください。"
+      too_long: "%{count}文字以内で入力してください。"
+      confirmation: "確認が一致しません。"
+      accepted: "承認してください。"
+      record_invalid: "検証エラーが発生しました: %{errors}"
+      not_a_number: "数値を入力してください。"
       not_saved:
         one: エラーが発生したため %{resource} は保存されませんでした。
         other: "%{count} 件のエラーが発生したため %{resource} は保存されませんでした。"
