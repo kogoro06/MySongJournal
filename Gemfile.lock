@@ -111,6 +111,7 @@ GEM
       warden (~> 1.2.3)
     devise-i18n (1.12.1)
       devise (>= 4.9.0)
+    devise-i18n-views (0.3.7)
     drb (2.2.1)
     erubi (1.13.0)
     globalid (1.2.1)
@@ -313,6 +314,7 @@ DEPENDENCIES
   debug
   devise
   devise-i18n
+  devise-i18n-views
   jbuilder
   jsbundling-rails
   pg (~> 1.1)
