@@ -18,7 +18,7 @@ class JournalsController < ApplicationController
   def create
     @journal = current_user.journals.new(journal_params)
     if @journal.save
-      redirect_to @journal, notice: "Journal was successfully created."
+      redirect_to journals_path, notice: "日記の作成に成功しました."
     else
       render :new, status: :unprocessable_entity
     end

@@ -1,48 +1,75 @@
 <div class="min-h-screen bg-customred flex flex-col items-center justify-center relative">
-  <div class="bg-white p-6 rounded shadow-md w-full max-w-2xl relative">
+  <div class="bg-white p-4 rounded shadow-md w-full max-w-lg relative">
     <%= form_with(model: @journal, local: true, id: "journal-form", class: "w-full space-y-4") do |form| %>
       <!-- タイトル入力 -->
       <div class="form-control relative">
         <%= form.label :title, "タイトル", class: "label" %>
         <div id="title-container">
           <!-- 表示状態 -->
-          <div id="title-display" class="hidden flex flex-col items-center justify-center w-4/5 mx-auto">
-            <div class="form-control w-4/5 mx-auto">
-              <span id="title-text" class="text-2xl font-bold text-center block"><%= @journal.title.presence || "タイトル未設定" %></span>
+          <div id="title-display" class="hidden flex flex-col items-center justify-center w-3/4 mx-auto">
+            <div class="form-control w-3/4 mx-auto">
+              <span id="title-text" class="text-xl font-bold text-center block"><%= @journal.title.presence || "タイトル未設定" %></span>
             </div>
-            <div class="form-control w-4/5 mx-auto text-right mt-4">
-              <button type="button" id="edit-title-btn" class="btn btn-outline btn-sm">編集</button>
+            <div class="form-control w-3/4 mx-auto text-right mt-2">
+              <button type="button" id="edit-title-btn" class="btn btn-outline btn-xs">編集</button>
             </div>
           </div>
 
           <!-- 編集状態 -->
           <div id="title-edit" class="<%= @journal.title.present? ? 'hidden' : '' %>">
-            <!-- タイトル入力フォーム -->
-            <div class="form-control w-4/5 mx-auto">
-              <%= form.text_field :title, required: true, placeholder: "タイトルを入力", class: "input input-bordered w-full" %>
+            <div class="form-control w-3/4 mx-auto">
+              <%= form.text_field :title, required: true, placeholder: "タイトルを入力", class: "input input-bordered w-full text-sm" %>
             </div>
-            <!-- 確定ボタン -->
-            <div class="form-control w-4/5 mx-auto text-right mt-4">
-              <button type="button" id="confirm-title-btn" class="btn btn-primary btn-sm">確定</button>
+            <div class="form-control w-3/4 mx-auto text-right mt-2">
+              <button type="button" id="confirm-title-btn" class="btn btn-primary btn-xs">確定</button>
             </div>
           </div>
         </div>
       </div>
 
       <!-- 日付表示 -->
-      <div class="form-control w-4/5 mx-auto text-right text-gray-500 text-sm">
+      <div class="form-control w-3/4 mx-auto text-right text-gray-500 text-xs">
         <%= Time.current.strftime('%Y年%m月%d日') %>
       </div>
 
       <!-- メモ入力 -->
       <div class="form-control">
-        <%= form.label :content, "一言メモ", class: "label" %>
-        <%= form.text_area :content, required: true, placeholder: "今日の出来事や気持ちを記入", class: "textarea textarea-bordered" %>
+        <%= form.label :content, "一言メモ", class: "label text-sm" %>
+        <%= form.text_area :content, required: true, placeholder: "今日の出来事や気持ちを記入", class: "textarea textarea-bordered text-sm" %>
+      </div>
+
+      <!-- 感情入力 -->
+      <div class="form-control">
+        <%= form.label :emotion, "感情", class: "label text-sm" %>
+        <%= form.select :emotion, options_for_select([["喜", 0], ["怒", 1], ["哀", 2], ["楽", 3]], @journal.emotion), { prompt: "選択してください" }, class: "select select-bordered text-sm" %>
+      </div>
+
+      <!-- 曲情報入力 -->
+      <div class="form-control">
+        <%= form.label :artist_name, "アーティスト名", class: "label text-sm" %>
+        <%= form.text_field :artist_name, required: true, placeholder: "アーティスト名を入力", class: "input input-bordered text-sm" %>
+      </div>
+
+      <div class="form-control">
+        <%= form.label :song_name, "曲名", class: "label text-sm" %>
+        <%= form.text_field :song_name, required: true, placeholder: "曲名を入力", class: "input input-bordered text-sm" %>
+      </div>
+
+      <!-- プレビューURL入力 -->
+      <div class="form-control">
+        <%= form.label :preview_url, "プレビューURL", class: "label text-sm" %>
+        <%= form.url_field :preview_url, placeholder: "プレビューURLを入力", class: "input input-bordered text-sm" %>
+      </div>
+
+      <!-- アルバム画像入力 -->
+      <div class="form-control">
+        <%= form.label :album_image, "アルバム画像URL", class: "label text-sm" %>
+        <%= form.url_field :album_image, placeholder: "アルバム画像のURLを入力", class: "input input-bordered text-sm" %>
       </div>
 
       <!-- 保存ボタン -->
-      <div class="flex justify-end mt-4">
-        <%= form.submit "日記を保存", class: "btn btn-primary" %>
+      <div class="flex justify-end mt-2">
+        <%= form.submit "日記を保存",class: "btn btn-primary btn-sm" %>
       </div>
     <% end %>
   </div>
@@ -60,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 確定ボタンを押したとき
   confirmTitleBtn.addEventListener("click", () => {
     if (titleInput.value.trim() !== "") {
-      titleText.textContent = titleInput.value; // 入力内容を表示部分に反映
+      titleText.textContent = titleInput.value;
       titleDisplay.classList.remove("hidden");
       titleEdit.classList.add("hidden");
     } else {
