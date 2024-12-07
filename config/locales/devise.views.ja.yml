@@ -27,17 +27,19 @@ ja:
         unconfirmed_email: 未確認Eメール
         unlock_token: ロック解除用トークン
         updated_at: 更新日
-    models:
-      user: ユーザー
     errors:
       models:
         user:
           attributes:
+            name:
+              blank: "ユーザーネームを入力してください。"
+              too_long: "ユーザーネームは%{count}文字以内で入力してください。"
             email:
               blank: "Eメールを入力してください。"
               invalid: "有効なEメールアドレスを入力してください。"
               taken: "このEメールは既に登録されています。"
             password:
+              blank: "パスワードを入力してください。"
               too_short: "パスワードは%{count}文字以上で入力してください。"
   devise:
     confirmations:
