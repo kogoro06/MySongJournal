@@ -8,7 +8,9 @@
         </h2>
 
         <!-- Error Messages -->
-        <%= render "devise/shared/error_messages", resource: resource %>
+        <% if resource.errors.any? %>
+          <%= render "devise/shared/error_messages", resource: resource %>
+        <% end %>
 
         <!-- Name Field -->
         <div class="field">
