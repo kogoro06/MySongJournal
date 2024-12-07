@@ -1,1 +1,5 @@
-<%= render "introduce" %>
+<% if user_signed_in? %>
+    <%= render "main_content" %> <!-- 新しく作成したメインコンテンツ部分 -->
+        <% else %>
+    <%= render "introduce" %>
+<%end%>
