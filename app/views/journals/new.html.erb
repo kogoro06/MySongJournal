@@ -49,17 +49,12 @@
         <%= form.label :artist_name, "アーティスト名", class: "label text-sm" %>
         <%= form.text_field :artist_name, required: true, placeholder: "アーティスト名を入力", class: "input input-bordered text-sm" %>
       </div>
-
-      <div class="form-control">
-        <%= form.label :song_name, "曲名", class: "label text-sm" %>
-        <%= form.text_field :song_name, required: true, placeholder: "曲名を入力", class: "input input-bordered text-sm" %>
-      </div>
-
-
-      <!-- 保存ボタン -->
-      <div class="flex justify-end mt-2">
-        <%= form.submit "日記を保存",class: "btn btn-primary btn-sm" %>
-      </div>
+    <div class="form-control">
+        <%= form.label :past_entries, "過去の日記一覧", class: "label text-sm" %>
+        <a href="<%= journals_path %>" class="btn btn-secondary text-sm w-full">
+            日記を保存
+        </a>
+    </div>
     <% end %>
   </div>
 </div>

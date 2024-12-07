@@ -12,6 +12,7 @@ module.exports = {
         customred: '#FF5758',
         header: '#65BBE9',
         footer: '#E5E7EB',
+        button: '#13253c',
       },
       spacing: {
         '72': '18rem',           // カスタムの余白サイズの追加
