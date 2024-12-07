@@ -1,6 +1,4 @@
-# test/fixtures/journals.yml
-
-one:
+journal_one:
   title: "Test Journal 1"
   content: "This is the content of test journal 1."
   emotion: 0
@@ -8,9 +6,9 @@ one:
   song_name: "Test Song 1"
   preview_url: "http://example.com/preview1"
   album_image: "http://example.com/album1.jpg"
-  user: one # users.yml に定義されたユーザーを関連付ける
+  user_id: 1 # 正しいカラム名を使用
 
-two:
+journal_two:
   title: "Test Journal 2"
   content: "This is the content of test journal 2."
   emotion: 1
@@ -18,4 +16,4 @@ two:
   song_name: "Test Song 2"
   preview_url: "http://example.com/preview2"
   album_image: "http://example.com/album2.jpg"
-  user: two # users.yml に定義されたユーザーを関連付ける
+  user_id: 2 # 正しいカラム名を使用

@@ -1,13 +1,20 @@
 require "test_helper"
 
 class JournalsControllerTest < ActionDispatch::IntegrationTest
-  test "should get index" do
-    get journals_index_url
-    assert_response :success
+  include Devise::Test::IntegrationHelpers # Deviseのヘルパーをインクルード
+
+  setup do
+    @user = users(:one) # users.ymlのユーザーを使用
+    sign_in @user # テストユーザーでサインイン
   end
 
   test "should get new" do
-    get journals_new_url
+    get new_journal_url
+    assert_response :success
+  end
+
+  test "should get index" do
+    get journals_url
     assert_response :success
   end
 end
