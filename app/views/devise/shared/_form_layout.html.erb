@@ -1,0 +1,10 @@
+<div class="h-screen flex flex-col justify-center items-center bg-customblue">
+  <div class="bg-white p-8 rounded shadow-md w-full max-w-sm">
+    <% flash.each do |key, message| %>
+      <div class="flash-message <%= key %>">
+        <%= message %>
+      </div>
+    <% end %>
+    <%= yield %>
+  </div>
+</div>
