@@ -1,35 +1,33 @@
 <div class="min-h-screen bg-customred flex flex-col items-center justify-center relative">
   <div class="bg-white p-4 rounded shadow-md w-full max-w-lg relative">
-    <%= form_with(model: @journal, local: true, id: "journal-form", class: "w-full space-y-4") do |form| %>
-      <!-- タイトル入力 -->
-      <div class="form-control relative">
-        <%= form.label :title, "タイトル", class: "label" %>
-        <div id="title-container">
-          <!-- 表示状態 -->
-          <div id="title-display" class="hidden flex flex-col items-center justify-center w-3/4 mx-auto">
-            <div class="form-control w-3/4 mx-auto">
-              <span id="title-text" class="text-xl font-bold text-center block"><%= @journal.title.presence || "タイトル未設定" %></span>
-            </div>
-            <div class="form-control w-3/4 mx-auto text-right mt-2">
-              <button type="button" id="edit-title-btn" class="btn btn-outline btn-xs">編集</button>
-            </div>
-          </div>
+    <%= form_with(model: @journal, local: true, id: "journal-form", class: "w-full space-y-6") do |form| %>
 
+      <!-- タイトル入力 -->
+      <div class="form-control">
+        <%= form.label :title, "タイトル", class: "label text-sm" %>
+        <div id="title-container" class="w-3/4 mx-auto">
+          <!-- 表示状態 -->
+          <div id="title-display" class="hidden flex flex-col items-center justify-center">
+            <span id="title-text" class="text-xl font-bold text-center block">
+              <%= @journal.title.presence || "タイトル未設定" %>
+            </span>
+            <button type="button" id="edit-title-btn" class="btn btn-outline btn-xs mt-2">
+              編集
+            </button>
+          </div>
           <!-- 編集状態 -->
           <div id="title-edit" class="<%= @journal.title.present? ? 'hidden' : '' %>">
-            <div class="form-control w-3/4 mx-auto">
-              <%= form.text_field :title, required: true, placeholder: "タイトルを入力", class: "input input-bordered w-full text-sm" %>
-            </div>
-            <div class="form-control w-3/4 mx-auto text-right mt-2">
-              <button type="button" id="confirm-title-btn" class="btn btn-primary btn-xs">確定</button>
-            </div>
+            <%= form.text_field :title, required: true, placeholder: "タイトルを入力", class: "input input-bordered w-full text-sm" %>
+            <button type="button" id="confirm-title-btn" class="btn btn-primary btn-xs mt-2 w-full">
+              確定
+            </button>
           </div>
         </div>
       </div>
 
       <!-- 日付表示 -->
-      <div class="form-control w-3/4 mx-auto text-right text-gray-500 text-xs">
-        <%= Time.current.strftime('%Y年%m月%d日') %>
+      <div class="form-control text-right">
+        <span class="text-xs text-gray-500"><%= Time.current.strftime('%Y年%m月%d日') %></span>
       </div>
 
       <!-- メモ入力 -->
@@ -54,17 +52,18 @@
         <%= form.label :song_name, "曲名", class: "label text-sm" %>
         <%= form.text_field :song_name, required: true, placeholder: "曲名を入力", class: "input input-bordered text-sm" %>
       </div>
+
       <!-- 保存ボタン -->
-      <div class="flex justify-end mt-2 form-control">
-        <%= form.submit "日記を保存", class: "btn btn-primary btn-sm" %>
+      <div class="form-control">
+        <%= form.submit "日記を保存", class: "btn btn-primary text-sm w-full" %>
       </div>
+
     <% end %>
   </div>
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-  console.log("DOMContentLoaded event fired"); // デバッグ用
+document.addEventListener("DOMContentLoaded", () => {
   const titleDisplay = document.getElementById("title-display");
   const titleEdit = document.getElementById("title-edit");
   const editTitleBtn = document.getElementById("edit-title-btn");
@@ -94,5 +93,4 @@
     titleEdit.classList.remove("hidden");
   });
 });
-
 </script>
