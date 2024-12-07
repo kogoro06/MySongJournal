@@ -19,6 +19,7 @@
 
   <body class="wrap">
     <%= render "shared/header" %>
+    <%= render "devise/shared/flash_messages" %> 
     <%= yield %>
     <%= yield(:js) %>
     <%= render "shared/footer" %>
