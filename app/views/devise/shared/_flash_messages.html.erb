@@ -1,0 +1,9 @@
+<% if flash.present? %>
+  <div class="space-y-4">
+    <% flash.each do |key, message| %>
+      <div class="<%= key == 'notice' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %> px-4 py-3 rounded-lg shadow-md">
+        <p class="font-medium"><%= message %></p>
+      </div>
+    <% end %>
+  </div>
+<% end %>

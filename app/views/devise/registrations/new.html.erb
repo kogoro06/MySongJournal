@@ -1,34 +1,120 @@
-<h2>Sign up</h2>
+<div class="flex justify-center items-center bg-customblue">
+  <div class="rounded-lg p-8" style="aspect-ratio: 1 / 1; width: 90%; max-width: 400px;">
+    <%= render "devise/shared/form_layout" do %>
+      <form class="space-y-6 h-full" action="<%= registration_path(resource_name) %>" method="post" enctype="multipart/form-data">
+        <!-- Title -->
+        <h2 class="text-2xl font-bold text-gray-700 text-center mb-6">
+          <%= t('devise.registrations.new.sign_up', default: 'アカウント登録') %>
+        </h2>
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+        <!-- Error Messages -->
+        <%= render "devise/shared/error_messages", resource: resource %>
 
-   <div class="field">
-    <%= f.label :name %><br>
-    <%= f.text_field :name, autofocus: true %>
+        <!-- Name Field -->
+        <div class="field">
+          <label for="name" class="block text-gray-700 text-sm font-bold mb-2">
+            <%= t('activerecord.attributes.user.name', default: '名前') %>
+          </label>
+          <input 
+            id="name" 
+            name="user[name]" 
+            type="text" 
+            placeholder="<%= t('activerecord.attributes.user.name', default: '名前') %>" 
+            required 
+            autofocus 
+            class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-outline bg-gray-50 placeholder-gray-400"
+            value="<%= resource.name if resource.present? %>">
+        </div>
+
+        <!-- Profile Image Field -->
+        <div class="field">
+          <label for="profile_image" class="block text-gray-700 text-sm font-bold mb-2">
+            <%= t('activerecord.attributes.user.profile_image', default: 'プロフィール画像') %>
+          </label>
+          <input 
+            id="profile_image" 
+            name="user[profile_image]" 
+            type="file" 
+            class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-outline bg-gray-50">
+        </div>
+
+        <!-- Email Field -->
+        <div class="mb-4">
+          <label for="email" class="block text-gray-700 text-sm font-bold mb-2">
+            <%= t('activerecord.attributes.user.email', default: 'Eメール') %>
+          </label>
+          <input 
+            id="email" 
+            name="user[email]" 
+            type="email" 
+            placeholder="<%= t('activerecord.attributes.user.email', default: 'Eメール') %>" 
+            required 
+            autocomplete="email" 
+            class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-outline bg-gray-50 placeholder-gray-400"
+            value="<%= resource.email if resource.present? %>">
+        </div>
+
+        <!-- Password Field -->
+        <div class="mb-4 relative">
+          <label for="password" class="block text-gray-700 text-sm font-bold mb-2">
+            <%= t('activerecord.attributes.user.password', default: 'パスワード') %>
+          </label>
+          <% if @minimum_password_length %>
+            <em class="text-gray-600 text-sm">
+              <%= t('devise.shared.minimum_password_length', count: @minimum_password_length, default: '（6文字以上）') %>
+            </em>
+          <% end %>
+          <div class="relative">
+            <input 
+              id="password" 
+              name="user[password]" 
+              type="password" 
+              placeholder="<%= t('activerecord.attributes.user.password', default: 'パスワード') %>" 
+              required 
+              autocomplete="new-password" 
+              class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-outline bg-gray-50 placeholder-gray-400">
+            <button 
+              type="button" 
+              class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none" 
+              onclick="togglePasswordVisibility('password', this)">
+              👁
+            </button>
+          </div>
+        </div>
+
+        <!-- Password Confirmation Field -->
+        <div class="mb-6 relative">
+          <label for="password_confirmation" class="block text-gray-700 text-sm font-bold mb-2">
+            <%= t('activerecord.attributes.user.password_confirmation', default: 'パスワード（確認用）') %>
+          </label>
+          <div class="relative">
+            <input 
+              id="password_confirmation" 
+              name="user[password_confirmation]" 
+              type="password" 
+              placeholder="<%= t('activerecord.attributes.user.password_confirmation', default: 'パスワード（確認用）') %>" 
+              required 
+              autocomplete="new-password" 
+              class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-outline bg-gray-50 placeholder-gray-400">
+            <button 
+              type="button" 
+              class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none" 
+              onclick="togglePasswordVisibility('password_confirmation', this)">
+              👁
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex items-center justify-between">
+          <button 
+            type="submit" 
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded focus:outline-none focus:shadow-outline w-full">
+            <%= t('devise.registrations.new.sign_up', default: 'アカウント登録') %>
+          </button>
+        </div>
+        <%= render "devise/shared/links" %>
+      </form>
+    <% end %>
   </div>
-
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
-  </div>
-
-  <div class="field">
-    <%= f.label :password %>
-    <% if @minimum_password_length %>
-    <em>(<%= @minimum_password_length %> characters minimum)</em>
-    <% end %><br />
-    <%= f.password_field :password, autocomplete: "new-password" %>
-  </div>
-
-  <div class="field">
-    <%= f.label :password_confirmation %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "Sign up" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>
