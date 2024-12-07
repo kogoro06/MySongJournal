@@ -1,11 +1,21 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+# test/fixtures/journals.yml
 
-# This model initially had no columns defined. If you add columns to the
-# model remove the "{}" from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
-#
-one: {}
-# column: value
-#
-two: {}
-# column: value
+one:
+  title: "Test Journal 1"
+  content: "This is the content of test journal 1."
+  emotion: 0
+  artist_name: "Test Artist 1"
+  song_name: "Test Song 1"
+  preview_url: "http://example.com/preview1"
+  album_image: "http://example.com/album1.jpg"
+  user: one # users.yml に定義されたユーザーを関連付ける
+
+two:
+  title: "Test Journal 2"
+  content: "This is the content of test journal 2."
+  emotion: 1
+  artist_name: "Test Artist 2"
+  song_name: "Test Song 2"
+  preview_url: "http://example.com/preview2"
+  album_image: "http://example.com/album2.jpg"
+  user: two # users.yml に定義されたユーザーを関連付ける
