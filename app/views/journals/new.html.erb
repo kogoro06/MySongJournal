@@ -1,2 +1,77 @@
-<h1>Journals#new</h1>
-<p>Find me in app/views/journals/new.html.erb</p>
+<div class="min-h-screen bg-customred flex flex-col items-center justify-center relative">
+  <div class="bg-white p-6 rounded shadow-md w-full max-w-2xl relative">
+    <%= form_with(model: @journal, local: true, id: "journal-form", class: "w-full space-y-4") do |form| %>
+      <!-- タイトル入力 -->
+      <div class="form-control relative">
+        <%= form.label :title, "タイトル", class: "label" %>
+        <div id="title-container">
+          <!-- 表示状態 -->
+          <div id="title-display" class="hidden flex flex-col items-center justify-center w-4/5 mx-auto">
+            <div class="form-control w-4/5 mx-auto">
+              <span id="title-text" class="text-2xl font-bold text-center block"><%= @journal.title.presence || "タイトル未設定" %></span>
+            </div>
+            <div class="form-control w-4/5 mx-auto text-right mt-4">
+              <button type="button" id="edit-title-btn" class="btn btn-outline btn-sm">編集</button>
+            </div>
+          </div>
+
+          <!-- 編集状態 -->
+          <div id="title-edit" class="<%= @journal.title.present? ? 'hidden' : '' %>">
+            <!-- タイトル入力フォーム -->
+            <div class="form-control w-4/5 mx-auto">
+              <%= form.text_field :title, required: true, placeholder: "タイトルを入力", class: "input input-bordered w-full" %>
+            </div>
+            <!-- 確定ボタン -->
+            <div class="form-control w-4/5 mx-auto text-right mt-4">
+              <button type="button" id="confirm-title-btn" class="btn btn-primary btn-sm">確定</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 日付表示 -->
+      <div class="form-control w-4/5 mx-auto text-right text-gray-500 text-sm">
+        <%= Time.current.strftime('%Y年%m月%d日') %>
+      </div>
+
+      <!-- メモ入力 -->
+      <div class="form-control">
+        <%= form.label :content, "一言メモ", class: "label" %>
+        <%= form.text_area :content, required: true, placeholder: "今日の出来事や気持ちを記入", class: "textarea textarea-bordered" %>
+      </div>
+
+      <!-- 保存ボタン -->
+      <div class="flex justify-end mt-4">
+        <%= form.submit "日記を保存", class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const titleDisplay = document.getElementById("title-display");
+  const titleEdit = document.getElementById("title-edit");
+  const editTitleBtn = document.getElementById("edit-title-btn");
+  const confirmTitleBtn = document.getElementById("confirm-title-btn");
+  const titleInput = document.querySelector("input[name='journal[title]']");
+  const titleText = document.getElementById("title-text");
+
+  // 確定ボタンを押したとき
+  confirmTitleBtn.addEventListener("click", () => {
+    if (titleInput.value.trim() !== "") {
+      titleText.textContent = titleInput.value; // 入力内容を表示部分に反映
+      titleDisplay.classList.remove("hidden");
+      titleEdit.classList.add("hidden");
+    } else {
+      alert("タイトルを入力してください！");
+    }
+  });
+
+  // 編集ボタンを押したとき
+  editTitleBtn.addEventListener("click", () => {
+    titleDisplay.classList.add("hidden");
+    titleEdit.classList.remove("hidden");
+  });
+});
+</script>
