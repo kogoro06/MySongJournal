@@ -18,9 +18,6 @@
           <!-- 編集状態 -->
           <div id="title-edit" class="<%= @journal.title.present? ? 'hidden' : '' %>">
             <%= form.text_field :title, required: true, placeholder: "タイトルを入力", class: "input input-bordered w-full text-sm" %>
-            <button type="button" id="confirm-title-btn" class="btn btn-primary btn-xs mt-2 w-full">
-              確定
-            </button>
           </div>
         </div>
       </div>
@@ -62,35 +59,4 @@
   </div>
 </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const titleDisplay = document.getElementById("title-display");
-  const titleEdit = document.getElementById("title-edit");
-  const editTitleBtn = document.getElementById("edit-title-btn");
-  const confirmTitleBtn = document.getElementById("confirm-title-btn");
-  const titleInput = document.querySelector("input[name='journal[title]']");
-  const titleText = document.getElementById("title-text");
 
-  if (!titleDisplay || !titleEdit || !editTitleBtn || !confirmTitleBtn || !titleInput || !titleText) {
-    console.error("Some DOM elements are not found");
-    return; // DOM要素が見つからない場合は終了
-  }
-
-  // 確定ボタンを押したとき
-  confirmTitleBtn.addEventListener("click", () => {
-    if (titleInput.value.trim() !== "") {
-      titleText.textContent = titleInput.value;
-      titleDisplay.classList.remove("hidden");
-      titleEdit.classList.add("hidden");
-    } else {
-      alert("タイトルを入力してください！");
-    }
-  });
-
-  // 編集ボタンを押したとき
-  editTitleBtn.addEventListener("click", () => {
-    titleDisplay.classList.add("hidden");
-    titleEdit.classList.remove("hidden");
-  });
-});
-</script>
