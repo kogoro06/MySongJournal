@@ -31,7 +31,7 @@ class JournalsController < ApplicationController
 
   def update
     if @journal.update(journal_params)
-      redirect_to @journal, notice: "Journal was successfully updated."
+      redirect_to journals_path, notice: "日記が更新されました."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -39,7 +39,7 @@ class JournalsController < ApplicationController
 
   def destroy
     @journal.destroy
-    redirect_to journals_path, notice: "Journal was successfully deleted."
+    redirect_to journals_path, notice: "日記が削除されました."
   end
 
   private
@@ -50,6 +50,11 @@ class JournalsController < ApplicationController
 
   def set_journal
     @journal = Journal.find(params[:id])
+  end
+  def authorize_journal
+    unless @journal.user == current_user
+      redirect_to journals_path, alert: "削除する権限がありません。"
+    end
   end
 
   def journal_params
