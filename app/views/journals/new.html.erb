@@ -55,17 +55,6 @@
         <%= form.text_field :song_name, required: true, placeholder: "曲名を入力", class: "input input-bordered text-sm" %>
       </div>
 
-      <!-- プレビューURL入力 -->
-      <div class="form-control">
-        <%= form.label :preview_url, "プレビューURL", class: "label text-sm" %>
-        <%= form.url_field :preview_url, placeholder: "プレビューURLを入力", class: "input input-bordered text-sm" %>
-      </div>
-
-      <!-- アルバム画像入力 -->
-      <div class="form-control">
-        <%= form.label :album_image, "アルバム画像URL", class: "label text-sm" %>
-        <%= form.url_field :album_image, placeholder: "アルバム画像のURLを入力", class: "input input-bordered text-sm" %>
-      </div>
 
       <!-- 保存ボタン -->
       <div class="flex justify-end mt-2">

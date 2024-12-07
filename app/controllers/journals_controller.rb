@@ -16,11 +16,13 @@ class JournalsController < ApplicationController
   end
 
   def create
+    Rails.logger.debug "Received params: #{params.inspect}"
     @journal = current_user.journals.new(journal_params)
     if @journal.save
       redirect_to journals_path, notice: "日記の作成に成功しました."
     else
-      render :new, status: :unprocessable_entity
+      Rails.logger.debug "Journal save errors: #{@journal.errors.full_messages}"
+      render :new
     end
   end
 
@@ -50,7 +52,9 @@ class JournalsController < ApplicationController
     @journal = Journal.find(params[:id])
   end
 
-  def authorize_journal
-    redirect_to journals_path, alert: "You are not authorized to perform this action." unless @journal.user == current_user
+  def journal_params
+    params.require(:journal).permit(:title, :content, :emotion, :artist_name, :song_name).tap do |p|
+      p[:emotion] = p[:emotion].to_i if p[:emotion].present?
+    end
   end
 end
