@@ -1,0 +1,50 @@
+<div class="min-h-screen bg-customred flex flex-col items-center justify-center relative">
+  <div class="bg-white p-6 rounded shadow-md w-full max-w-lg relative">
+    <!-- タイトル表示 -->
+    <div class="text-center mb-4">
+      <h1 class="text-2xl font-bold"><%= @journal.title.presence || "タイトル未設定" %></h1>
+      <p class="text-xs text-gray-500 mt-1"><%= @journal.created_at.strftime('%Y年%m月%d日') %></p>
+    </div>
+
+    <!-- 一言メモ表示 -->
+    <div class="form-control mb-4">
+      <h2 class="label text-sm font-semibold">一言メモ</h2>
+      <p class="textarea textarea-bordered text-sm bg-gray-100 p-2"><%= @journal.content %></p>
+    </div>
+
+    <!-- 感情表示 -->
+    <div class="form-control mb-4">
+      <h2 class="label text-sm font-semibold">感情</h2>
+      <p class="select select-bordered text-sm bg-gray-100 p-2">
+        <%= case @journal.emotion
+          when "喜" then "喜び"
+          when "怒" then "怒り"
+          when "哀" then "悲しみ"
+          when "楽" then "楽しさ"
+          else "未設定"
+        end %>
+      </p>
+    </div>
+
+    <!-- 曲情報表示 -->
+    <div class="form-control mb-4">
+      <h2 class="label text-sm font-semibold">アーティスト名</h2>
+      <p class="input input-bordered text-sm bg-gray-100 p-2"><%= @journal.artist_name %></p>
+    </div>
+    <div class="form-control mb-4">
+      <h2 class="label text-sm font-semibold">曲名</h2>
+      <p class="input input-bordered text-sm bg-gray-100 p-2"><%= @journal.song_name %></p>
+    </div>
+
+    <!-- アクションボタン -->
+    <div class="flex justify-between mt-6">
+      <a href="<%= edit_journal_path(@journal) %>" class="btn btn-secondary text-sm">編集</a>
+     <%= button_to "削除", journal_path(@journal), method: :delete, data: { confirm: "本当に削除しますか？" }, class: "px-6 py-2 bg-red-500 text-white font-medium rounded shadow-md hover:bg-red-600" %>
+    </div>
+
+    <!-- 戻るボタン -->
+    <div class="mt-4 text-center">
+      <a href="<%= journals_path %>" class="text-blue-500 hover:underline text-sm">← 日記一覧に戻る</a>
+    </div>
+  </div>
+</div>

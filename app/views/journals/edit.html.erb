@@ -1,0 +1,52 @@
+<div class="min-h-screen bg-customred flex flex-col items-center justify-center relative">
+  <div class="bg-white p-4 rounded shadow-md w-full max-w-lg relative">
+    <h1 class="text-2xl font-bold text-center mb-6">日記を編集</h1>
+    <%= form_with(model: @journal, local: true, id: "journal-edit-form", class: "w-full space-y-6") do |form| %>
+
+      <!-- タイトル入力 -->
+      <div class="form-control">
+        <%= form.label :title, "タイトル", class: "label text-sm" %>
+        <%= form.text_field :title, required: true, placeholder: "タイトルを入力", class: "input input-bordered w-full text-sm" %>
+      </div>
+
+      <!-- 日付表示 -->
+      <div class="form-control text-right">
+        <span class="text-xs text-gray-500"><%= @journal.created_at.strftime('%Y年%m月%d日') %></span>
+      </div>
+
+      <!-- メモ入力 -->
+      <div class="form-control">
+        <%= form.label :content, "一言メモ", class: "label text-sm" %>
+        <%= form.text_area :content, required: true, placeholder: "今日の出来事や気持ちを記入", class: "textarea textarea-bordered text-sm" %>
+      </div>
+
+      <!-- 感情入力 -->
+      <div class="form-control">
+        <%= form.label :emotion, "感情", class: "label text-sm" %>
+        <%= form.select :emotion, options_for_select([["喜", 0], ["怒", 1], ["哀", 2], ["楽", 3]], @journal.emotion), { prompt: "選択してください" }, class: "select select-bordered text-sm" %>
+      </div>
+
+      <!-- 曲情報入力 -->
+      <div class="form-control">
+        <%= form.label :artist_name, "アーティスト名", class: "label text-sm" %>
+        <%= form.text_field :artist_name, required: true, placeholder: "アーティスト名を入力", class: "input input-bordered text-sm" %>
+      </div>
+
+      <div class="form-control">
+        <%= form.label :song_name, "曲名", class: "label text-sm" %>
+        <%= form.text_field :song_name, required: true, placeholder: "曲名を入力", class: "input input-bordered text-sm" %>
+      </div>
+
+      <!-- 保存ボタン -->
+      <div class="form-control">
+        <%= form.submit "変更を保存", class: "btn btn-primary text-sm w-full" %>
+      </div>
+
+      <!-- 戻るボタン -->
+      <div class="form-control text-center mt-4">
+        <a href="<%= journal_path(@journal) %>" class="text-blue-500 hover:underline text-sm">← 戻る</a>
+      </div>
+
+    <% end %>
+  </div>
+</div>
