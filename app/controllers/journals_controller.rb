@@ -2,9 +2,13 @@ class JournalsController < ApplicationController
   before_action :authenticate_user!, except: [ :show, :index ]
   before_action :set_journal, only: [ :show, :edit, :update, :destroy ]
   before_action :authorize_journal, only: [ :edit, :update, :destroy ]
-
   def index
-    @journals = Journal.all
+  @emotion_filter = params[:emotion] # フィルター条件を取得
+  @journals = if @emotion_filter.present?
+                Journal.where(emotion: @emotion_filter) # 絞り込み
+  else
+                Journal.all # すべて取得
+  end
   end
 
   def show
@@ -27,6 +31,7 @@ class JournalsController < ApplicationController
   end
 
   def edit
+    @journal = Journal.find(params[:id])
   end
 
   def update
