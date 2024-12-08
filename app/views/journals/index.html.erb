@@ -8,7 +8,7 @@
       <%= form_with url: journals_path, method: :get, local: true, class: "flex items-center space-x-2 text-white" do |f| %>
         <%= f.select :emotion, Journal.emotions.keys.map { |key| [key.humanize, key] },
                      { include_blank: "すべて" },
-                     { class: "px-4 py-2 border rounded-md" } %>
+                     { class: "px-4 py-2 border rounded-md bg-customred" } %>
         <%= f.submit "絞り込む", class: "px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600" %>
       <% end %>
     </div>
