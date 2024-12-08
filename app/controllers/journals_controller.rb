@@ -3,14 +3,13 @@ class JournalsController < ApplicationController
   before_action :set_journal, only: [ :show, :edit, :update, :destroy ]
   before_action :authorize_journal, only: [ :edit, :update, :destroy ]
   def index
-  @emotion_filter = params[:emotion] # フィルター条件を取得
-  @journals = if @emotion_filter.present?
-                Journal.where(emotion: @emotion_filter) # 絞り込み
-  else
-                Journal.all # すべて取得
+    @emotion_filter = params[:emotion] # フィルター条件を取得
+    @journals = if @emotion_filter.present?
+                  current_user.journals.where(emotion: @emotion_filter) # ログインユーザーの日記を絞り込み
+                else
+                  current_user.journals # ログインユーザーの日記のみ取得
+                end
   end
-  end
-
   def show
     @journals = Journal.find(params[:id])
   end
