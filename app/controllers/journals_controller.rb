@@ -6,9 +6,9 @@ class JournalsController < ApplicationController
   @emotion_filter = params[:emotion] # フィルター条件を取得
   @journals = if @emotion_filter.present?
                 Journal.where(emotion: @emotion_filter) # 絞り込み
-              else
+  else
                 Journal.all # すべて取得
-              end
+  end
   end
 
   def show
