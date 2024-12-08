@@ -1,9 +1,17 @@
 <div class="min-h-screen bg-customblue text-black flex flex-col items-center pt-8 pb-8">
   <div class="bg-white p-6 rounded shadow-md w-full max-w-2xl">
-    <!-- ページタイトル -->
-   <h1 class="text-2xl font-bold text-center mb-6">
+    <!-- ページタイトルと絞り込み -->
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold">
         <%= "#{current_user.name}'s Journal" %>
-    </h1>
+      </h1>
+      <%= form_with url: journals_path, method: :get, local: true, class: "flex items-center space-x-2 text-white" do |f| %>
+        <%= f.select :emotion, Journal.emotions.keys.map { |key| [key.humanize, key] },
+                     { include_blank: "すべて" },
+                     { class: "px-4 py-2 border rounded-md" } %>
+        <%= f.submit "絞り込む", class: "px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600" %>
+      <% end %>
+    </div>
 
     <!-- 一覧表示 -->
     <ul class="space-y-4">
@@ -18,14 +26,15 @@
           <div class="flex space-x-4 mt-2">
             <!-- 日記を見るリンク -->
             <%= link_to '日記を見る', journal_path(journal), class: "px-6 py-2 bg-gray-500 text-white font-medium rounded shadow-md hover:bg-gray-600" %>
-            <!-- 編集リンク (色変更) -->
+            <!-- 編集リンク -->
             <%= link_to "編集", edit_journal_path(journal), class: "px-6 py-2 bg-yellow-500 text-white font-medium rounded shadow-md hover:bg-yellow-600" %>
-            <!-- 削除ボタン (色変更) -->
+            <!-- 削除ボタン -->
             <%= button_to "削除", journal_path(journal), method: :delete, data: { confirm: "本当に削除しますか？" }, class: "px-6 py-2 bg-red-500 text-white font-medium rounded shadow-md hover:bg-red-600" %>
           </div>
         </li>
       <% end %>
     </ul>
+
     <!-- 日記作成ボタン -->
     <div class="flex justify-center mt-6">
       <%= link_to "新しい日記を作成", new_journal_path, class: "btn btn-primary w-full" %>
