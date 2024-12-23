@@ -48,6 +48,7 @@ services:
       - bundle_data:/usr/local/bundle:cached
     environment:
       TZ: Asia/Tokyo
+      REDIS_URL: redis://redis:6379/0
       POSTGRES_PASSWORD: password
     depends_on:
       - db
