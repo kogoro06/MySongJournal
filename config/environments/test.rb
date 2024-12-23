@@ -64,6 +64,6 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
-  ENV["SPOTIFY_CLIENT_ID"] ||= "a6bb07593cdd421899b12e3661b3bc1b"
-  ENV["SPOTIFY_CLIENT_SECRET"] ||= "42f4957c2880402880ca1a86115c842a"
+  ENV["SPOTIFY_CLIENT_ID"] ||= ENV.fetch("SPOTIFY_CLIENT_ID", nil)
+  ENV["SPOTIFY_CLIENT_SECRET"] ||= ENV.fetch("SPOTIFY_CLIENT_SECRET", nil)
 end
