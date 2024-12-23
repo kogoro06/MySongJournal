@@ -1,0 +1,12 @@
+:concurrency: 5
+:queues:
+  - default
+  - mailers
+  - critical
+
+:redis:
+  url: redis://redis:6379/0
+:schedule:
+  spotify_token_refresh:
+    cron: '0 * * * *' # 毎時0分に実行
+    class: 'SpotifyTokenRefreshWorker'
