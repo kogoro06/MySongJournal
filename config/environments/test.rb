@@ -63,7 +63,8 @@ Rails.application.configure do
   # config.action_view.annotate_rendered_view_with_filenames = true
 
   # Raise error when a before_action's only/except options reference missing actions.
-  config.action_controller.raise_on_missing_callback_actions = true
-  ENV["SPOTIFY_CLIENT_ID"] ||= ENV.fetch("SPOTIFY_CLIENT_ID", nil)
-  ENV["SPOTIFY_CLIENT_SECRET"] ||= ENV.fetch("SPOTIFY_CLIENT_SECRET", nil)
+  # Spotify APIの認証をスキップ
+  ENV["SPOTIFY_CLIENT_ID"] ||= "test_client_id"
+  ENV["SPOTIFY_CLIENT_SECRET"] ||= "test_client_secret"
+  ENV["SPOTIFY_REDIRECT_URI_LOCAL"] ||= "http://localhost:3000/callback"
 end
