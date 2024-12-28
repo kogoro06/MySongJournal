@@ -14,6 +14,9 @@ Rails.application.routes.draw do
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
+  get "spotify/search", to: "spotify#search", as: :spotify_search
+  post "spotify/select_tracks", to: "spotify#select_tracks", as: :select_tracks
+
   # Defines the root path route ("/")
   root "static_pages#top"
 end

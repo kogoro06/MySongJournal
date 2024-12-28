@@ -1,0 +1,31 @@
+<!-- Spotify 検索フォーム -->
+<h2 class="text-lg font-bold mb-4 text-white">Spotify 曲検索</h2>
+
+<%= form_with url: spotify_search_path, method: :get, local: false, remote: true, id: "spotify-search-form" do |f| %>
+  <!-- 検索タイプ選択 -->
+  <div class="mb-4">
+    <%= f.label :search_type, "検索タイプ", class: "block text-sm font-medium text-white mb-2" %>
+    <%= f.select :search_type,
+          [["曲名で検索", "track"], ["アーティスト名で検索", "artist"]],
+          { prompt: "検索タイプを選択" },
+          { id: "search-type-select",
+            class: "mt-1 block w-full px-4 py-2 border border-gray-400 rounded-md shadow-sm text-white bg-gray-700 placeholder-white focus:ring-blue-500 focus:border-blue-500 appearance-none" } %>
+  </div>
+
+  <!-- 検索キーワード入力 -->
+  <div class="mb-4">
+    <%= f.label :query, "検索キーワード", class: "block text-sm font-medium text-white mb-2" %>
+    <%= f.text_field :query,
+          required: true,
+          id: "query-input",
+          class: "mt-1 block w-full px-4 py-2 border border-gray-400 rounded-md shadow-sm text-white bg-gray-700 placeholder-white focus:ring-blue-500 focus:border-blue-500" %>
+  </div>
+
+  <!-- 検索ボタン -->
+  <div class="text-center">
+    <%= f.submit "検索", class: "px-4 py-2 bg-blue-500 text-white font-medium rounded shadow-md hover:bg-blue-600" %>
+  </div>
+<% end %>
+
+<!-- 検索結果表示エリア -->
+<div id="search-results" class="mt-4 text-white"></div>
