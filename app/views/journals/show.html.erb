@@ -1,50 +1,83 @@
-<div class="min-h-screen bg-customred flex flex-col items-center justify-center relative">
-  <div class="bg-white p-6 rounded shadow-md w-full max-w-lg relative">
-    <!-- タイトル表示 -->
+<div class="min-h-screen bg-customred text-white flex items-center justify-center py-10">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl space-y-6">
+    <!-- 日付表示 -->
     <div class="text-center mb-4">
-      <h1 class="text-2xl font-bold"><%= @journal.title.presence || "タイトル未設定" %></h1>
-      <p class="text-xs text-gray-500 mt-1"><%= @journal.created_at.strftime('%Y年%m月%d日') %></p>
+      <span class="text-xl font-semibold text-gray-700">
+        <%= @journal.created_at.strftime('%Y年%m月%d日') %>
+      </span>
     </div>
 
-    <!-- 一言メモ表示 -->
-    <div class="form-control mb-4">
-      <h2 class="label text-sm font-semibold">一言メモ</h2>
-      <p class="textarea textarea-bordered text-sm bg-gray-100 p-2"><%= @journal.content %></p>
+    <!-- タイトル表示 -->
+    <div>
+      <h2 class="text-md font-medium text-gray-700 mb-2">日記タイトル</h2>
+      <p class="text-lg font-semibold text-gray-900"><%= @journal.title %></p>
     </div>
 
-    <!-- 感情表示 -->
-    <div class="form-control mb-4">
-      <h2 class="label text-sm font-semibold">感情</h2>
-      <p class="select select-bordered text-sm bg-gray-100 p-2">
-        <%= case @journal.emotion
-          when "喜" then "喜び"
-          when "怒" then "怒り"
-          when "哀" then "悲しみ"
-          when "楽" then "楽しさ"
-          else "未設定"
-        end %>
+    <!-- 曲情報 -->
+    <div class="bg-gray-50 p-4 rounded-md shadow-inner mt-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-2">選択した曲情報</h2>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">曲名</label>
+        <p class="block text-md font-bold text-gray-800"><%= @journal.song_name || '未選択' %></p>
+      </div>
+      
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">アーティスト名</label>
+        <p class="block text-md font-bold text-gray-800"><%= @journal.artist_name || '未選択' %></p>
+      </div>
+
+      <% if @journal.album_image.present? %>
+        <div class="mb-4 text-center">
+          <img src="<%= @journal.album_image %>" alt="アルバム画像" class="w-64 h-64 object-cover mx-auto rounded-lg shadow-md">
+        </div>
+      <% else %>
+        <div class="mb-4 text-center">
+          <img src="" alt="アルバム画像" class="w-64 h-64 object-cover mx-auto opacity-50">
+        </div>
+      <% end %>
+
+      <div class="text-center">
+        <audio controls class="w-full">
+          <% if @journal.preview_url.present? %>
+            <source src="<%= @journal.preview_url %>" type="audio/mpeg">
+          <% end %>
+          お使いのブラウザは音声プレビューをサポートしていません。
+        </audio>
+      </div>
+    </div>
+
+    <!-- メモ表示 -->
+    <div>
+      <h2 class="text-md font-medium text-gray-700 mb-2">一言メモ</h2>
+      <p class="text-md text-gray-800 bg-gray-50 p-4 rounded-md shadow-inner">
+        <%= @journal.content %>
       </p>
     </div>
 
-    <!-- 曲情報表示 -->
-    <div class="form-control mb-4">
-      <h2 class="label text-sm font-semibold">アーティスト名</h2>
-      <p class="input input-bordered text-sm bg-gray-100 p-2"><%= @journal.artist_name %></p>
-    </div>
-    <div class="form-control mb-4">
-      <h2 class="label text-sm font-semibold">曲名</h2>
-      <p class="input input-bordered text-sm bg-gray-100 p-2"><%= @journal.song_name %></p>
+    <!-- 感情表示 -->
+    <div>
+      <h2 class="text-md font-medium text-gray-700 mb-2">感情</h2>
+      <p class="text-md text-gray-800 bg-gray-50 p-2 rounded-md shadow-inner">
+        <%= case @journal.emotion
+            when "喜" then "喜び"
+            when "怒" then "怒り"
+            when "哀" then "悲しみ"
+            when "楽" then "楽しさ"
+            else "未設定"
+          end %>
+      </p>
     </div>
 
     <!-- アクションボタン -->
     <div class="flex justify-between mt-6">
-      <a href="<%= edit_journal_path(@journal) %>" class="btn btn-secondary text-sm">編集</a>
-     <%= button_to "削除", journal_path(@journal), method: :delete, data: { confirm: "本当に削除しますか？" }, class: "px-6 py-2 bg-red-500 text-white font-medium rounded shadow-md hover:bg-red-600" %>
+      <%= link_to "編集", edit_journal_path(@journal), class: "btn btn-secondary text-sm" %>
+      <%= button_to "削除", journal_path(@journal), method: :delete, data: { confirm: "本当に削除しますか？" }, class: "btn btn-danger text-sm" %>
     </div>
 
     <!-- 戻るボタン -->
-    <div class="mt-4 text-center">
-      <a href="<%= journals_path %>" class="text-blue-500 hover:underline text-sm">← 日記一覧に戻る</a>
+    <div class="text-center mt-4">
+      <%= link_to "← 日記一覧に戻る", journals_path, class: "text-blue-500 hover:underline text-sm" %>
     </div>
   </div>
 </div>
