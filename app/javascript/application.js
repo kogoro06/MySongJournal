@@ -1,7 +1,7 @@
 // Entry point for the build script in your package.json
 import "@hotwired/turbo-rails"
 import "./controllers"
-import './controllers/modal';
+import { initializeButtonsAndModal } from "./controllers/modal";
 import "./controllers/search";
 import "./controllers/search_conditions";
 

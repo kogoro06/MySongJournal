@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
   get "spotify/search", to: "spotify#search", as: :spotify_search
+  get 'spotify/results', to: 'spotify#results', as: 'spotify_results'
   post "spotify/select_tracks", to: "spotify#select_tracks", as: :select_tracks
 
   # Defines the root path route ("/")

@@ -1,0 +1,42 @@
+<!-- 📊 検索結果エリア -->
+<h3 class="text-lg font-medium text-white mb-4 text-center">🎧 検索結果</h3>
+
+<!-- 検索フォーム -->
+<div class="p-6 rounded-lg shadow-md mb-8">
+  <%= render 'spotify/search' %>
+</div>
+
+<% if @tracks.present? %>
+  <div class="p-6 bg-gray-800 rounded-lg shadow-md">
+    <ul class="space-y-4">
+      <% @tracks.each do |track| %>
+        <li class="p-4 border border-gray-600 rounded-md bg-gray-700 flex flex-col md:flex-row md:items-center md:gap-4">
+          <div class="flex-1">
+            <p><strong>🎵 曲名:</strong> <%= track[:song_name] %></p>
+            <p><strong>🎤 アーティスト:</strong> <%= track[:artist_name] %></p>
+            <% if track[:album_image].present? %>
+              <img src="<%= track[:album_image] %>" alt="アルバム画像" class="mt-2 w-24 h-24 object-cover rounded-md">
+            <% end %>
+          </div>
+          <% if track[:preview_url].present? %>
+            <div class="mt-4 md:mt-0 md:w-1/3">
+              <audio controls class="w-full">
+                <source src="<%= track[:preview_url] %>" type="audio/mpeg">
+              </audio>
+            </div>
+          <% end %>
+          <div class="mt-4 md:mt-0">
+            <%= button_to "🎯 この曲を選択", select_tracks_path(selected_track: track.to_json), method: :post, remote: true, class: "px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-center" %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% else %>
+  <p class="text-white text-center">🔍 検索結果が見つかりませんでした。</p>
+<% end %>
+
+<!-- 🔄 検索フォームに戻るリンク -->
+<div class="text-center mt-6">
+  <%= link_to "📓 日記作成ページに戻る", new_journal_path, class: "px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600" %>
+</div>
