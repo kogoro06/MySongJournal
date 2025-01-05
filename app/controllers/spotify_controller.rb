@@ -6,31 +6,41 @@ class SpotifyController < ApplicationController
   def search
     @tracks = []
     query_parts = []
-
+  
     # ✅ 初期検索条件の追加
     if params[:initial_search_type].present? && params[:initial_query].present?
-      query_parts << "#{params[:initial_search_type]}:#{params[:initial_query]}"
+      if params[:initial_search_type] == 'keyword'
+        query_parts << "#{params[:initial_query]}"
+      else
+        query_parts << "#{params[:initial_search_type]}:#{params[:initial_query]}"
+      end
     else
       flash.now[:alert] = "検索タイプとキーワードを入力してください。"
       return render partial: "spotify/search", locals: { tracks: [] }
     end
-
+  
     # ✅ 追加検索条件の追加
     if params[:search_conditions].present? && params[:search_values].present?
       params[:search_conditions].zip(params[:search_values]).each do |condition, value|
-        query_parts << "#{condition}:#{value}" if condition.present? && value.present?
+        if condition.present? && value.present?
+          if condition == 'keyword'
+            query_parts << "#{value}"
+          else
+            query_parts << "#{condition}:#{value}"
+          end
+        end
       end
     end
-
+  
     # ✅ 検索クエリの生成
     query_string = query_parts.join(" ")
     Rails.logger.debug "🔍 Spotify API Query: #{query_string}"
-
+  
     if query_string.blank?
       flash.now[:alert] = "検索条件が無効です。"
       return render partial: "spotify/search", locals: { tracks: [] }
     end
-
+  
     # ✅ Spotify APIリクエスト
     begin
       results = RSpotify::Track.search(query_string, market: "JP")
@@ -49,9 +59,9 @@ class SpotifyController < ApplicationController
       Rails.logger.error "🚨 Unexpected Error: #{e.message}"
       flash.now[:alert] = "予期しないエラーが発生しました。"
     end
-
+  
     respond_to do |format|
-      format.html { render  "spotify/results", locals: { tracks: @tracks } }
+      format.html { render "spotify/results", locals: { tracks: @tracks } }
       format.turbo_stream { render "spotify/results", locals: { tracks: @tracks } }
     end
   end
