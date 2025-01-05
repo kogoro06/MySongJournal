@@ -15,7 +15,7 @@ function initializeSearchConditions() {
         <option value="">--条件を選択--</option>
         <option value="track">曲名</option>
         <option value="artist">アーティスト名</option>
-        <option value="album">アルバム名</option>
+        <option value="keyword">キーワード</option>
       </select>
       <input type="text" name="search_values[]" placeholder="キーワードを入力"
         class="block w-2/3 px-4 py-2 border rounded-md text-white bg-gray-700">
