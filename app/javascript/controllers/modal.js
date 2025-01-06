@@ -3,12 +3,6 @@ function openSpotifyModal() {
   const spotifyModal = document.getElementById('spotify-modal');
   const modalContent = document.getElementById('spotify-modal-content');
 
-  if (!spotifyModal || !modalContent) {
-    console.warn('⚠️ モーダル要素が見つかりません。IDを確認してください。');
-    return;
-  }
-
-  console.log('🎵 モーダルを開きます');
   spotifyModal.showModal();
 
   fetch('/spotify/search', {
@@ -24,7 +18,6 @@ function openSpotifyModal() {
       modalContent.innerHTML = html;
     })
     .catch(error => {
-      console.error('🔴 モーダル内の検索フォーム読み込みエラー:', error.message);
       modalContent.innerHTML = '<p class="text-red-500">検索フォームの読み込みに失敗しました。</p>';
     });
 }
@@ -41,7 +34,6 @@ function initializeModal() {
 
   if (spotifyModal) {
     spotifyModal.addEventListener('close', () => {
-      console.log('🎵 モーダルを閉じます');
       modalContent.innerHTML = '';
     });
   }

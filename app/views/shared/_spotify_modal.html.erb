@@ -1,8 +1,10 @@
 <dialog id="spotify-modal" class="modal">
   <div class="modal-box relative bg-customblue text-white">
     <form method="dialog">
-      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-white">✕</button>
+      <button id="close-search-modal" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-white">✕</button>
     </form>
-    <div id="spotify-modal-content" class="mt-4 text-white"></div>
+    <div id="spotify-modal-content" class="mt-4 text-white">
+      <%= render 'spotify/search' %>
+    </div>
   </div>
 </dialog>

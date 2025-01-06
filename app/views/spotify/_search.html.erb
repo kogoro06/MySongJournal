@@ -1,33 +1,35 @@
 <!-- 🎵 Spotify 曲検索 -->
 <h2 class="text-xl font-bold mb-6 text-white text-center">🎵 Spotify 曲検索</h2>
 
-<div class="p-6 rounded-lg bg-customblue ">
+<div class="p-6 rounded-lg bg-customblue">
   <%= form_with url: spotify_search_path, method: :get, local: false, remote: true, id: "spotify-search-form" do |f| %>
-    <!-- 🔍 検索タイプ -->
-    <div class="mb-4">
-      <%= f.label :initial_search_type, "🔍 検索タイプ", class: "block text-sm font-medium text-white mb-2" %>
-      <%= f.select :initial_search_type, 
-            [["曲名", "track"], ["アーティスト名", "artist"], ["キーワード", "keyword"]],
-            { prompt: "検索タイプを選択" },
-            { id: "initial-search-type",
-              class: "block w-full px-4 py-2 border border-gray-400 rounded-md text-white bg-gray-700 focus:ring-blue-500 focus:border-blue-500" } %>
+    <!-- 🔍 初回検索条件 -->
+    <div id="search-conditions">
+      <div class="search-condition mt-4" data-condition-id="initial">
+        <div class="mb-4">
+          <%= f.label :initial_search_type, "🔍 検索タイプ", class: "block text-sm font-medium text-white mb-2" %>
+          <%= f.select :initial_search_type, 
+                [["曲名", "track"], ["アーティスト名", "artist"], ["キーワード", "keyword"]],
+                { prompt: "検索タイプを選択" },
+                { id: "initial-search-type",
+                  class: "condition-select block w-full px-4 py-2 border border-gray-400 rounded-md text-white bg-gray-700 focus:ring-blue-500 focus:border-blue-500" } %>
+        </div>
+        <div class="mb-6">
+          <%= f.label :initial_query, "📝 検索キーワード", class: "block text-sm font-medium text-white mb-2" %>
+          <%= f.text_field :initial_query, placeholder: "キーワードを入力", id: "initial-query", 
+                class: "condition-input block w-full px-4 py-2 border border-gray-400 rounded-md text-white bg-gray-700 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500" %>
+        </div>
+      </div>
     </div>
 
-    <!-- 📝 検索キーワード -->
-    <div class="mb-6">
-      <%= f.label :initial_query, "📝 検索キーワード", class: "block text-sm font-medium text-white mb-2" %>
-      <%= f.text_field :initial_query, placeholder: "キーワードを入力", id: "initial-query", 
-            class: "block w-full px-4 py-2 border border-gray-400 rounded-md text-white bg-gray-700 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500" %>
-    </div>
-
-    <!-- ➕ 検索条件の追加・削除 -->
-    <div id="search-conditions" class="space-y-4 mb-4"></div>
-
-    <div class="flex gap-4 mb-6">
-      <button type="button" id="add-condition-btn" class="flex-1 px-4 py-2 bg-green-500 text-white font-medium rounded hover:bg-green-600 text-center">
+    <!-- ➕ 検索条件の追加・削除ボタン -->
+    <div class="flex gap-4 mt-4 mb-6">
+      <button type="button" id="add-condition-btn" 
+        class="flex-1 px-4 py-2 bg-green-500 text-white font-medium rounded hover:bg-green-600 text-center">
         ➕ 検索条件を追加
       </button>
-      <button type="button" id="remove-condition-btn" class="flex-1 px-4 py-2 bg-red-500 text-white font-medium rounded hover:bg-red-600 text-center">
+      <button type="button" id="remove-condition-btn" 
+        class="flex-1 px-4 py-2 bg-red-500 text-white font-medium rounded hover:bg-red-600 text-center">
         ➖ 検索条件を削除
       </button>
     </div>
