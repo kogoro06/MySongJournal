@@ -1,4 +1,4 @@
-// 🎯 検索条件の初期化と動的追加・削除
+// ✅ 検索条件の初期化と動的追加・削除
 export function initializeSearchConditions() {
   console.log('✅ 検索条件の初期化開始');
 
@@ -6,33 +6,44 @@ export function initializeSearchConditions() {
   const addConditionBtn = document.getElementById('add-condition-btn');
   const removeConditionBtn = document.getElementById('remove-condition-btn');
   const searchForm = document.getElementById('spotify-search-form');
-  const initialSearchType = document.getElementById('initial-search-type');
-  const initialQuery = document.getElementById('initial-query');
+  let conditionId = 0; // 条件IDのカウンター
+  const MAX_CONDITIONS = 2; // 初期条件 + 追加2つ
 
-  let conditionId = 0; // 初期条件は非表示なので0から開始
-  const MAX_CONDITIONS = 3; // 初期条件 + 追加2つ
-
-  if (!searchConditionsContainer || !addConditionBtn || !removeConditionBtn || !searchForm || !initialSearchType || !initialQuery) {
+  if (!searchConditionsContainer || !addConditionBtn || !removeConditionBtn || !searchForm) {
     console.warn('⚠️ 検索条件関連の要素が見つかりません。');
     return;
   }
 
+  // ✅ conditionId を動的に再計算する関数
+  function getNextConditionId() {
+    const conditions = searchConditionsContainer.querySelectorAll('.search-condition');
+    const ids = Array.from(conditions).map((condition) => parseInt(condition.dataset.conditionId, 10) || 0);
+    return Math.max(0, ...ids) + 1;
+  }
+
   // ✅ 検索条件テンプレート
-  const conditionTemplate = (id) => `
+  const conditionTemplate = (id, searchType = '', queryValue = '') => `
     <div class="search-condition mt-4" data-condition-id="${id}">
       <div class="mb-4">
         <label class="block text-sm font-medium text-white mb-2">🔍 検索タイプ</label>
-        <select name="search_conditions[]" class="condition-select block w-full px-4 py-2 border border-gray-400 rounded-md text-white bg-gray-700">
+        <select name="search_conditions[]" class="condition-select block w-full px-4 py-2 border rounded-md text-white bg-gray-700" data-condition-id="${id}">
           <option value="">検索タイプを選択</option>
-          <option value="track">曲名</option>
-          <option value="artist">アーティスト名</option>
-          <option value="keyword">キーワード</option>
+          <option value="track" ${searchType === 'track' ? 'selected' : ''}>曲名</option>
+          <option value="artist" ${searchType === 'artist' ? 'selected' : ''}>アーティスト名</option>
+          <option value="keyword" ${searchType === 'keyword' ? 'selected' : ''}>キーワード</option>
+          <option value="year" ${searchType === 'year' ? 'selected' : ''}>年代</option>
         </select>
       </div>
-      <div class="mb-6">
-        <label class="block text-sm font-medium text-white mb-2">📝 検索キーワード</label>
-        <input type="text" name="search_values[]" placeholder="キーワードを入力"
-          class="condition-input block w-full px-4 py-2 border border-gray-400 rounded-md text-white bg-gray-700">
+      <div class="mb-6" id="query-container-${id}">
+        ${
+          searchType === 'year'
+            ? `<select name="search_values[]" class="condition-select block w-full px-4 py-2 border rounded-md text-white bg-gray-700">
+                <option value="">年代を選択</option>
+                ${Array.from({ length: 26 }, (_, i) => `<option value="${2000 + i}" ${queryValue === String(2000 + i) ? 'selected' : ''}>${2000 + i}</option>`).join('')}
+              </select>`
+            : `<input type="text" name="search_values[]" value="${queryValue}" placeholder="キーワードを入力"
+                class="condition-input block w-full px-4 py-2 border rounded-md text-white bg-gray-700">`
+        }
       </div>
     </div>
   `;
@@ -40,58 +51,64 @@ export function initializeSearchConditions() {
   // ✅ ボタン状態を更新
   function updateButtonStates() {
     const conditionCount = searchConditionsContainer.querySelectorAll('.search-condition').length;
-    addConditionBtn.disabled = conditionCount >= MAX_CONDITIONS; // 最大数
-    removeConditionBtn.disabled = conditionCount <= 1; // 最小数（1セット以上）
+    addConditionBtn.disabled = conditionCount >= MAX_CONDITIONS;
+    removeConditionBtn.disabled = conditionCount <= 1;
     console.log(`🔄 現在の条件数: ${conditionCount}`);
   }
 
+  // ✅ 検索タイプ変更時の処理
+  function attachConditionListeners(id) {
+    const searchType = document.querySelector(`[data-condition-id="${id}"] .condition-select`);
+    const queryContainer = document.getElementById(`query-container-${id}`);
+
+    if (!searchType || !queryContainer) {
+      console.warn(`⚠️ 検索タイプまたは検索フィールドコンテナが見つかりません。ID: ${id}`);
+      return;
+    }
+
+    searchType.addEventListener('change', () => {
+      const currentQueryValue = queryContainer.querySelector('input, select')?.value || '';
+      if (searchType.value === 'year') {
+        queryContainer.innerHTML = `
+          <select name="search_values[]" class="condition-select block w-full px-4 py-2 border rounded-md text-white bg-gray-700">
+            <option value="">年代を選択</option>
+            ${Array.from({ length: 26 }, (_, i) => `<option value="${2000 + i}" ${currentQueryValue === String(2000 + i) ? 'selected' : ''}>${2000 + i}</option>`).join('')}
+          </select>
+        `;
+      } else {
+        queryContainer.innerHTML = `
+          <input type="text" name="search_values[]" value="${currentQueryValue}" placeholder="キーワードを入力"
+            class="condition-input block w-full px-4 py-2 border rounded-md text-white bg-gray-700">
+        `;
+      }
+    });
+  }
+
   // ✅ 検索条件追加
-  if (!addConditionBtn.hasAttribute('data-listener')) {
-    addConditionBtn.addEventListener('click', () => {
-      if (searchConditionsContainer.querySelectorAll('.search-condition').length < MAX_CONDITIONS) {
-        conditionId += 1;
-        searchConditionsContainer.insertAdjacentHTML('beforeend', conditionTemplate(conditionId));
-        updateButtonStates();
-        console.log(`🟢 検索条件${conditionId}が追加されました`);
-      }
-    });
-    addConditionBtn.setAttribute('data-listener', 'true');
-  }
-
-  // ✅ 検索条件削除
-  if (!removeConditionBtn.hasAttribute('data-listener')) {
-    removeConditionBtn.addEventListener('click', () => {
-      const conditions = searchConditionsContainer.querySelectorAll('.search-condition');
-      if (conditions.length >= 1) {
-        conditions[conditions.length - 1].remove();
-        updateButtonStates();
-        console.log('🗑️ 最後の検索条件が削除されました。');
-      }
-    });
-    removeConditionBtn.setAttribute('data-listener', 'true');
-  }
-
-  // ✅ 検索バリデーション
-  searchForm.addEventListener('submit', (event) => {
-    const errors = [];
-
-    // 初期条件のバリデーション
-    if (!initialSearchType.value.trim()) {
-      errors.push('⚠️ 検索タイプが選択されていません。');
-    }
-    if (!initialQuery.value.trim()) {
-      errors.push('⚠️ 検索キーワードが入力されていません。');
-    }
-
-    // エラー表示と送信ブロック
-    if (errors.length > 0) {
-      event.preventDefault(); // ページ遷移をブロック
-      alert(errors.join('\n'));
-      console.warn('❌ 検索バリデーションエラー:', errors);
+  addConditionBtn.addEventListener('click', () => {
+    if (searchConditionsContainer.querySelectorAll('.search-condition').length < MAX_CONDITIONS) {
+      const id = getNextConditionId();
+      searchConditionsContainer.insertAdjacentHTML('beforeend', conditionTemplate(id));
+      attachConditionListeners(id);
+      updateButtonStates();
+      console.log(`🟢 検索条件${id}が追加されました`);
     }
   });
 
-  // 初期状態を設定
+  // ✅ 検索条件削除
+  removeConditionBtn.addEventListener('click', () => {
+    const conditions = searchConditionsContainer.querySelectorAll('.search-condition');
+    if (conditions.length > 1) {
+      conditions[conditions.length - 1].remove();
+      updateButtonStates();
+      console.log('🗑️ 最後の検索条件が削除されました。');
+    }
+  });
+
+  // ✅ 初期条件にリスナーを適用
+  attachConditionListeners('initial');
+
+  // ✅ 初期状態を設定
   updateButtonStates();
 }
 
@@ -102,4 +119,5 @@ function initializeSpotifySearch() {
 
 // ✅ TurboとDOMContentLoadedで初期化
 document.addEventListener('turbo:load', initializeSpotifySearch);
+document.addEventListener('turbo:render', initializeSpotifySearch);
 document.addEventListener('DOMContentLoaded', initializeSpotifySearch);
