@@ -16,6 +16,14 @@ function openSpotifyModal() {
     })
     .then(html => {
       modalContent.innerHTML = html;
+      // 動的インポートで関数を読み込み、実行
+      import('./spotify_search.js')
+        .then(module => {
+          module.initializeSearchConditions(); // 読み込んだ関数を実行
+        })
+        .catch(error => {
+          console.error('モジュールの読み込みに失敗しました:', error);
+        });
     })
     .catch(error => {
       modalContent.innerHTML = '<p class="text-red-500">検索フォームの読み込みに失敗しました。</p>';

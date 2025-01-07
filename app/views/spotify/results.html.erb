@@ -1,16 +1,22 @@
+
 <!-- 📊 検索結果エリア -->
-<h3 class="text-lg font-medium text-white mb-4 text-center">🎧 検索結果</h3>
+ <h2 class="text-xl font-bold my-6  text-white text-center flex items-center justify-center gap-2">
+    <%= image_tag 'spotify.png', alt: 'Spotify Logo', class: 'inline h-6 w-6' %>
+    検索結果
+  </h2>
 
 <% if @tracks.present? %>
-  <div class="p-6 bg-gray-800 rounded-lg shadow-md">
-    <ul class="space-y-4">
+  <div class="p-6 rounded-lg">
+    <ul class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <% @tracks.each do |track| %>
-        <li class="p-4 border border-gray-600 rounded-md bg-gray-700 flex flex-col md:flex-row md:items-center md:gap-4">
-          <div class="flex-1">
+        <li class="p-4 border border-gray-600 rounded-md bg-gray-700 font-bold  flex-row grid grid-cols-3 md:flex-row md:items-center md:gap-6">
+          <div class="flex-1 text-center font-bold ">
             <p><strong>🎵 曲名:</strong> <%= track[:song_name] %></p>
             <p><strong>🎤 アーティスト:</strong> <%= track[:artist_name] %></p>
+          </div>
+          <div class="flex justify-center">
             <% if track[:album_image].present? %>
-              <img src="<%= track[:album_image] %>" alt="アルバム画像" class="mt-2 w-24 h-24 object-cover rounded-md">
+              <img src="<%= track[:album_image] %>" alt="アルバム画像" class="mt-2 w-24 h-24 object-cover rounded-md items-center">
             <% end %>
           </div>
           <% if track[:preview_url].present? %>
@@ -20,7 +26,7 @@
               </audio>
             </div>
           <% end %>
-          <div class="mt-4 md:mt-0">
+          <div class="mt-4 md:mt-0 text-center font-bold">
             <%= button_to "🎯 この曲を選択", select_tracks_path(selected_track: track.to_json), method: :post, remote: true, class: "px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-center" %>
           </div>
         </li>
@@ -31,45 +37,6 @@
   <p class="text-white text-center">🔍 検索結果が見つかりませんでした。</p>
 <% end %>
 
-<!-- 検索フォーム -->
-<div class="p-6 rounded-lg shadow-md mb-8">
-  <div class="p-6 rounded-lg bg-customblue ">
-    <%= form_with url: spotify_search_path, method: :get, local: false, remote: true, id: "spotify-search-form" do |f| %>
-      <h2 class="text-xl font-bold mb-6 text-white text-center">🎵 再検索フォームはこちら</h2>
-      <h3 class="text-xl mb-6 text-white text-center">検索条件は２つまで追加できます</h3>
-      <!-- 🔍 検索タイプ -->
-      <div class="mb-4" id="search_form">
-        <%= f.label :initial_search_type, "🔍 検索タイプ", class: "block text-sm font-medium text-white mb-2" %>
-        <%= f.select :initial_search_type, 
-              [["曲名", "track"], ["アーティスト名", "artist"], ["キーワード", "keyword"]],
-              { prompt: "検索タイプを選択" },
-              { id: "initial-search-type",
-                class: "block w-full px-4 py-2 border border-gray-400 rounded-md text-white bg-gray-700 focus:ring-blue-500 focus:border-blue-500" } %>
-      </div>
-
-      <!-- 📝 検索キーワード -->
-      <div class="mb-6">
-        <%= f.label :initial_query, "📝 検索キーワード", class: "block text-sm font-medium text-white mb-2" %>
-        <%= f.text_field :initial_query, placeholder: "キーワードを入力", id: "initial-query", 
-              class: "block w-full px-4 py-2 border border-gray-400 rounded-md text-white bg-gray-700 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500" %>
-      </div>
-
-      <!-- ➕ 検索条件の追加・削除 -->
-      <div id="search-conditions" class="space-y-4 mb-4"></div>
-
-      <div class="flex gap-4 mb-6">
-        <button type="button" id="add-condition-btn" class="flex-1 px-4 py-2 bg-green-500 text-white font-medium rounded hover:bg-green-600 text-center">
-          ➕ 検索条件を追加
-        </button>
-        <button type="button" id="remove-condition-btn" class="flex-1 px-4 py-2 bg-red-500 text-white font-medium rounded hover:bg-red-600 text-center">
-          ➖ 検索条件を削除
-        </button>
-      </div>
-
-      <!-- 🔎 検索ボタン -->
-      <div class="text-center mb-4">
-        <%= f.submit "🔎 検索", class: "w-full px-4 py-2 bg-blue-500 text-white font-medium rounded hover:bg-blue-600 text-center" %>
-      </div>
-    <% end %>
+  <div class="p-6">
+    <%= render partial: 'spotify/search' %>
   </div>
-</div>

@@ -1,12 +1,12 @@
 // 🎯 検索条件の初期化と動的追加・削除
-function initializeSearchConditions() {
+export function initializeSearchConditions() {
   console.log('✅ 検索条件の初期化開始');
 
   const searchConditionsContainer = document.getElementById('search-conditions');
   const addConditionBtn = document.getElementById('add-condition-btn');
   const removeConditionBtn = document.getElementById('remove-condition-btn');
   let conditionId = 0; // 初期条件は非表示なので0から開始
-  const MAX_CONDITIONS = 2; // 初期条件 + 追加2つ
+  const MAX_CONDITIONS = 3; // 初期条件 + 追加2つ
 
   if (!searchConditionsContainer || !addConditionBtn || !removeConditionBtn) {
     console.warn('⚠️ 検索条件関連の要素が見つかりません。');
@@ -37,7 +37,7 @@ function initializeSearchConditions() {
   function updateButtonStates() {
     const conditionCount = searchConditionsContainer.querySelectorAll('.search-condition').length;
     addConditionBtn.disabled = conditionCount >= MAX_CONDITIONS; // 最大数
-    removeConditionBtn.disabled = conditionCount <= 0; // 最小数（1セット以上）
+    removeConditionBtn.disabled = conditionCount <= 1; // 最小数（1セット以上）
     console.log(`🔄 現在の条件数: ${conditionCount}`);
   }
 
@@ -58,7 +58,7 @@ function initializeSearchConditions() {
   if (!removeConditionBtn.hasAttribute('data-listener')) {
     removeConditionBtn.addEventListener('click', () => {
       const conditions = searchConditionsContainer.querySelectorAll('.search-condition');
-      if (conditions.length > 0) {
+      if (conditions.length >= 1) {
         conditions[conditions.length - 1].remove();
         updateButtonStates();
         console.log('🗑️ 最後の検索条件が削除されました。');
@@ -71,7 +71,7 @@ function initializeSearchConditions() {
   updateButtonStates();
 }
 
-// ✅ 初期化関数
+// ✅ 初期化関数// ✅ 初期化関数
 function initializeSpotifySearch() {
   initializeSearchConditions();
 }

@@ -63,17 +63,15 @@
           </div>
         </div>
       <% end %>
-
-      <!-- モーダルボタン -->
-      <div class="flex gap-4 mt-6 id="initi>
-        <button type="button" id="open-search-modal" class="btn btn-secondary w-full">
-          曲を選ぶ
-        </button>
-        <button type="button" id="reopen-search-modal" class="btn btn-secondary w-1/2 hidden">
-          曲を選びなおす
-        </button>
-      </div>
-
+    <!-- モーダルボタン -->
+    <div class="flex gap-4 mt-6">
+      <button type="button" id="open-search-modal" class="btn btn-secondary w-full">
+        曲を選ぶ
+      </button>
+      <button type="button" id="reopen-search-modal" class="btn btn-secondary w-1/2 hidden">
+        曲を選びなおす
+      </button>
+    </div>
       <!-- 隠しフィールドで曲情報を送信 -->
       <%= form.hidden_field :song_name, value: @journal.song_name %>
       <%= form.hidden_field :artist_name, value: @journal.artist_name %>
