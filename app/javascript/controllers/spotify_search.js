@@ -5,10 +5,14 @@ export function initializeSearchConditions() {
   const searchConditionsContainer = document.getElementById('search-conditions');
   const addConditionBtn = document.getElementById('add-condition-btn');
   const removeConditionBtn = document.getElementById('remove-condition-btn');
+  const searchForm = document.getElementById('spotify-search-form');
+  const initialSearchType = document.getElementById('initial-search-type');
+  const initialQuery = document.getElementById('initial-query');
+
   let conditionId = 0; // 初期条件は非表示なので0から開始
   const MAX_CONDITIONS = 3; // 初期条件 + 追加2つ
 
-  if (!searchConditionsContainer || !addConditionBtn || !removeConditionBtn) {
+  if (!searchConditionsContainer || !addConditionBtn || !removeConditionBtn || !searchForm || !initialSearchType || !initialQuery) {
     console.warn('⚠️ 検索条件関連の要素が見つかりません。');
     return;
   }
@@ -67,11 +71,31 @@ export function initializeSearchConditions() {
     removeConditionBtn.setAttribute('data-listener', 'true');
   }
 
+  // ✅ 検索バリデーション
+  searchForm.addEventListener('submit', (event) => {
+    const errors = [];
+
+    // 初期条件のバリデーション
+    if (!initialSearchType.value.trim()) {
+      errors.push('⚠️ 検索タイプが選択されていません。');
+    }
+    if (!initialQuery.value.trim()) {
+      errors.push('⚠️ 検索キーワードが入力されていません。');
+    }
+
+    // エラー表示と送信ブロック
+    if (errors.length > 0) {
+      event.preventDefault(); // ページ遷移をブロック
+      alert(errors.join('\n'));
+      console.warn('❌ 検索バリデーションエラー:', errors);
+    }
+  });
+
   // 初期状態を設定
   updateButtonStates();
 }
 
-// ✅ 初期化関数// ✅ 初期化関数
+// ✅ 初期化関数
 function initializeSpotifySearch() {
   initializeSearchConditions();
 }
