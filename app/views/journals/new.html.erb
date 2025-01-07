@@ -79,16 +79,16 @@
       <%= form.hidden_field :preview_url, value: @journal.preview_url %>
       <%= form.hidden_field :spotify_track_id, value: @journal.spotify_track_id %>
 
-      <!-- メモ入力 -->
-      <div>
-        <%= form.label :content, "一言メモ", class: "block text-md font-medium text-gray-700 mb-2" %>
-        <%= form.text_area :content, required: true, placeholder: "今日の出来事や気持ちを記入", class: "textarea textarea-bordered w-full px-4 py-2" %>
-      </div>
-
-      <!-- 感情入力 -->
+          <!-- 感情入力 -->
       <div>
         <%= form.label :emotion, "感情", class: "block text-md font-medium text-gray-700 mb-2" %>
         <%= form.select :emotion, options_for_select([["喜", 0], ["怒", 1], ["哀", 2], ["楽", 3]], @journal.emotion), { prompt: "選択してください" }, class: "select select-bordered w-full px-4 py-2" %>
+      </div>
+
+      <!-- メモ入力 -->
+      <div>
+        <%= form.label :content, "本文", class: "block text-md font-medium text-gray-700 mb-2" %>
+        <%= form.text_area :content, required: true, placeholder: "今日の出来事や気持ちを記入", class: "textarea textarea-bordered w-full px-4 py-2" %>
       </div>
 
       <!-- 保存ボタン -->

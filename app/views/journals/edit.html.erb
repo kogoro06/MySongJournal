@@ -1,27 +1,30 @@
+<!-- 📖 日記フォーム -->
 <div class="min-h-screen bg-customred text-white flex items-center justify-center py-10">
   <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl space-y-6">
     <%= form_with(model: @journal, local: false, id: "journal-form", class: "space-y-6") do |form| %>
       
-      <!-- 日付表示 -->
+      <!-- 📅 日付表示 -->
       <div class="text-center mb-4">
-        <span class="text-xl font-semibold text-gray-700"><%= Time.now.strftime('%Y年%m月%d日') %></span>
+        <span class="text-xl font-semibold text-gray-700">
+          <%= Time.now.strftime('%Y年%m月%d日') %>
+        </span>
       </div>
 
-      <!-- タイトル入力 -->
+      <!-- 📝 タイトル入力 -->
       <div>
-        <%= form.label :title, "日記タイトル", class: "block text-xl text-gray-700 mb-2" %>
-        <%= form.text_field :title, required: true, placeholder: "タイトルを入力", class: "input input-bordered w-full px-4 py-2" %>
+        <%= form.label :title, "日記タイトル", class: "block text-xl font-medium text-gray-700 mb-2" %>
+        <%= form.text_field :title, required: true, placeholder: "タイトルを入力", class: "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" %>
       </div>
 
-      <!-- 曲情報（選択後のみ表示） -->
+      <!-- 🎼 曲情報（選択後のみ表示） -->
       <% if @journal.song_name.present? || @journal.artist_name.present? || @journal.album_image.present? %>
         <div class="bg-gray-100 p-4 text-center mt-6 rounded-lg shadow-inner">
-          <h2 class="text-xl font-bold text-gray-800 mb-4">選択した曲情報</h2>
+          <h2 class="text-xl font-bold text-gray-800 mb-4">🎵 選択した曲情報</h2>
 
           <% if @journal.artist_name.present? %>
             <div class="mb-2">
               <span id="selected-artist-name" class="block text-lg font-medium text-gray-800">
-                アーティスト: <%= @journal.artist_name %>
+                🎤 アーティスト: <%= @journal.artist_name %>
               </span>
             </div>
           <% end %>
@@ -29,13 +32,13 @@
           <% if @journal.song_name.present? %>
             <div class="mb-2">
               <span id="selected-song-name" class="block text-lg font-medium text-gray-800">
-                曲名: <%= @journal.song_name %>
+                🎵 曲名: <%= @journal.song_name %>
               </span>
             </div>
           <% end %>
 
           <% if @journal.album_image.present? %>
-            <div class="mb-4 text-center">
+            <div class="mb-4">
               <a href="https://open.spotify.com/track/<%= @journal.spotify_track_id %>" target="_blank">
                 <img id="selected-album-image" src="<%= @journal.album_image %>" 
                      alt="アルバム画像" 
@@ -52,8 +55,13 @@
               </audio>
             </div>
           <% end %>
-
-          <!-- Spotifyロゴとリンク -->
+              <!-- 🎯 モーダルボタン -->
+          <div class="flex gap-4 mt-6">
+            <button type="button" id="open-search-modal" class="w-full px-4 py-2 bg-green-500 text-white font-medium rounded-md hover:bg-green-600 transition">
+            🔄 曲を選びなおす
+            </button>
+          </div>
+                  <!-- Spotifyリンク -->
           <div class="flex items-center justify-center mt-4 gap-2">
             <a href="https://open.spotify.com/track/<%= @journal.spotify_track_id %>" target="_blank" class="flex items-center gap-2">
               <%= image_tag 'spotify_logo.png', alt: 'Spotifyロゴ', class: 'h-6 w-auto' %>
@@ -63,39 +71,28 @@
           </div>
         </div>
       <% end %>
-
-      <!-- モーダルボタン -->
-      <div class="flex gap-4 mt-6 id="initi>
-        <button type="button" id="open-search-modal" class="btn btn-secondary w-full">
-          曲を選ぶ
-        </button>
-        <button type="button" id="reopen-search-modal" class="btn btn-secondary w-1/2 hidden">
-          曲を選びなおす
-        </button>
-      </div>
-
-      <!-- 隠しフィールドで曲情報を送信 -->
+      <!-- 🎼 隠しフィールドで曲情報を送信 -->
       <%= form.hidden_field :song_name, value: @journal.song_name %>
       <%= form.hidden_field :artist_name, value: @journal.artist_name %>
       <%= form.hidden_field :album_image, value: @journal.album_image %>
       <%= form.hidden_field :preview_url, value: @journal.preview_url %>
       <%= form.hidden_field :spotify_track_id, value: @journal.spotify_track_id %>
 
-      <!-- メモ入力 -->
-      <div>
-        <%= form.label :content, "一言メモ", class: "block text-md font-medium text-gray-700 mb-2" %>
-        <%= form.text_area :content, required: true, placeholder: "今日の出来事や気持ちを記入", class: "textarea textarea-bordered w-full px-4 py-2" %>
-      </div>
-
-      <!-- 感情入力 -->
+            <!-- 😊 感情入力 -->
       <div>
         <%= form.label :emotion, "感情", class: "block text-md font-medium text-gray-700 mb-2" %>
-        <%= form.select :emotion, options_for_select([["喜", 0], ["怒", 1], ["哀", 2], ["楽", 3]], @journal.emotion), { prompt: "選択してください" }, class: "select select-bordered w-full px-4 py-2" %>
+        <%= form.select :emotion, options_for_select([["喜", 0], ["怒", 1], ["哀", 2], ["楽", 3]], @journal.emotion), { prompt: "選択してください" }, class: "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" %>
       </div>
 
-      <!-- 保存ボタン -->
+      <!-- 📝 メモ入力 -->
+      <div>
+        <%= form.label :content, "本文", class: "block text-md font-medium text-gray-700 mb-2" %>
+        <%= form.text_area :content, required: true, placeholder: "今日の出来事や気持ちを記入", class: "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" %>
+      </div>
+
+      <!-- 💾 保存ボタン -->
       <div class="text-center mt-6">
-        <%= form.submit "日記を保存", class: "btn btn-primary w-full py-2 text-lg" %>
+        <%= form.submit "📥 日記を保存", class: "w-full px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition text-lg" %>
       </div>
     <% end %>
   </div>
