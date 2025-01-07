@@ -1,0 +1,7 @@
+<select name="initial_query" id="initial-query" 
+        class="condition-select block w-full px-4 py-2 border rounded-md text-white bg-gray-700">
+  <option value="">年代を選択</option>
+  <% (1970..2025).each do |year| %>
+    <option value="<%= year %>"><%= year %></option>
+  <% end %>
+</select>

@@ -16,10 +16,20 @@ function openSpotifyModal() {
     })
     .then(html => {
       modalContent.innerHTML = html;
-      // 動的インポートで関数を読み込み、実行
+
+      // 検索条件初期化
       import('./spotify_search.js')
         .then(module => {
-          module.initializeSearchConditions(); // 読み込んだ関数を実行
+          module.initializeSearchConditions();
+        })
+        .catch(error => {
+          console.error('モジュールの読み込みに失敗しました:', error);
+        });
+
+      // 年代トグル初期化
+      import('./spotify_year_toggle.js')
+        .then(module => {
+          module.initializeYearToggle();
         })
         .catch(error => {
           console.error('モジュールの読み込みに失敗しました:', error);
