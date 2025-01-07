@@ -23,6 +23,8 @@ module Myapp
     #
     config.time_zone = "Asia/Tokyo"
     # config.eager_load_paths << Rails.root.join("extras")
+    ENV["SPOTIFY_REDIRECT_URI"] ||= ENV["SPOTIFY_REDIRECT_URI_LOCAL"] if Rails.env.development?
+    ENV["SPOTIFY_REDIRECT_URI"] ||= ENV["SPOTIFY_REDIRECT_URI_PRODUCTION"] if Rails.env.production?
     config.i18n.default_locale = :ja
     config.active_job.queue_adapter = :sidekiq
   end
