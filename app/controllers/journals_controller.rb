@@ -1,7 +1,7 @@
 class JournalsController < ApplicationController
-  before_action :authenticate_user!, except: [:show, :index]
-  before_action :set_journal, only: [:show, :edit, :update, :destroy]
-  before_action :authorize_journal, only: [:edit, :update, :destroy]
+  before_action :authenticate_user!, except: [ :show, :index ]
+  before_action :set_journal, only: [ :show, :edit, :update, :destroy ]
+  before_action :authorize_journal, only: [ :edit, :update, :destroy ]
 
   # 一覧表示
   def index
