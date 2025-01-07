@@ -7,5 +7,5 @@ class Journal < ApplicationRecord
   validates :song_name, presence: true, length: { maximum: 100 }
   validates :artist_name, presence: true, length: { maximum: 100 }
   validates :album_image, presence: true, format: { with: URI.regexp(%w[http https]), message: "must be a valid URL" }
-  validates :preview_url, presence: true, format: { with: URI.regexp(%w[http https]), message: "must be a valid URL", allow_nil: true }
+  validates :preview_url, format: { with: URI.regexp(%w[http https]), message: "must be a valid URL" }, allow_blank: true
 end
