@@ -13,12 +13,12 @@
         <div class="mb-4">
           <%= f.label :initial_search_type, "🔍 検索タイプ", class: "block text-sm font-medium text-white mb-2" %>
           <%= f.select :initial_search_type, 
-                [["曲名", "track"], ["アーティスト名", "artist"], ["キーワード", "keyword"]],
+                [["曲名", "track"], ["アーティスト名", "artist"], ["キーワード", "keyword"],["年代", "year"]],
                 { prompt: "検索タイプを選択" },
                 { id: "initial-search-type",
                   class: "condition-select block w-full px-4 py-2 border border-gray-400 rounded-md text-white bg-gray-700 focus:ring-blue-500 focus:border-blue-500" } %>
         </div>
-        <div class="mb-6">
+        <div class="mb-6" id="initial-query-container">
           <%= f.label :initial_query, "📝 検索キーワード", class: "block text-sm font-medium text-white mb-2" %>
           <%= f.text_field :initial_query, placeholder: "キーワードを入力", id: "initial-query", 
                 class: "condition-input block w-full px-4 py-2 border border-gray-400 rounded-md text-white bg-gray-700 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500" %>
