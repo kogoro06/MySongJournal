@@ -78,26 +78,32 @@ class SpotifyController < ApplicationController
 
   def autocomplete
     query = params[:query]
+    type = params[:type] || "track,artist"
+  
     return render json: [] if query.blank?
   
     begin
+      headers = {
+        Authorization: "Bearer #{fetch_access_token}",
+        "Accept-Language" => "ja"
+      }
+  
       response = RestClient.get(
         "https://api.spotify.com/v1/search",
         {
           params: {
             q: query,
-            type: "track,artist",
+            type: type,
             limit: 10
-          },
-          Authorization: "Bearer #{fetch_access_token}"
-        }
+          }
+        }.merge(headers)
       )
       results = JSON.parse(response.body)
   
       autocomplete_results = []
   
-      # トラック結果
-      if results["tracks"] && results["tracks"]["items"]
+      # 検索タイプに応じて結果を整形
+      if type.include?("track") && results["tracks"] && results["tracks"]["items"]
         autocomplete_results += results["tracks"]["items"].map do |track|
           {
             id: track["id"],
@@ -108,8 +114,7 @@ class SpotifyController < ApplicationController
         end
       end
   
-      # アーティスト結果
-      if results["artists"] && results["artists"]["items"]
+      if type.include?("artist") && results["artists"] && results["artists"]["items"]
         autocomplete_results += results["artists"]["items"].map do |artist|
           {
             id: artist["id"],
@@ -128,7 +133,7 @@ class SpotifyController < ApplicationController
       render json: { error: "予期しないエラーが発生しました: #{e.message}" }, status: :internal_server_error
     end
   end
-
+  
   # 🎯 トラック選択機能
   def select_tracks
     return unless params[:selected_track].present?
