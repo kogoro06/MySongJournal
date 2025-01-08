@@ -24,7 +24,28 @@ function openSpotifyModal() {
 
       // 検索条件初期化
       import('./spotify_search.js')
-        .then(module => module.initializeSearchConditions())
+        .then(module => {
+          module.initializeSearchConditions();
+
+          // 初期化後に再設定が必要な場合、モーダル内でイベントリスナーを再設定
+          const newQueryInput = document.getElementById('initial-query');
+          if (newQueryInput) {
+            newQueryInput.addEventListener('input', function (event) {
+              const query = event.target.value.trim();
+              if (query === '') {
+                autoCompleteList.innerHTML = '';
+                return;
+              }
+              fetch(`/spotify_search?query=${query}`)
+                .then((response) => response.json())
+                .then((data) => {
+                  const suggestions = data.suggestions;
+                  renderSuggestions(suggestions);
+                })
+                .catch((error) => console.error('Error fetching data:', error));
+            });
+          }
+        })
         .catch(error => console.error('検索条件モジュールの読み込みに失敗:', error));
 
       // 年代トグル初期化

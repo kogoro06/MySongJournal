@@ -1,3 +1,5 @@
+import { initializeUserInput } from './user_input'; // user_input.jsをインポート
+
 // ✅ 検索条件の初期化と動的追加・削除
 export function initializeSearchConditions() {
   console.log('✅ 検索条件の初期化開始');
@@ -56,33 +58,36 @@ export function initializeSearchConditions() {
     console.log(`🔄 現在の条件数: ${conditionCount}`);
   }
 
-  // ✅ 検索タイプ変更時の処理
-  function attachConditionListeners(id) {
-    const searchType = document.querySelector(`[data-condition-id="${id}"] .condition-select`);
-    const queryContainer = document.getElementById(`query-container-${id}`);
+// 検索タイプ変更時の処理
+function attachConditionListeners(id) {
+  const searchType = document.querySelector(`[data-condition-id="${id}"] .condition-select`);
+  const queryContainer = document.getElementById(`query-container-${id}`);
 
-    if (!searchType || !queryContainer) {
-      console.warn(`⚠️ 検索タイプまたは検索フィールドコンテナが見つかりません。ID: ${id}`);
-      return;
-    }
-
-    searchType.addEventListener('change', () => {
-      const currentQueryValue = queryContainer.querySelector('input, select')?.value || '';
-      if (searchType.value === 'year') {
-        queryContainer.innerHTML = `
-          <select name="search_values[]" class="condition-select block w-full px-4 py-2 border rounded-md text-white bg-gray-700">
-            <option value="">年代を選択</option>
-            ${Array.from({ length: 26 }, (_, i) => `<option value="${2000 + i}" ${currentQueryValue === String(2000 + i) ? 'selected' : ''}>${2000 + i}</option>`).join('')}
-          </select>
-        `;
-      } else {
-        queryContainer.innerHTML = `
-          <input type="text" name="search_values[]" value="${currentQueryValue}" placeholder="キーワードを入力"
-            class="condition-input block w-full px-4 py-2 border rounded-md text-white bg-gray-700">
-        `;
-      }
-    });
+  if (!searchType || !queryContainer) {
+    console.warn(`⚠️ 検索タイプまたは検索フィールドコンテナが見つかりません。ID: ${id}`);
+    return;
   }
+
+  // 検索タイプが変更されたときに処理
+  searchType.addEventListener('change', () => {
+    const currentQueryValue = queryContainer.querySelector('input, select')?.value || '';
+
+    // 検索タイプに応じて入力フィールドを更新
+    if (searchType.value === 'year') {
+      queryContainer.innerHTML = `
+        <select name="search_values[]" class="condition-select block w-full px-4 py-2 border rounded-md text-white bg-gray-700">
+          <option value="">年代を選択</option>
+          ${Array.from({ length: 26 }, (_, i) => `<option value="${2000 + i}" ${currentQueryValue === String(2000 + i) ? 'selected' : ''}>${2000 + i}</option>`).join('')}
+        </select>
+      `;
+    } else {
+      queryContainer.innerHTML = `
+        <input type="text" name="search_values[]" value="${currentQueryValue}" placeholder="キーワードを入力"
+          class="condition-input block w-full px-4 py-2 border rounded-md text-white bg-gray-700">
+      `;
+    }
+  });
+}
 
   // ✅ 検索条件追加
   addConditionBtn.addEventListener('click', () => {
@@ -121,3 +126,16 @@ function initializeSpotifySearch() {
 document.addEventListener('turbo:load', initializeSpotifySearch);
 document.addEventListener('turbo:render', initializeSpotifySearch);
 document.addEventListener('DOMContentLoaded', initializeSpotifySearch);
+
+// ユーザー入力の初期化
+document.addEventListener('turbo:load', () => {
+  initializeUserInput();
+});
+
+document.addEventListener('turbo:render', () => {
+  initializeUserInput();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  initializeUserInput();
+});
