@@ -76,6 +76,59 @@ class SpotifyController < ApplicationController
     end
   end
 
+  def autocomplete
+    query = params[:query]
+    return render json: [] if query.blank?
+  
+    begin
+      response = RestClient.get(
+        "https://api.spotify.com/v1/search",
+        {
+          params: {
+            q: query,
+            type: "track,artist",
+            limit: 10
+          },
+          Authorization: "Bearer #{fetch_access_token}"
+        }
+      )
+      results = JSON.parse(response.body)
+  
+      autocomplete_results = []
+  
+      # トラック結果
+      if results["tracks"] && results["tracks"]["items"]
+        autocomplete_results += results["tracks"]["items"].map do |track|
+          {
+            id: track["id"],
+            name: track["name"],
+            type: "track",
+            artist: track["artists"].map { |a| a["name"] }.join(", ")
+          }
+        end
+      end
+  
+      # アーティスト結果
+      if results["artists"] && results["artists"]["items"]
+        autocomplete_results += results["artists"]["items"].map do |artist|
+          {
+            id: artist["id"],
+            name: artist["name"],
+            type: "artist"
+          }
+        end
+      end
+  
+      render json: autocomplete_results
+    rescue RestClient::ExceptionWithResponse => e
+      Rails.logger.error "🚨 Spotify Autocomplete API Error: #{e.response}"
+      render json: { error: "Spotify APIエラー: #{e.response}" }, status: :bad_request
+    rescue StandardError => e
+      Rails.logger.error "🚨 Unexpected Error: #{e.message}"
+      render json: { error: "予期しないエラーが発生しました: #{e.message}" }, status: :internal_server_error
+    end
+  end
+
   # 🎯 トラック選択機能
   def select_tracks
     return unless params[:selected_track].present?

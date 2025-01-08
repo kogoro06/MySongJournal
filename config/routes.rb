@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   get "spotify/results", to: "spotify#results", as: "spotify_results"
   post "spotify/select_tracks", to: "spotify#select_tracks", as: :select_tracks
   get "spotify/year_search_template", to: "spotify#year_search_template"
+  get 'spotify/autocomplete', to: 'spotify#autocomplete'
 
   # Defines the root path route ("/")
   root "static_pages#top"
