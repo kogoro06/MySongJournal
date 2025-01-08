@@ -1,5 +1,3 @@
-// app/javascript/controllers/spotify_search.js
-
 /** ✅ 検索条件の初期化 */
 export function initializeSearchConditions() {
   console.log('✅ 検索条件の初期化開始');
