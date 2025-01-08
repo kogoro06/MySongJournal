@@ -20,8 +20,8 @@
         </div>
         <div class="mb-6" id="initial-query-container">
           <%= f.label :initial_query, "📝 検索キーワード", class: "block text-sm font-medium text-white mb-2" %>
-          <%= f.text_field :initial_query, placeholder: "キーワードを入力", id: "initial-query", 
-                class: "condition-input block w-full px-4 py-2 border border-gray-400 rounded-md text-white bg-gray-700 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500" %>
+          <%= f.text_field :initial_query, placeholder: "キーワードを入力", id: "initial-query", class: "condition-input block w-full px-4 py-2 border border-gray-400 rounded-md text-white bg-gray-700 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500" %>
+                <ul id="autoComplete_list" class="list-group"></ul>
         </div>
       </div>
     </div>

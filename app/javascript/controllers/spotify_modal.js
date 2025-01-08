@@ -3,6 +3,11 @@ function openSpotifyModal() {
   const spotifyModal = document.getElementById('spotify-modal');
   const modalContent = document.getElementById('spotify-modal-content');
 
+  if (!spotifyModal || !modalContent) {
+    console.error('⚠️ モーダル要素が見つかりません。');
+    return;
+  }
+
   spotifyModal.showModal();
 
   fetch('/spotify/search', {
@@ -19,24 +24,22 @@ function openSpotifyModal() {
 
       // 検索条件初期化
       import('./spotify_search.js')
-        .then(module => {
-          module.initializeSearchConditions();
-        })
-        .catch(error => {
-          console.error('モジュールの読み込みに失敗しました:', error);
-        });
+        .then(module => module.initializeSearchConditions())
+        .catch(error => console.error('検索条件モジュールの読み込みに失敗:', error));
 
       // 年代トグル初期化
       import('./spotify_year_toggle.js')
-        .then(module => {
-          module.initializeYearToggle();
-        })
-        .catch(error => {
-          console.error('モジュールの読み込みに失敗しました:', error);
-        });
+        .then(module => module.initializeYearToggle())
+        .catch(error => console.error('年代トグルモジュールの読み込みに失敗:', error));
+
+      // オートコンプリート初期化
+      import('./spotify_autocomplete.js')
+        .then(module => module.initializeSpotifyAutocomplete())
+        .catch(error => console.error('オートコンプリートモジュールの読み込みに失敗:', error));
     })
     .catch(error => {
       modalContent.innerHTML = '<p class="text-red-500">検索フォームの読み込みに失敗しました。</p>';
+      console.error('モーダルコンテンツの読み込みエラー:', error);
     });
 }
 
