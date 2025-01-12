@@ -1,0 +1,39 @@
+<!-- 🎵 選択した曲情報 -->
+<div class="bg-gray-100 p-4 text-center mt-6 rounded-lg shadow-inner">
+  <h2 class="text-xl font-bold text-gray-800 mb-4">選択した曲情報</h2>
+
+  <% if journal.artist_name.present? %>
+    <div class="mb-2">
+      <span id="selected-artist-name" class="block text-lg font-medium text-gray-800">
+        アーティスト: <%= journal.artist_name %>
+      </span>
+    </div>
+  <% end %>
+
+  <% if journal.song_name.present? %>
+    <div class="mb-2">
+      <span id="selected-song-name" class="block text-lg font-medium text-gray-800">
+        曲名: <%= journal.song_name %>
+      </span>
+    </div>
+  <% end %>
+
+  <% if journal.album_image.present? %>
+    <div class="mb-4 text-center">
+      <a href="https://open.spotify.com/track/<%= journal.spotify_track_id %>" target="_blank">
+        <img id="selected-album-image" src="<%= journal.album_image %>" 
+             alt="アルバム画像" 
+             class="w-64 h-64 object-cover mx-auto rounded-lg shadow-md">
+      </a>
+    </div>
+  <% end %>
+
+  <% if journal.preview_url.present? %>
+    <div>
+      <audio id="selected-audio" controls class="w-full rounded-lg">
+        <source src="<%= journal.preview_url %>" type="audio/mpeg">
+        お使いのブラウザは音声プレビューをサポートしていません。
+      </audio>
+    </div>
+  <% end %>
+</div>

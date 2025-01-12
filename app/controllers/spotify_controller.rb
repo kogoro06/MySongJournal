@@ -154,6 +154,7 @@ class SpotifyController < ApplicationController
     end
   end
 
+
   def year_search_template
     render partial: "spotify/year_search_template"
   end
