@@ -9,11 +9,11 @@
   <!-- 🔍 検索条件 -->
   <form id="spotify-search-form" action="<%= spotify_search_path %>" method="get" class="space-y-4">
     <div id="search-conditions">
-      <div class="search-condition mt-4" data-condition-id="initial">
+      <!-- 初期検索条件 -->
+      <div class="search-condition mt-4" data-condition-id="0">
         <div class="mb-4">
-          <label for="initial-search-type" class="block text-md font-medium mb-2">🔍 検索タイプ</label>
-          <select name="initial_search_type" id="initial-search-type"
-                  class="select select-bordered w-full px-4 py-2 rounded-md bg-gray-700 text-white">
+          <label for="search-type-0" class="block text-md font-medium mb-2">🔍 検索タイプ</label>
+          <select name="search_conditions[]" id="search-type-0" class="select select-bordered w-full px-4 py-2 rounded-md bg-gray-700 text-white">
             <option value="" selected>検索タイプを選択</option>
             <option value="track">曲名</option>
             <option value="artist">アーティスト名</option>
@@ -21,14 +21,10 @@
             <option value="year">年代</option>
           </select>
         </div>
-        <div class="mb-4">
-          <label for="initial-query" class="block text-md font-medium mb-2">📝 検索キーワード</label>
-          <!-- query-container を追加 -->
-          <div id="query-container-initial">
-            <input type="text" name="initial_query" id="initial-query" placeholder="キーワードを入力"
-                   class="input input-bordered w-full px-4 py-2 rounded-md bg-gray-700 text-white">
-          </div>
-          <ul id="autoComplete_list" class="bg-white text-gray-800 rounded-md shadow-md mt-2 max-h-40 overflow-y-auto"></ul>
+
+        <!-- 動的に切り替わるコンテナ -->
+        <div class="mb-4" id="query-container-0">
+          <input type="text" name="search_values[]" id="initial-query-0" placeholder="キーワードを入力" class="input input-bordered w-full px-4 py-2 rounded-md bg-gray-700 text-white">
         </div>
       </div>
     </div>

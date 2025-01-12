@@ -3,46 +3,58 @@ export function initializeSpotifyAutocomplete() {
   const searchConditionsContainer = document.getElementById('search-conditions');
   const abortControllers = new Map(); // 各フィールドごとのリクエスト管理
 
-  // 🔄 検索条件ごとにイベントを追加
-  function initializeAutoCompleteForField(queryField, typeField) {
-    queryField.addEventListener('input', (event) => {
-      const query = event.target.value.trim();
-      const type = typeField.value;
+// 🔄 検索条件ごとにイベントを追加
+function initializeAutoCompleteForField(queryField, typeField) {
+  queryField.addEventListener('input', (event) => {
+    const query = event.target.value.trim();
+    const type = typeField.value;
 
-      if (!query) {
-        clearSuggestions(queryField);
-        return;
-      }
+    if (!query) {
+      console.log('ℹ️ クエリが空です。候補をクリアします。');
+      clearSuggestions(queryField);
+      return;
+    }
 
-      // 既存のリクエストをキャンセル
-      if (abortControllers.has(queryField)) {
-        abortControllers.get(queryField).abort();
-      }
+    // 現在のリクエストをキャンセル
+    if (abortControllers.has(queryField)) {
+      const controller = abortControllers.get(queryField);
+      controller.abort();
+    }
 
-      const controller = new AbortController();
-      abortControllers.set(queryField, controller);
+    // 新しいリクエストを初期化
+    const controller = new AbortController();
+    abortControllers.set(queryField, controller);
 
-      fetch(`/spotify/autocomplete?query=${encodeURIComponent(query)}&type=${type}`, {
-        signal: controller.signal,
+    console.log(`🔍 オートコンプリートリクエスト: query="${query}", type="${type}"`);
+
+    fetch(`/spotify/autocomplete?query=${encodeURIComponent(query)}&type=${type}`, {
+      signal: controller.signal,
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTPエラー: ${response.status}`);
+        }
+        return response.json();
       })
-        .then(response => {
-          if (!response.ok) throw new Error(`HTTPエラー: ${response.status}`);
-          return response.json();
-        })
-        .then(data => {
-          const uniqueSuggestions = filterUniqueSuggestions(data);
-          renderSuggestions(uniqueSuggestions, queryField);
-        })
-        .catch(error => {
-          if (error.name === 'AbortError') {
-            console.log('🔄 リクエストがキャンセルされました:', queryField);
-          } else {
-            console.error('❌ APIリクエストエラー:', error);
-          }
-        });
-    });
-  }
+      .then(data => {
+        if (data.length === 0) {
+          console.log('ℹ️ 検索結果なし。候補をクリアします。');
+          clearSuggestions(queryField);
+          return;
+        }
 
+        const uniqueSuggestions = filterUniqueSuggestions(data);
+        renderSuggestions(uniqueSuggestions, queryField);
+      })
+      .catch(error => {
+        if (error.name === 'AbortError') {
+          console.log('🔄 リクエストがキャンセルされました:', queryField);
+        } else {
+          console.error('❌ APIリクエストエラー:', error);
+        }
+      });
+  });
+}
   // 🎯 重複データを除去する関数
   function filterUniqueSuggestions(suggestions) {
     const seen = new Set();

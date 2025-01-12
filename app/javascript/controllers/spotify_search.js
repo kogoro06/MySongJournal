@@ -78,6 +78,11 @@ export function initializeSearchConditions() {
       const container = event.target.closest('.search-condition');
       const queryContainer = container.querySelector('[id^="query-container-"]');
 
+      if (!queryContainer) {
+        console.warn('⚠️ クエリコンテナが見つかりません:', container);
+        return;
+      }
+
       if (event.target.value === 'year') {
         queryContainer.innerHTML = `
           <select name="search_values[]" class="select select-bordered w-full px-4 py-2 rounded-md bg-gray-700 text-white">
