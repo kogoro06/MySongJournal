@@ -1,5 +1,5 @@
 <!-- 🎵 Spotify 検索フォーム -->
-<div class="p-4 rounded-lg bg-customblue text-white shadow-md space-y-4">
+<div class="p-4 rounded-lg bg-customblue text-white space-y-4">
   <div class="text-xl font-bold text-center flex items-center justify-center gap-2">
     <%= image_tag 'spotify.png', alt: 'Spotify Logo', class: 'inline h-6 w-6' %>
     Spotify 曲検索
@@ -23,8 +23,11 @@
         </div>
         <div class="mb-4">
           <label for="initial-query" class="block text-md font-medium mb-2">📝 検索キーワード</label>
-          <input type="text" name="initial_query" id="initial-query" placeholder="キーワードを入力"
-                 class="input input-bordered w-full px-4 py-2 rounded-md bg-gray-700 text-white">
+          <!-- query-container を追加 -->
+          <div id="query-container-initial">
+            <input type="text" name="initial_query" id="initial-query" placeholder="キーワードを入力"
+                   class="input input-bordered w-full px-4 py-2 rounded-md bg-gray-700 text-white">
+          </div>
           <ul id="autoComplete_list" class="bg-white text-gray-800 rounded-md shadow-md mt-2 max-h-40 overflow-y-auto"></ul>
         </div>
       </div>
