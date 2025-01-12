@@ -39,7 +39,7 @@ class JournalsController < ApplicationController
   # 日記作成処理
   def create
     @journal = current_user.journals.new(journal_params)
-  
+
     if session[:selected_track].present?
       track = session[:selected_track]
       @journal.song_name ||= track["song_name"]
@@ -48,10 +48,10 @@ class JournalsController < ApplicationController
       @journal.preview_url ||= track["preview_url"]
       @journal.spotify_track_id ||= track["spotify_track_id"]
     end
-  
+
     Rails.logger.debug "🚀 Journal Params: #{journal_params.inspect}"
     Rails.logger.debug "🎵 Session Track: #{session[:selected_track].inspect}"
-  
+
     if @journal.save
       session.delete(:selected_track) # 使用後はセッションをクリア
       redirect_to journals_path, notice: "日記の作成に成功しました."
