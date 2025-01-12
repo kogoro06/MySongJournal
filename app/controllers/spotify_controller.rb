@@ -137,7 +137,7 @@ class SpotifyController < ApplicationController
   # 🎯 トラック選択機能
   def select_tracks
     return unless params[:selected_track].present?
-
+  
     begin
       session[:selected_track] = JSON.parse(params[:selected_track])
       Rails.logger.info "✅ Track saved in session: #{session[:selected_track]}"
@@ -153,6 +153,7 @@ class SpotifyController < ApplicationController
       render :search, status: :unprocessable_entity
     end
   end
+  
 
   def year_search_template
     render partial: "spotify/year_search_template"
