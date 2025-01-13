@@ -12,9 +12,9 @@ def search
       if condition.present? && value.present?
         query_parts << if condition == "keyword"
                          value
-                       else
+        else
                          "#{condition}:#{value}"
-                       end
+        end
       end
     end
   else
@@ -55,7 +55,7 @@ def search
     render "spotify/results", locals: { tracks: @tracks }
   else
     flash.now[:alert] = "検索結果がありませんでした。"
-    return redirect_to spotify_results_path 
+    redirect_to spotify_results_path
   end
 end
 

@@ -27,7 +27,7 @@ export function initializeSearchConditions() {
       <div class="search-condition mt-4" data-condition-id="${id}">
         <div class="mb-4">
           <label class="block text-md font-medium text-white mb-2">🔍 検索タイプ</label>
-          <select name="search_conditions[]" class="select select-bordered w-full px-4 py-2 rounded-md bg-gray-700 text-white" data-condition-id="${id}">
+          <select name="search_conditions[]" class="select select-bordered w-full px-4 py-2 rounded-md bg-gray-700 text-white" data-condition-id="${id}" onchange="updateUsedSearchTypes()">
             <option value="" ${selectedType === '' ? 'selected' : ''}>検索タイプを選択</option>
             ${getAllSearchTypes()
               .map(
@@ -162,6 +162,30 @@ export function initializeSearchConditions() {
 
       event.target.dataset.previousValue = newType; // 新しいタイプを保存
     }
+  }
+
+  /** 検索条件が変更された後、選択したタイプを更新する */
+  function updateUsedSearchTypes() {
+    usedSearchTypes = [];
+    const conditions = searchConditionsContainer.querySelectorAll('.search-condition select');
+    conditions.forEach((select) => {
+      const type = select.value;
+      if (type) {
+        usedSearchTypes.push(type);
+      }
+    });
+
+    // 再度、利用可能な検索タイプを反映
+    searchConditionsContainer.querySelectorAll('.search-condition select').forEach((select) => {
+      const options = select.querySelectorAll('option');
+      options.forEach((option) => {
+        if (usedSearchTypes.includes(option.value) && option.value !== select.value) {
+          option.disabled = true;
+        } else {
+          option.disabled = false;
+        }
+      });
+    });
   }
 
   /** 検索結果を処理 */
