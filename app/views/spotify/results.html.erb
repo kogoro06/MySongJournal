@@ -1,21 +1,21 @@
 <!-- 📊 検索結果エリア -->
-   <div class="text-xl font-bold text-white text-center flex items-center justify-center gap-2">
-      <%= image_tag 'spotify.png', alt: 'Spotify Logo', class: 'inline h-6 w-6' %>
-      検索結果
-    </div>
+<div class="text-xl font-bold text-white text-center flex items-center justify-center gap-2">
+  <%= image_tag 'spotify.png', alt: 'Spotify Logo', class: 'inline h-6 w-6' %>
+  検索結果
+</div>
 
 <% if @tracks.present? %>
   <div class="p-6 rounded-lg bg-gray-800 shadow-md">
     <ul class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <% @tracks.each do |track| %>
         <li class="p-4 border border-gray-600 rounded-lg bg-gray-700 flex flex-col items-center text-center shadow-md hover:bg-gray-600 transition">
-                    <!-- 🎼 曲情報 -->
+          <!-- 🎼 曲情報 -->
           <div class="mb-4">
             <p class="text-lg font-medium text-white mb-1">🎵 <strong>曲名:</strong> <%= track[:song_name] %></p>
             <p class="text-sm text-gray-300 mb-2">🎤 <strong>アーティスト:</strong> <%= track[:artist_name] %></p>
-            <% if track[:track_url].present? %>
+            <% if track[:preview_url].present? %>
               <p>
-                <a href="<%= track[:track_url] %>" target="_blank" class="text-blue-400 hover:underline">
+                <a href="<%= track[:preview_url] %>" target="_blank" class="text-blue-400 hover:underline">
                   🌐 曲を聴く
                 </a>
               </p>
