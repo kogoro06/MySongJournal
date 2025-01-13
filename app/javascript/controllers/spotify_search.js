@@ -77,7 +77,6 @@ export function initializeSearchConditions() {
       track: '曲名',
       artist: 'アーティスト名',
       keyword: 'キーワード',
-      release_year: '発売年',
     };
     return labels[type] || type;
   }
