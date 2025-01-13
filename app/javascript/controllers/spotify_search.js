@@ -54,20 +54,6 @@ export function initializeSearchConditions() {
     `;
   }
 
-  /** 🔢 年選択のセレクトボックス生成 */
-  function generateYearSelect(selectedValue) {
-    const currentYear = new Date().getFullYear();
-    return `
-      <select name="search_values[]" class="select select-bordered w-full px-4 py-2 rounded-md bg-gray-700 text-white">
-        <option value="">発売年を選択</option>
-        ${Array.from({ length: currentYear - 1970 + 1 }, (_, i) => {
-          const year = 1970 + i;
-          return `<option value="${year}" ${year === parseInt(selectedValue, 10) ? 'selected' : ''}>${year}</option>`;
-        }).join('')}
-      </select>
-    `;
-  }
-
   /** 📝 テキスト入力生成 */
   function generateTextInput(value) {
     return `

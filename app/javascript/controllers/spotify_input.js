@@ -54,26 +54,6 @@ export function initializeSpotifyInput() {
     }
   }
 
-  /** 🎯 検索タイプ変更 */
-  searchTypeSelect.addEventListener('change', () => {
-    const selectedValue = searchTypeSelect.value;
-    console.log(`🔄 検索タイプが変更されました: ${selectedValue}`);
-
-    if (selectedValue === 'year') {
-      queryContainer.innerHTML = `
-        <select name="search_values[]" id="initial-query" class="condition-select block w-full px-4 py-2 border rounded-md text-white bg-gray-700">
-          <option value="">年代を選択</option>
-          ${Array.from({ length: 26 }, (_, i) => `<option value="${1970 + i}">${1970 + i}</option>`).join('')}
-        </select>
-        <ul id="autoComplete_list"></ul>
-      `;
-    } else {
-      queryContainer.innerHTML = `
-        <input type="text" name="initial_query" id="initial-query" placeholder="キーワードを入力"
-          class="condition-input block w-full px-4 py-2 border rounded-md text-white bg-gray-700">
-        <ul id="autoComplete_list"></ul>
-      `;
-    }
 
     // 新しい要素にイベントリスナーを再設定
     const newQueryInput = document.getElementById('initial-query');
