@@ -1,3 +1,4 @@
+/** ✅ 検索条件の初期化 */
 export function initializeSearchConditions() {
   console.log('✅ 検索条件の初期化開始');
 
@@ -22,8 +23,6 @@ export function initializeSearchConditions() {
 
   /** 📝 検索条件のテンプレート生成 */
   function createConditionTemplate(id, selectedType = '', value = '') {
-    const availableTypes = getAvailableSearchTypes();
-
     return `
       <div class="search-condition mt-4" data-condition-id="${id}">
         <div class="mb-4">
@@ -43,11 +42,7 @@ export function initializeSearchConditions() {
         <div class="mb-4">
           <label class="block text-md font-medium text-white mb-2">📝 検索キーワード</label>
           <div id="query-container-${id}">
-            ${
-              selectedType === 'release_year'
-                ? generateYearSelect(value)
-                : generateTextInput(value)
-            }
+            ${generateTextInput(value)}
           </div>
         </div>
       </div>
@@ -63,7 +58,7 @@ export function initializeSearchConditions() {
 
   /** 🔄 全検索タイプを取得 */
   function getAllSearchTypes() {
-    return ['track', 'artist', 'keyword', 'release_year'];
+    return ['track', 'artist', 'keyword'];
   }
 
   /** 🛠️ 利用可能な検索タイプを取得 */
@@ -111,6 +106,39 @@ export function initializeSearchConditions() {
     removeConditionBtn.disabled = conditionCount <= 1;
   }
 
+  /** 検索条件が正しいかチェック */
+  function validateSearchConditions() {
+    let isValid = true;
+    const conditions = searchConditionsContainer.querySelectorAll('.search-condition');
+
+    conditions.forEach((condition) => {
+      const searchType = condition.querySelector('select').value;
+      const searchValue = condition.querySelector('input')?.value.trim();
+
+      if (!searchType || !searchValue) {
+        isValid = false;
+      }
+    });
+
+    return isValid;
+  }
+
+  /** 検索ボタンがクリックされたときの処理 */
+  function handleFormSubmit(event) {
+    event.preventDefault(); // 画面遷移を防止
+
+    // 検索条件が不正な場合はアラートを表示
+    if (!validateSearchConditions()) {
+      alert("検索条件が不完全です。検索キーワードとタイプを正しく入力してください。");
+      return;
+    }
+
+    // 検索フォームを送信
+    const form = event.target;
+    form.submit();
+  }
+
+  /** 検索条件タイプが変更されたときの処理 */
   function handleConditionTypeChange(event) {
     if (event.target.classList.contains('select')) {
       const container = event.target.closest('.search-condition');
@@ -130,16 +158,13 @@ export function initializeSearchConditions() {
       }
 
       // タイプを切り替えた場合、キーワードをリセット
-      if (newType === 'release_year') {
-        queryContainer.innerHTML = generateYearSelect('');
-      } else {
-        queryContainer.innerHTML = generateTextInput('');
-      }
+      queryContainer.innerHTML = generateTextInput('');
 
       event.target.dataset.previousValue = newType; // 新しいタイプを保存
     }
   }
 
+  /** 検索結果を処理 */
   function handleInputValueChange(event) {
     if (event.target.tagName === 'SELECT' || event.target.tagName === 'INPUT') {
       const container = event.target.closest('.search-condition');
@@ -148,10 +173,17 @@ export function initializeSearchConditions() {
     }
   }
 
-  searchConditionsContainer.addEventListener('change', handleConditionTypeChange);
-  searchConditionsContainer.addEventListener('input', handleInputValueChange);
+  // イベントリスナーを登録
   addConditionBtn.addEventListener('click', addCondition);
   removeConditionBtn.addEventListener('click', removeCondition);
+  searchConditionsContainer.addEventListener('change', handleConditionTypeChange);
+  searchConditionsContainer.addEventListener('input', handleInputValueChange);
+
+  // 検索フォームの送信イベント
+  const form = document.getElementById('spotify-search-form');
+  if (form) {
+    form.addEventListener('submit', handleFormSubmit);
+  }
 
   updateButtonStates();
   console.log('✅ 検索条件の初期化完了');

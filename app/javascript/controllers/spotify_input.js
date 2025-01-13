@@ -68,7 +68,7 @@ export function initializeSpotifyInput() {
     } else {
       console.error('❌ 新しい #initial-query または #autoComplete_list が見つかりません。');
     }
-  });
+  };
 
   /** 🎯 初期リスナー設定 */
   const initialQueryInput = document.getElementById('initial-query');
@@ -76,4 +76,3 @@ export function initializeSpotifyInput() {
     addInputEventListener(initialQueryInput);
     console.log('✅ 初期入力フィールドにイベントリスナーが設定されました');
   }
-}

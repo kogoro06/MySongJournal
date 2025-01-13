@@ -1,64 +1,64 @@
 class SpotifyController < ApplicationController
   require "rest-client"
   require "json"
+# 🎵 検索機能
+def search
+  @tracks = []
+  query_parts = []
 
-  # 🎵 検索機能
-  def search
-    @tracks = []
-    query_parts = []
-
-    # 初期検索条件の追加
-    if params[:search_conditions].present? && params[:search_values].present?
-      params[:search_conditions].zip(params[:search_values]).each do |condition, value|
-        if condition.present? && value.present?
-          query_parts << if condition == "keyword"
-                           value
-          else
-                           "#{condition}:#{value}"
-          end
-        end
+  # 初期検索条件の追加
+  if params[:search_conditions].present? && params[:search_values].present?
+    params[:search_conditions].zip(params[:search_values]).each do |condition, value|
+      if condition.present? && value.present?
+        query_parts << if condition == "keyword"
+                         value
+                       else
+                         "#{condition}:#{value}"
+                       end
       end
-    else
-      flash.now[:alert] = "検索条件を入力してください。"
-      return render partial: "spotify/search"
     end
-
-    # 検索クエリの生成
-    query_string = query_parts.join(" ")
-    Rails.logger.debug "🔍 Spotify API Query: #{query_string}"
-
-    if query_string.blank?
-      flash.now[:alert] = "検索条件が無効です。"
-      return render partial: "spotify/search"
-    end
-
-    # Spotify APIリクエスト
-    begin
-      results = RSpotify::Track.search(query_string, market: "JP")
-      @tracks = results.map do |track|
-        {
-          song_name: track.name,
-          artist_name: track.artists.map(&:name).join(", "),
-          preview_url: track.preview_url,
-          album_image: track.album.images.first&.dig("url")
-        }
-      end
-    rescue RestClient::BadRequest => e
-      Rails.logger.error "🚨 Spotify API Error: #{e.response}"
-      flash.now[:alert] = "Spotify検索中にエラーが発生しました。"
-    rescue StandardError => e
-      Rails.logger.error "🚨 Unexpected Error: #{e.message}"
-      flash.now[:alert] = "予期しないエラーが発生しました。"
-    end
-
-    # 結果の表示
-    if @tracks.any?
-      render "spotify/results", locals: { tracks: @tracks }
-    else
-      flash.now[:alert] = "検索結果がありませんでした。"
-      render partial: "spotify/search"
-    end
+  else
+    flash.now[:alert] = "検索条件を入力してください。"
+    return render partial: "spotify/search" # 検索条件が空なら再表示
   end
+
+  # 検索クエリの生成
+  query_string = query_parts.join(" ")
+  Rails.logger.debug "🔍 Spotify API Query: #{query_string}"
+
+  if query_string.blank?
+    flash.now[:alert] = "検索条件が無効です。"
+    return render partial: "spotify/search" # 無効な検索条件なら再表示
+  end
+
+  # Spotify APIリクエスト
+  begin
+    results = RSpotify::Track.search(query_string, market: "JP")
+    @tracks = results.map do |track|
+      {
+        song_name: track.name,
+        artist_name: track.artists.map(&:name).join(", "),
+        preview_url: track.preview_url,
+        album_image: track.album.images.first&.dig("url")
+      }
+    end
+  rescue RestClient::BadRequest => e
+    Rails.logger.error "🚨 Spotify API Error: #{e.response}"
+    flash.now[:alert] = "Spotify検索中にエラーが発生しました。"
+  rescue StandardError => e
+    Rails.logger.error "🚨 Unexpected Error: #{e.message}"
+    flash.now[:alert] = "予期しないエラーが発生しました。"
+  end
+
+  # 結果の表示
+  if @tracks.any?
+    render "spotify/results", locals: { tracks: @tracks }
+  else
+    flash.now[:alert] = "検索結果がありませんでした。"
+    return redirect_to spotify_results_path 
+  end
+end
+
   def results
     @tracks = []
     if params[:initial_query].present?
