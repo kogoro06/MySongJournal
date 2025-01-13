@@ -2,7 +2,6 @@ import "@hotwired/turbo-rails";
 import "./controllers";
 import { initializeSpotifyModal } from "./controllers/spotify_modal";
 import { initializeSearchConditions } from "./controllers/spotify_search";
-import { initializeYearToggle } from "./controllers/spotify_year_toggle";
 import { initializeSpotifyAutocomplete } from "./controllers/spotify_autocomplete";
 import { initializeSpotifyInput } from "./controllers/spotify_input";
 
@@ -16,9 +15,6 @@ function initializeSpotifySearch() {
 
     initializeSearchConditions();
     console.log('✅ 検索条件が初期化されました');
-
-    initializeYearToggle();
-    console.log('✅ 年代トグルが初期化されました');
 
     initializeSpotifyAutocomplete();
     console.log('✅ オートコンプリートが初期化されました');

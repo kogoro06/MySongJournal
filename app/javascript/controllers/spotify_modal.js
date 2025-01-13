@@ -54,10 +54,6 @@ export function initializeSpotifyModal() {
         .then((module) => module.initializeSearchConditions())
         .catch((error) => console.error('❌ 検索条件モジュールの読み込みエラー:', error));
 
-      import('./spotify_year_toggle.js')
-        .then((module) => module.initializeYearToggle())
-        .catch((error) => console.error('❌ 年代トグルモジュールの読み込みエラー:', error));
-
       import('./spotify_autocomplete.js')
         .then((module) => module.initializeSpotifyAutocomplete())
         .catch((error) => console.error('❌ オートコンプリートモジュールの読み込みエラー:', error));
