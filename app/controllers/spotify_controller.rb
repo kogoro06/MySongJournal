@@ -181,9 +181,16 @@ class SpotifyController < ApplicationController
   # 🔄 アクセストークンを取得・更新
   def fetch_access_token
     token = ENV["SPOTIFY_ACCESS_TOKEN"]
-    return token if token.present?
-
-    # アクセストークンがない場合、リフレッシュトークンで新しいトークンを取得
+  
+    if token.nil? || token_expired?
+      # アクセストークンをリフレッシュ
+      refresh_access_token
+    else
+      token
+    end
+  end
+  
+  def refresh_access_token
     begin
       response = RestClient.post(
         "https://accounts.spotify.com/api/token",
@@ -196,15 +203,16 @@ class SpotifyController < ApplicationController
         }
       )
       new_token = JSON.parse(response.body)["access_token"]
-      ENV["SPOTIFY_ACCESS_TOKEN"] = new_token
-      Rails.logger.info "✅ Spotify Access Token refreshed"
+      ENV["SPOTIFY_ACCESS_TOKEN"] = new_token # 必要に応じて他の保存方法に変更
       new_token
     rescue RestClient::ExceptionWithResponse => e
       Rails.logger.error "🚨 Spotify Token Refresh Error: #{e.response}"
-      raise "アクセストークンのリフレッシュに失敗しました。"
-    rescue StandardError => e
-      Rails.logger.error "🚨 Unexpected Error: #{e.message}"
-      raise "予期しないエラーが発生しました。"
+      raise "アクセストークンのリフレッシュに失敗しました"
     end
+  end
+  def token_expired?
+    # アクセストークンの有効期限を適切に確認するロジックを実装する
+    # 例: トークンの有効期限を保存して比較する
+    false
   end
 end
