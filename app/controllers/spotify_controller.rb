@@ -10,16 +10,12 @@ def search
   if params[:search_conditions].present? && params[:search_values].present?
     params[:search_conditions].zip(params[:search_values]).each do |condition, value|
       if condition.present? && value.present?
-        query_parts << if condition == "keyword"
-                         value
-        else
-                         "#{condition}:#{value}"
-        end
+        query_parts << (condition == "keyword" ? value : "#{condition}:#{value}")
       end
     end
   else
     flash.now[:alert] = "検索条件を入力してください。"
-    return render partial: "spotify/search" # 検索条件が空なら再表示
+    return render partial: "spotify/search"
   end
 
   # 検索クエリの生成
@@ -28,7 +24,7 @@ def search
 
   if query_string.blank?
     flash.now[:alert] = "検索条件が無効です。"
-    return render partial: "spotify/search" # 無効な検索条件なら再表示
+    return render partial: "spotify/search"
   end
 
   # Spotify APIリクエスト
@@ -37,7 +33,7 @@ def search
     @tracks = results.map do |track|
       {
         song_name: track.name,
-        artist_name: track.artists.map(&:name).join(", "),
+        artist_name: fetch_artist_name(track), # 日本語名を取得
         preview_url: track.preview_url,
         album_image: track.album.images.first&.dig("url")
       }
@@ -49,6 +45,8 @@ def search
     Rails.logger.error "🚨 Unexpected Error: #{e.message}"
     flash.now[:alert] = "予期しないエラーが発生しました。"
   end
+
+  Rails.logger.debug "Response Data to Frontend: #{@tracks}"
 
   # 結果の表示
   if @tracks.any?
@@ -149,21 +147,23 @@ end
 
   private
 
-  # 🎤 アーティスト名を日本語で取得
   def fetch_artist_name(track)
     artist = track.artists.first
     return artist&.name if artist.nil?
-
+  
     # Spotify APIに直接リクエストを送信し、日本語名を取得
     begin
       response = RestClient.get(
         "https://api.spotify.com/v1/artists/#{artist.id}",
         {
           Authorization: "Bearer #{fetch_access_token}",
-          "Accept-Language": "ja"
+          "Accept-Language": "ja" # 日本語のレスポンスをリクエスト
         }
       )
       detailed_artist = JSON.parse(response.body)
+      Rails.logger.debug "Spotify Artist API Response: #{detailed_artist}"
+  
+      # 日本語名があればそれを返し、なければデフォルトの名前を返す
       detailed_artist["name"] || artist.name
     rescue RestClient::ExceptionWithResponse => e
       Rails.logger.error "🚨 Spotify Artist API Error: #{e.response}"
