@@ -4,7 +4,6 @@ import { initializeSpotifyModal } from "./controllers/spotify_modal";
 import { initializeSearchConditions } from "./controllers/spotify_search";
 import { initializeSpotifyAutocomplete } from "./controllers/spotify_autocomplete";
 import { initializeSpotifyInput } from "./controllers/spotify_input";
-import "./controllers/form-data";
 
 /** ✅ Spotify関連機能の初期化 */
 function initializeSpotifySearch() {
