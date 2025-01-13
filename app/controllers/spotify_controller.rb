@@ -50,7 +50,7 @@ class SpotifyController < ApplicationController
       Rails.logger.error "🚨 Unexpected Error: #{e.message}"
       flash.now[:alert] = "予期しないエラーが発生しました。"
     end
-  
+
     # 結果の表示
     if @tracks.any?
       render "spotify/results", locals: { tracks: @tracks }
