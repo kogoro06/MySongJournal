@@ -63,7 +63,7 @@ export function initializeSpotifyInput() {
       queryContainer.innerHTML = `
         <select name="search_values[]" id="initial-query" class="condition-select block w-full px-4 py-2 border rounded-md text-white bg-gray-700">
           <option value="">年代を選択</option>
-          ${Array.from({ length: 26 }, (_, i) => `<option value="${2000 + i}">${2000 + i}</option>`).join('')}
+          ${Array.from({ length: 26 }, (_, i) => `<option value="${1970 + i}">${1970 + i}</option>`).join('')}
         </select>
         <ul id="autoComplete_list"></ul>
       `;

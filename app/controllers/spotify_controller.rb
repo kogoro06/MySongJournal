@@ -181,7 +181,7 @@ class SpotifyController < ApplicationController
   # 🔄 アクセストークンを取得・更新
   def fetch_access_token
     token = ENV["SPOTIFY_ACCESS_TOKEN"]
-  
+
     if token.nil? || token_expired?
       # アクセストークンをリフレッシュ
       refresh_access_token
@@ -189,7 +189,7 @@ class SpotifyController < ApplicationController
       token
     end
   end
-  
+
   def refresh_access_token
     begin
       response = RestClient.post(
