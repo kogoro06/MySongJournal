@@ -72,27 +72,42 @@ export function initializeSearchConditions() {
     removeConditionBtn.disabled = conditionCount <= 1;
   }
 
-  /** 🔄 検索タイプ変更時の処理 */
   function handleConditionTypeChange(event) {
-    if (event.target.classList.contains('select')) {
-      const container = event.target.closest('.search-condition');
-      const queryContainer = container.querySelector('[id^="query-container-"]');
-
+    console.log("🔧 検索タイプが変更されました:", event.target.value);
+  
+    if (event.target.classList.contains("select")) {
+      const container = event.target.closest(".search-condition");
+      console.log("🔍 検索条件コンテナ:", container);
+  
+      const queryContainer = container?.querySelector('[id^="query-container-"]');
+      console.log("📦 クエリコンテナ:", queryContainer);
+  
       if (!queryContainer) {
-        console.warn('⚠️ クエリコンテナが見つかりません:', container);
+        console.warn("⚠️ クエリコンテナが見つかりません:", container);
         return;
       }
-
-      if (event.target.value === 'year') {
+  
+      // 現在の入力値を保持
+      const currentValue = queryContainer.querySelector("input, select")?.value || "";
+  
+      if (event.target.value === "year") {
+        console.log("🗓️ 年代が選択されました。");
+        
+        // 1970年から現在の年までの選択肢を生成
+        const currentYear = new Date().getFullYear();
         queryContainer.innerHTML = `
           <select name="search_values[]" class="select select-bordered w-full px-4 py-2 rounded-md bg-gray-700 text-white">
             <option value="">年代を選択</option>
-            ${Array.from({ length: 26 }, (_, i) => `<option value="${2000 + i}">${2000 + i}</option>`).join('')}
+            ${Array.from({ length: currentYear - 1970 + 1 }, (_, i) => {
+              const year = 1970 + i;
+              return `<option value="${year}" ${year === parseInt(currentValue) ? "selected" : ""}>${year}</option>`;
+            }).join("")}
           </select>
         `;
       } else {
+        console.log("🔤 テキスト入力が選択されました。");
         queryContainer.innerHTML = `
-          <input type="text" name="search_values[]" placeholder="キーワードを入力" class="input input-bordered w-full px-4 py-2 rounded-md bg-gray-700 text-white">
+          <input type="text" name="search_values[]" value="${currentValue}" placeholder="キーワードを入力" class="input input-bordered w-full px-4 py-2 rounded-md bg-gray-700 text-white">
         `;
       }
     }
