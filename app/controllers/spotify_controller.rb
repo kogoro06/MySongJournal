@@ -72,15 +72,15 @@ class SpotifyController < ApplicationController
   def autocomplete
     query = params[:query]
     type = params[:type] || "track,artist"
-  
+
     return render json: [] if query.blank?
-  
+
     begin
       headers = {
         Authorization: "Bearer #{fetch_access_token}",
         "Accept-Language" => "ja"
       }
-  
+
       response = RestClient.get(
         "https://api.spotify.com/v1/search",
         {
@@ -92,9 +92,9 @@ class SpotifyController < ApplicationController
         }.merge(headers)
       )
       results = JSON.parse(response.body)
-  
+
       autocomplete_results = []
-  
+
       # 検索タイプに応じて結果を整形
       if type.include?("track") && results["tracks"] && results["tracks"]["items"]
         autocomplete_results += results["tracks"]["items"].map do |track|
@@ -106,7 +106,7 @@ class SpotifyController < ApplicationController
           }
         end
       end
-  
+
       if type.include?("artist") && results["artists"] && results["artists"]["items"]
         autocomplete_results += results["artists"]["items"].map do |artist|
           {
@@ -116,7 +116,7 @@ class SpotifyController < ApplicationController
           }
         end
       end
-  
+
       render json: autocomplete_results
     rescue RestClient::ExceptionWithResponse => e
       Rails.logger.error "🚨 Spotify Autocomplete API Error: #{e.response}"
@@ -181,7 +181,7 @@ class SpotifyController < ApplicationController
   # 🔄 アクセストークンを取得・更新
   def fetch_access_token
     token = ENV["SPOTIFY_ACCESS_TOKEN"]
-  
+
     if token.nil? || token_expired?
       # アクセストークンをリフレッシュ
       refresh_access_token
@@ -189,7 +189,7 @@ class SpotifyController < ApplicationController
       token
     end
   end
-  
+
   def refresh_access_token
     begin
       response = RestClient.post(
