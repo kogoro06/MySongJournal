@@ -9,10 +9,8 @@ class JournalsController < ApplicationController
     session.delete(:selected_track)
     session.delete(:journal_form)
 
-    @emotion_filter = params[:emotion]
-    @journals = current_user.journals
-    @journals = @journals.where(emotion: @emotion_filter) if @emotion_filter.present?
-    @journals = @journals.order(created_at: :asc)
+    @journals = current_user.journals.order(created_at: :desc)
+    @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
   end
 
   # 詳細表示

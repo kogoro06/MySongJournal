@@ -6,8 +6,6 @@ import { application } from "./application"
 
 import HelloController from "./hello_controller"
 import SpotifySearchController from "./spotify_search_controller"
-import EmotionFilterController from "./emotion_filter_controller"
 
 application.register("hello", HelloController)
 application.register("spotify-search", SpotifySearchController)
-application.register("emotion-filter", EmotionFilterController)
