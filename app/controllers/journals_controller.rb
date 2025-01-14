@@ -111,8 +111,6 @@ class JournalsController < ApplicationController
   def journal_params
     params.require(:journal).permit(
       :title, :content, :emotion, :song_name, :artist_name, :album_image, :preview_url, :spotify_track_id
-    ).tap do |journal_params|
-      journal_params[:emotion] = Journal.emotions.key(journal_params[:emotion]) if journal_params[:emotion].present?
-    end
+    )
   end
 end
