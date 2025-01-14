@@ -2,37 +2,81 @@ class JournalsController < ApplicationController
   before_action :authenticate_user!, except: [ :show, :index ]
   before_action :set_journal, only: [ :show, :edit, :update, :destroy ]
   before_action :authorize_journal, only: [ :edit, :update, :destroy ]
+
+  # 一覧表示
   def index
-    @emotion_filter = params[:emotion] # フィルター条件を取得
-    @journals = if @emotion_filter.present?
-                  current_user.journals.where(emotion: @emotion_filter) # ログインユーザーの日記を絞り込み
-    else
-                  current_user.journals # ログインユーザーの日記のみ取得
-    end
+    # 一覧表示時にセッションをクリア
+    session.delete(:selected_track)
+    session.delete(:journal_form)
+
+    @journals = current_user.journals.order(created_at: :desc)
+    @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
   end
+
+  # 詳細表示
   def show
-    @journals = Journal.find(params[:id])
+    # `set_journal` ですでに @journal をセットしているので、ここは不要
   end
 
+  # 新規作成フォーム表示
   def new
-    @journal = Journal.new
-  end
+    # トップページからのアクセス時はセッションをクリア
+    if params[:from] == "top"
+      session.delete(:selected_track)
+      session.delete(:journal_form)
+    end
 
-  def create
-    Rails.logger.debug "Received params: #{params.inspect}"
-    @journal = current_user.journals.new(journal_params)
-    if @journal.save
-      redirect_to journals_path, notice: "日記の作成に成功しました."
-    else
-      Rails.logger.debug "Journal save errors: #{@journal.errors.full_messages}"
-      render :new
+    @journal = Journal.new
+
+    # セッションから曲の情報を復元
+    if session[:selected_track].present?
+      @journal.assign_attributes(
+        song_name: session[:selected_track]["song_name"],
+        artist_name: session[:selected_track]["artist_name"],
+        album_image: session[:selected_track]["album_image"],
+        preview_url: session[:selected_track]["preview_url"],
+        spotify_track_id: session[:selected_track]["spotify_track_id"]
+      )
+    end
+
+    # セッションからフォームの入力値を復元
+    if session[:journal_form].present?
+      form_data = session[:journal_form]
+      @journal.assign_attributes(
+        title: form_data["title"],
+        content: form_data["content"]
+      )
+      # emotionを数値から文字列キーに変換
+      if form_data["emotion"].present?
+        emotion_key = Journal.emotions.key(form_data["emotion"])
+        @journal.emotion = emotion_key if emotion_key.present?
+      end
     end
   end
 
-  def edit
-    @journal = Journal.find(params[:id])
+  # 日記作成処理
+  def create
+    @journal = current_user.journals.build(journal_params)
+
+    if @journal.save
+      # セッションをクリア
+      session.delete(:selected_track)
+      session.delete(:journal_form)
+
+      # 保存成功後は一覧ページにリダイレクト
+      redirect_to journals_path, notice: "日記を保存しました。"
+    else
+      Rails.logger.error "Journal save failed: #{@journal.errors.full_messages}"
+      flash.now[:alert] = "日記の保存に失敗しました。"
+      render :new, status: :unprocessable_entity
+    end
   end
 
+  # 編集フォーム表示
+  def edit
+  end
+
+  # 更新処理
   def update
     if @journal.update(journal_params)
       redirect_to journals_path, notice: "日記が更新されました."
@@ -41,6 +85,7 @@ class JournalsController < ApplicationController
     end
   end
 
+  # 削除処理
   def destroy
     @journal.destroy
     redirect_to journals_path, notice: "日記が削除されました."
@@ -53,22 +98,22 @@ class JournalsController < ApplicationController
 
   private
 
-  def journal_params
-    params.require(:journal).permit(:title, :emotion, :content, :artist_name, :song_name, :preview_url, :album_image)
+  # 日記をセットする
+  def set_journal
+    @journal = current_user.journals.find(params[:id])
   end
 
-  def set_journal
-    @journal = Journal.find(params[:id])
-  end
+  # ユーザー権限の確認
   def authorize_journal
     unless @journal.user == current_user
-      redirect_to journals_path, alert: "削除する権限がありません。"
+      redirect_back fallback_location: journals_path, alert: "削除する権限がありません。"
     end
   end
 
+  # 日記パラメータの許可
   def journal_params
-    params.require(:journal).permit(:title, :content, :emotion, :artist_name, :song_name).tap do |p|
-      p[:emotion] = p[:emotion].to_i if p[:emotion].present?
-    end
+    params.require(:journal).permit(
+      :title, :content, :emotion, :song_name, :artist_name, :album_image, :preview_url, :spotify_track_id
+    )
   end
 end

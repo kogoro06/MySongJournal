@@ -1,3 +1,5 @@
+version: '3.8' # Docker Composeのバージョンを指定
+
 services:
   db:
     image: postgres
@@ -6,7 +8,7 @@ services:
       TZ: Asia/Tokyo
       POSTGRES_PASSWORD: password
     volumes:
-      - postgresql_data:/var/lib/postgresql
+      - postgres_volume:/var/lib/postgresql/data
     ports:
       - 5432:5432
     healthcheck:
@@ -14,6 +16,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
   web:
     build:
       context: .
@@ -27,12 +30,40 @@ services:
       - node_modules:/myapp/node_modules
     environment:
       TZ: Asia/Tokyo
+      REDIS_URL: redis://redis:6379/0
     ports:
       - "3000:3000"
     depends_on:
       db:
         condition: service_healthy
+
+  sidekiq:
+    container_name: sidekiq_container
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: bundle exec sidekiq
+    volumes:
+      - .:/myapp
+      - bundle_data:/usr/local/bundle:cached
+    environment:
+      TZ: Asia/Tokyo
+      REDIS_URL: redis://redis:6379/0
+      POSTGRES_PASSWORD: password
+    depends_on:
+      - db
+      - redis
+
+  redis:
+    image: "redis:7.0-alpine"
+    volumes:
+      - redis_volume:/data
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+
 volumes:
   bundle_data:
-  postgresql_data:
+  postgres_volume:
+  redis_volume:
   node_modules:

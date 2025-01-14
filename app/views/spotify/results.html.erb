@@ -1,0 +1,54 @@
+<!-- 📊 検索結果エリア -->
+<div class="text-xl font-bold text-white text-center flex items-center justify-center gap-2">
+  <%= image_tag 'spotify.png', alt: 'Spotify Logo', class: 'inline h-6 w-6' %>
+  検索結果
+</div>
+
+<% if @tracks.present? %>
+  <div class="p-6 rounded-lg bg-gray-800 shadow-md">
+    <ul class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <% @tracks.each do |track| %>
+        <li class="p-4 border border-gray-600 rounded-lg bg-gray-700 flex flex-col items-center text-center shadow-md hover:bg-gray-600 transition">
+          <!-- 🎼 曲情報 -->
+          <div class="mb-4">
+            <p class="text-lg font-medium text-white mb-1">🎵 <strong>曲名:</strong> <%= track[:song_name] %></p>
+            <p class="text-sm text-gray-300 mb-2">🎤 <strong>アーティスト:</strong> <%= track[:artist_name] %></p>
+            <% if track[:preview_url].present? %>
+              <p>
+                <a href="<%= track[:preview_url] %>" target="_blank" class="text-blue-400 hover:underline">
+                  🌐 曲を聴く
+                </a>
+              </p>
+            <% end %>
+          </div>
+          <!-- 🎵 アルバム画像 -->
+          <% if track[:album_image].present? %>
+            <div class="w-48 h-48 mb-4">
+              <img src="<%= track[:album_image] %>" alt="アルバム画像" class="w-full h-full object-cover rounded-md shadow-md">
+            </div>
+          <% end %>
+          <!-- 🔊 試聴プレイヤー -->
+          <% if track[:preview_url].present? %>
+            <div class="w-full mb-4">
+              <audio controls class="w-full">
+                <source src="<%= track[:preview_url] %>" type="audio/mpeg">
+              </audio>
+            </div>
+          <% end %>
+
+          <!-- 🎯 曲選択ボタン -->
+          <div>
+            <%= button_to "🎯 この曲を選択", select_tracks_path(selected_track: track.to_json), method: :post, remote: true, class: "px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition text-center" %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% else %>
+  <p class="text-white text-center">🔍 検索結果が見つかりませんでした。</p>
+<% end %>
+
+<!-- 🔄 検索フォーム -->
+<div class="mt-8 p-6 rounded-lg bg-gray-800 shadow-md">
+  <%= render partial: 'spotify/search' %>
+</div>

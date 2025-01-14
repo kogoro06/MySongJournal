@@ -15,9 +15,10 @@
     <link rel="apple-touch-icon" href="/icon.png">
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
+    <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.9/dist/autoComplete.min.js"></script>
   </head>
 
-  <body class="wrap">
+  <body class="flex flex-col min-h-screen">
     <%= render "shared/header" %>
     <%= render "devise/shared/flash_messages" %> 
     <%= yield %>
