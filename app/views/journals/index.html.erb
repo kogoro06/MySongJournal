@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-customblue text-black flex flex-col items-center pt-8 pb-8">
-  <div class="bg-white p-6 rounded shadow-md w-full max-w-2xl">
+  <div class="bg-white p-6 rounded shadow-md w-full max-w-7xl">
     <!-- ページタイトルと絞り込み -->
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-bold">
@@ -18,10 +18,14 @@
     </div>
 
     <!-- 一覧表示 -->
-    <ul class="space-y-4">
+    <ul class="grid grid-cols-2 gap-4">
       <% @journals.each_with_index do |journal, index| %>
         <li class="bg-gray-100 p-4 rounded shadow">
+<<<<<<< Updated upstream
           <div class="flex items-stretch min-h-[100px]">
+=======
+          <div class="flex items-stretch">
+>>>>>>> Stashed changes
             <!-- 日記情報 -->
             <div class="flex-grow flex flex-col justify-between">
               <div class="text-lg font-bold">タイトル: <%= journal.title.presence || "未設定" %></div>
@@ -40,6 +44,7 @@
               <%= button_to "削除", journal_path(journal), 
                   method: :delete, 
                   data: { confirm: "本当に削除しますか？" }, 
+<<<<<<< Updated upstream
                   form_class: "w-32",
                   class: "w-full px-6 py-2 bg-red-500 text-white font-medium rounded shadow-md hover:bg-red-600 text-center" %>
             </div>
@@ -50,6 +55,19 @@
                 <%= image_tag journal.album_image, class: "w-full h-full object-cover" %>
               </div>
             <% end %>
+=======
+                  class: "w-32 px-6 py-2 bg-red-500 text-white font-medium rounded shadow-md hover:bg-red-600" %>
+            </div>
+
+            <!-- ジャケット写真 -->
+            <div class="flex-shrink-0 w-48 -m-4 ml-0">
+              <%= image_tag journal.album_image, 
+                  class: "w-full h-full object-cover rounded-tr-md rounded-br-md", 
+                  loading: "lazy",
+                  onerror: "this.onerror=null; this.src='/images/no-image.png';" 
+              %>
+            </div>
+>>>>>>> Stashed changes
           </div>
         </li>
       <% end %>

@@ -1,5 +1,3 @@
-version: '3.8' # Docker Composeのバージョンを指定
-
 services:
   db:
     image: postgres
@@ -36,6 +34,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
 
   sidekiq:
     container_name: sidekiq_container
@@ -55,12 +55,11 @@ services:
       - redis
 
   redis:
-    image: "redis:7.0-alpine"
-    volumes:
-      - redis_volume:/data
-    command: redis-server --appendonly yes
+    image: redis:latest
     ports:
       - "6379:6379"
+    volumes:
+      - redis_volume:/data
 
 volumes:
   bundle_data:

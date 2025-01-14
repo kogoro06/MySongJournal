@@ -1,5 +1,5 @@
 class JournalsController < ApplicationController
-  before_action :authenticate_user!, except: [ :show, :index ]
+  before_action :authenticate_user!, except: [ :show, :index, :timeline ]
   before_action :set_journal, only: [ :show, :edit, :update, :destroy ]
   before_action :authorize_journal, only: [ :edit, :update, :destroy ]
 
@@ -10,6 +10,18 @@ class JournalsController < ApplicationController
     session.delete(:journal_form)
 
     @journals = current_user.journals.order(created_at: :desc)
+    @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
+
+    # デバッグログ
+    @journals.each do |journal|
+      Rails.logger.debug "Journal ID: #{journal.id}"
+      Rails.logger.debug "Album Image URL: #{journal.album_image}"
+    end
+  end
+
+  # タイムライン表示
+  def timeline
+    @journals = Journal.includes(:user).order(created_at: :desc)
     @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
   end
 
