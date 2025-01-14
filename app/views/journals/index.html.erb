@@ -17,19 +17,35 @@
     <ul class="space-y-4">
       <% @journals.each_with_index do |journal, index| %>
         <li class="bg-gray-100 p-4 rounded shadow">
-          <div class="text-lg font-bold">No.<%= index + 1 %></div>
-          <div>作成日: <%= journal.created_at.in_time_zone('Asia/Tokyo').strftime("%Y年%m月%d日 %H:%M") %></div>
-          <div>タイトル: <%= journal.title.presence || "未設定" %></div>
-          <div>感情: <%= journal.emotion.presence || "未設定" %></div>
-          <div>アーティスト名: <%= journal.artist_name.presence || "未設定" %></div>
-          <div>曲名: <%= journal.song_name.presence || "未設定" %></div>
-          <div class="flex space-x-4 mt-2">
-            <!-- 日記を見るリンク -->
-            <%= link_to '日記を見る', journal_path(journal), class: "px-6 py-2 bg-gray-500 text-white font-medium rounded shadow-md hover:bg-gray-600" %>
-            <!-- 編集リンク -->
-            <%= link_to "編集", edit_journal_path(journal), class: "px-6 py-2 bg-yellow-500 text-white font-medium rounded shadow-md hover:bg-yellow-600" %>
-            <!-- 削除ボタン -->
-            <%= button_to "削除", journal_path(journal), method: :delete, data: { confirm: "本当に削除しますか？" }, class: "px-6 py-2 bg-red-500 text-white font-medium rounded shadow-md hover:bg-red-600" %>
+          <div class="flex items-stretch min-h-[100px]">
+            <!-- 日記情報 -->
+            <div class="flex-grow flex flex-col justify-between">
+              <div class="text-lg font-bold">タイトル: <%= journal.title.presence || "未設定" %></div>
+              <div>作成日: <%= journal.created_at.in_time_zone('Asia/Tokyo').strftime("%Y年%m月%d日 %H:%M") %></div>
+              <div>感情: <%= journal.emotion.presence || "未設定" %></div>
+              <div>アーティスト名: <%= journal.artist_name.presence || "未設定" %></div>
+              <div>曲名: <%= journal.song_name.presence || "未設定" %></div>
+            </div>
+
+            <!-- ボタングループ -->
+            <div class="flex flex-col justify-between mr-24 gap-3">
+              <%= link_to '日記を見る', journal_path(journal), 
+                  class: "w-32 px-6 py-2 bg-gray-500 text-white font-medium rounded shadow-md hover:bg-gray-600 text-center" %>
+              <%= link_to "編集", edit_journal_path(journal), 
+                  class: "w-32 px-6 py-2 bg-yellow-500 text-white font-medium rounded shadow-md hover:bg-yellow-600 text-center" %>
+              <%= button_to "削除", journal_path(journal), 
+                  method: :delete, 
+                  data: { confirm: "本当に削除しますか？" }, 
+                  form_class: "w-32",
+                  class: "w-full px-6 py-2 bg-red-500 text-white font-medium rounded shadow-md hover:bg-red-600 text-center" %>
+            </div>
+            
+            <!-- ジャケット写真 -->
+            <% if journal.album_image.present? %>
+              <div class="flex-shrink-0 -m-4 w-40">
+                <%= image_tag journal.album_image, class: "w-full h-full object-cover" %>
+              </div>
+            <% end %>
           </div>
         </li>
       <% end %>

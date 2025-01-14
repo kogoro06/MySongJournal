@@ -46,6 +46,11 @@ class JournalsController < ApplicationController
     redirect_to journals_path, notice: "日記が削除されました."
   end
 
+  def timeline
+    @journals = Journal.includes(:user).order(created_at: :desc)
+    @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
+  end
+
   private
 
   def journal_params
