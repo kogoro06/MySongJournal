@@ -69,7 +69,7 @@ end
 
   def results
     @tracks = []
-    
+
     # フォームの値をセッションに保存
     if params[:journal].present?
       session[:journal_form] = {
@@ -153,14 +153,14 @@ end
     begin
       # 選択した曲の情報をセッションに保存
       session[:selected_track] = JSON.parse(params[:selected_track])
-      
+
       # フォームの入力値をセッションに保存
       session[:journal_form] = {
         title: params[:journal][:title],
         content: params[:journal][:content],
         emotion: params[:journal][:emotion]
       } if params[:journal].present?
-      
+
       Rails.logger.info "✅ Track and form data saved in session: #{session[:selected_track]}, #{session[:journal_form]}"
       flash[:notice] = "曲を保存しました。"
       redirect_to new_journal_path
@@ -180,7 +180,7 @@ end
   def fetch_artist_name(track)
     artist = track.artists.first
     return artist&.name if artist.nil?
-  
+
     # Spotify APIに直接リクエストを送信し、日本語名を取得
     begin
       response = RestClient.get(
@@ -192,7 +192,7 @@ end
       )
       detailed_artist = JSON.parse(response.body)
       Rails.logger.debug "Spotify Artist API Response: #{detailed_artist}"
-  
+
       # 日本語名があればそれを返し、なければデフォルトの名前を返す
       detailed_artist["name"] || artist.name
     rescue RestClient::ExceptionWithResponse => e

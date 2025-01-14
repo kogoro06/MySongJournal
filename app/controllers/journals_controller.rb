@@ -8,7 +8,7 @@ class JournalsController < ApplicationController
     # 一覧表示時にセッションをクリア
     session.delete(:selected_track)
     session.delete(:journal_form)
-    
+
     @emotion_filter = params[:emotion]
     @journals = current_user.journals
     @journals = @journals.where(emotion: @emotion_filter) if @emotion_filter.present?
@@ -23,13 +23,13 @@ class JournalsController < ApplicationController
   # 新規作成フォーム表示
   def new
     # トップページからのアクセス時はセッションをクリア
-    if params[:from] == 'top'
+    if params[:from] == "top"
       session.delete(:selected_track)
       session.delete(:journal_form)
     end
 
     @journal = Journal.new
-    
+
     # セッションから曲の情報を復元
     if session[:selected_track].present?
       @journal.assign_attributes(
