@@ -62,7 +62,7 @@ class JournalsController < ApplicationController
       # セッションをクリア
       session.delete(:selected_track)
       session.delete(:journal_form)
-      
+
       # 保存成功後は一覧ページにリダイレクト
       redirect_to journals_path, notice: "日記を保存しました。"
     else
