@@ -58,25 +58,18 @@ class JournalsController < ApplicationController
 
   # 日記作成処理
   def create
-    @journal = current_user.journals.new(journal_params)
-
-    if session[:selected_track].present?
-      track = session[:selected_track]
-      @journal.song_name ||= track["song_name"]
-      @journal.artist_name ||= track["artist_name"]
-      @journal.album_image ||= track["album_image"]
-      @journal.preview_url ||= track["preview_url"]
-      @journal.spotify_track_id ||= track["spotify_track_id"]
-    end
-
-    Rails.logger.debug "🚀 Journal Params: #{journal_params.inspect}"
-    Rails.logger.debug "🎵 Session Track: #{session[:selected_track].inspect}"
+    @journal = current_user.journals.build(journal_params)
 
     if @journal.save
-      # 保存成功後は一覧ページにリダイレクト（セッションは一覧表示時にクリアされる）
-      redirect_to journals_path, notice: "日記を保存しました。新しい日記を書きましょう！"
+      # セッションをクリア
+      session.delete(:selected_track)
+      session.delete(:journal_form)
+      
+      # 保存成功後は一覧ページにリダイレクト
+      redirect_to journals_path, notice: "日記を保存しました。"
     else
-      Rails.logger.debug "❌ Journal save errors: #{@journal.errors.full_messages}"
+      Rails.logger.error "Journal save failed: #{@journal.errors.full_messages}"
+      flash.now[:alert] = "日記の保存に失敗しました。"
       render :new, status: :unprocessable_entity
     end
   end

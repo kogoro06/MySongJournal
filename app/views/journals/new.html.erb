@@ -74,7 +74,12 @@
       <!-- 😊 感情入力 -->
       <div>
         <%= form.label :emotion, "感情", class: "block text-md font-medium text-gray-700 mb-2" %>
-        <%= form.select :emotion, options_for_select([["喜", 0], ["怒", 1], ["哀", 2], ["楽", 3]], @journal.emotion), { prompt: "選択してください" }, name: "journal[emotion]", class: "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400",id: "journal-emotion" %>
+        <%= form.select :emotion, 
+            options_for_select([["喜", "喜"], ["怒", "怒"], ["哀", "哀"], ["楽", "楽"]], @journal.emotion), 
+            { prompt: "選択してください" }, 
+            name: "journal[emotion]", 
+            class: "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400",
+            id: "journal-emotion" %>
       </div>
 
       <!-- 📝 メモ入力 -->
