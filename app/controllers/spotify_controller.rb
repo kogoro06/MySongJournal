@@ -20,7 +20,18 @@ def search
   if params[:search_conditions].present? && params[:search_values].present?
     params[:search_conditions].zip(params[:search_values]).each do |condition, value|
       if condition.present? && value.present?
-        query_parts << (condition == "keyword" ? value : "#{condition}:#{value}")
+        case condition
+        when "year"
+          # 年代をSpotify APIのクエリに変換（例：1990s → year:1990-1999）
+          decade = value.match(/(\d{4})s/)&.[](1)
+          if decade
+            start_year = decade
+            end_year = decade.to_i + 9
+            query_parts << "year:#{start_year}-#{end_year}"
+          end
+        else
+          query_parts << (condition == "keyword" ? value : "#{condition}:#{value}")
+        end
       end
     end
   else

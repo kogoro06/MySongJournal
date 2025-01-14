@@ -1,9 +1,18 @@
-import "@hotwired/turbo-rails";
-import "./controllers";
-import { initializeSpotifyModal } from "./controllers/spotify_modal";
-import { initializeSearchConditions } from "./controllers/spotify_search";
-import { initializeSpotifyAutocomplete } from "./controllers/spotify_autocomplete";
-import { initializeSpotifyInput } from "./controllers/spotify_input";
+// Entry point for the build script in your package.json
+import "@hotwired/turbo-rails"
+import { Application } from "@hotwired/stimulus"
+
+// Stimulus設定
+const application = Application.start()
+
+// コントローラーを登録
+import SpotifySearchController from "./controllers/spotify_search_controller"
+application.register("spotify-search", SpotifySearchController)
+
+// その他のSpotify関連機能をインポート
+import { initializeSpotifyModal } from "./controllers/spotify_modal"
+import { initializeSpotifyAutocomplete } from "./controllers/spotify_autocomplete"
+import { initializeSpotifyInput } from "./controllers/spotify_input"
 
 /** ✅ Spotify関連機能の初期化 */
 function initializeSpotifySearch() {
@@ -13,19 +22,14 @@ function initializeSpotifySearch() {
     initializeSpotifyModal();
     console.log('✅ Spotifyモーダルが初期化されました');
 
-    initializeSearchConditions();
-    console.log('✅ 検索条件が初期化されました');
-
     initializeSpotifyAutocomplete();
     console.log('✅ オートコンプリートが初期化されました');
 
     initializeSpotifyInput();
-    console.log('✅ 入力処理が初期化されました');
+    console.log('✅ 入力フィールドが初期化されました');
   } catch (error) {
-    console.error('❌ Spotify機能の初期化中にエラーが発生しました:', error);
+    console.error('❌ 初期化中にエラーが発生しました:', error);
   }
-
-  console.log('🎯 Spotify関連機能の初期化が完了しました');
 }
 
 /** 🎯 Turboイベントで初期化関数を再実行 */
