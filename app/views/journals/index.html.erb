@@ -21,11 +21,7 @@
     <ul class="grid grid-cols-2 gap-4">
       <% @journals.each_with_index do |journal, index| %>
         <li class="bg-gray-100 p-4 rounded shadow">
-<<<<<<< Updated upstream
-          <div class="flex items-stretch min-h-[100px]">
-=======
           <div class="flex items-stretch">
->>>>>>> Stashed changes
             <!-- 日記情報 -->
             <div class="flex-grow flex flex-col justify-between">
               <div class="text-lg font-bold">タイトル: <%= journal.title.presence || "未設定" %></div>
@@ -44,18 +40,6 @@
               <%= button_to "削除", journal_path(journal), 
                   method: :delete, 
                   data: { confirm: "本当に削除しますか？" }, 
-<<<<<<< Updated upstream
-                  form_class: "w-32",
-                  class: "w-full px-6 py-2 bg-red-500 text-white font-medium rounded shadow-md hover:bg-red-600 text-center" %>
-            </div>
-            
-            <!-- ジャケット写真 -->
-            <% if journal.album_image.present? %>
-              <div class="flex-shrink-0 -m-4 w-40">
-                <%= image_tag journal.album_image, class: "w-full h-full object-cover" %>
-              </div>
-            <% end %>
-=======
                   class: "w-32 px-6 py-2 bg-red-500 text-white font-medium rounded shadow-md hover:bg-red-600" %>
             </div>
 
@@ -67,11 +51,15 @@
                   onerror: "this.onerror=null; this.src='/images/no-image.png';" 
               %>
             </div>
->>>>>>> Stashed changes
           </div>
         </li>
       <% end %>
     </ul>
+
+    <!-- ページネーション -->
+    <div class="mt-6">
+      <%= paginate @journals %>
+    </div>
 
     <!-- 日記作成ボタン -->
     <div class="flex justify-center mt-6">

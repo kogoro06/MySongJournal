@@ -11,6 +11,7 @@ class JournalsController < ApplicationController
 
     @journals = current_user.journals.order(created_at: :desc)
     @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
+    @journals = @journals.page(params[:page]).per(6)  # 1ページあたり6件表示
 
     # デバッグログ
     @journals.each do |journal|
