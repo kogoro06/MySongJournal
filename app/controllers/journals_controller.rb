@@ -5,6 +5,10 @@ class JournalsController < ApplicationController
 
   # 一覧表示
   def index
+    # 一覧表示時にセッションをクリア
+    session.delete(:selected_track)
+    session.delete(:journal_form)
+    
     @emotion_filter = params[:emotion]
     @journals = current_user.journals
     @journals = @journals.where(emotion: @emotion_filter) if @emotion_filter.present?
@@ -18,21 +22,37 @@ class JournalsController < ApplicationController
 
   # 新規作成フォーム表示
   def new
-    @journal = Journal.new
-
-    # セッションに選択されたトラック情報がある場合、それを反映
-    if session[:selected_track].present?
-      track = session[:selected_track]
-      Rails.logger.debug "🎵 Session Track Data: #{track.inspect}"
-
-      @journal.song_name = track["song_name"]
-      @journal.artist_name = track["artist_name"]
-      @journal.album_image = track["album_image"]
-      @journal.preview_url = track["preview_url"]
-      @journal.spotify_track_id = track["spotify_track_id"]
-
-      # セッションのデータは使用後にクリア
+    # トップページからのアクセス時はセッションをクリア
+    if params[:from] == 'top'
       session.delete(:selected_track)
+      session.delete(:journal_form)
+    end
+
+    @journal = Journal.new
+    
+    # セッションから曲の情報を復元
+    if session[:selected_track].present?
+      @journal.assign_attributes(
+        song_name: session[:selected_track]["song_name"],
+        artist_name: session[:selected_track]["artist_name"],
+        album_image: session[:selected_track]["album_image"],
+        preview_url: session[:selected_track]["preview_url"],
+        spotify_track_id: session[:selected_track]["spotify_track_id"]
+      )
+    end
+
+    # セッションからフォームの入力値を復元
+    if session[:journal_form].present?
+      form_data = session[:journal_form]
+      @journal.assign_attributes(
+        title: form_data["title"],
+        content: form_data["content"]
+      )
+      # emotionを数値から文字列キーに変換
+      if form_data["emotion"].present?
+        emotion_key = Journal.emotions.key(form_data["emotion"])
+        @journal.emotion = emotion_key if emotion_key.present?
+      end
     end
   end
 
@@ -53,8 +73,8 @@ class JournalsController < ApplicationController
     Rails.logger.debug "🎵 Session Track: #{session[:selected_track].inspect}"
 
     if @journal.save
-      session.delete(:selected_track) # 使用後はセッションをクリア
-      redirect_to journals_path, notice: "日記の作成に成功しました."
+      # 保存成功後は一覧ページにリダイレクト（セッションは一覧表示時にクリアされる）
+      redirect_to journals_path, notice: "日記を保存しました。新しい日記を書きましょう！"
     else
       Rails.logger.debug "❌ Journal save errors: #{@journal.errors.full_messages}"
       render :new, status: :unprocessable_entity
@@ -99,7 +119,7 @@ class JournalsController < ApplicationController
     params.require(:journal).permit(
       :title, :content, :emotion, :song_name, :artist_name, :album_image, :preview_url, :spotify_track_id
     ).tap do |journal_params|
-      journal_params[:emotion] = journal_params[:emotion].to_i if journal_params[:emotion].present?
+      journal_params[:emotion] = Journal.emotions.key(journal_params[:emotion]) if journal_params[:emotion].present?
     end
   end
 end

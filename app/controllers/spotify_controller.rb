@@ -6,6 +6,16 @@ def search
   @tracks = []
   query_parts = []
 
+  # フォームの値をセッションに保存
+  if params[:journal].present?
+    session[:journal_form] = {
+      title: params[:journal][:title],
+      content: params[:journal][:content],
+      emotion: params[:journal][:emotion]
+    }
+    Rails.logger.info "✅ Form data saved in session: #{session[:journal_form]}"
+  end
+
   # 初期検索条件の追加
   if params[:search_conditions].present? && params[:search_values].present?
     params[:search_conditions].zip(params[:search_values]).each do |condition, value|
@@ -59,6 +69,17 @@ end
 
   def results
     @tracks = []
+    
+    # フォームの値をセッションに保存
+    if params[:journal].present?
+      session[:journal_form] = {
+        title: params[:journal][:title],
+        content: params[:journal][:content],
+        emotion: params[:journal][:emotion]
+      }
+      Rails.logger.info "✅ Form data saved in session from results: #{session[:journal_form]}"
+    end
+
     if params[:initial_query].present?
       @tracks = search_tracks(
         query: params[:initial_query],
@@ -130,8 +151,17 @@ end
     return unless params[:selected_track].present?
 
     begin
+      # 選択した曲の情報をセッションに保存
       session[:selected_track] = JSON.parse(params[:selected_track])
-      Rails.logger.info "✅ Track saved in session: #{session[:selected_track]}"
+      
+      # フォームの入力値をセッションに保存
+      session[:journal_form] = {
+        title: params[:journal][:title],
+        content: params[:journal][:content],
+        emotion: params[:journal][:emotion]
+      } if params[:journal].present?
+      
+      Rails.logger.info "✅ Track and form data saved in session: #{session[:selected_track]}, #{session[:journal_form]}"
       flash[:notice] = "曲を保存しました。"
       redirect_to new_journal_path
     rescue JSON::ParserError => e
