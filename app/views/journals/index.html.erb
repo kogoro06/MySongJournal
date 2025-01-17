@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-customblue text-black flex flex-col items-center pt-8 pb-8">
-  <div class="bg-white p-6 rounded shadow-md w-full max-w-2xl">
+  <div class="bg-white p-6 rounded shadow-md w-full max-w-7xl">
     <!-- ページタイトルと絞り込み -->
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-bold">
@@ -18,26 +18,48 @@
     </div>
 
     <!-- 一覧表示 -->
-    <ul class="space-y-4">
+    <ul class="grid grid-cols-2 gap-4">
       <% @journals.each_with_index do |journal, index| %>
         <li class="bg-gray-100 p-4 rounded shadow">
-          <div class="text-lg font-bold">No.<%= index + 1 %></div>
-          <div>作成日: <%= journal.created_at.in_time_zone('Asia/Tokyo').strftime("%Y年%m月%d日 %H:%M") %></div>
-          <div>タイトル: <%= journal.title.presence || "未設定" %></div>
-          <div>感情: <%= journal.emotion.presence || "未設定" %></div>
-          <div>アーティスト名: <%= journal.artist_name.presence || "未設定" %></div>
-          <div>曲名: <%= journal.song_name.presence || "未設定" %></div>
-          <div class="flex space-x-4 mt-2">
-            <!-- 日記を見るリンク -->
-            <%= link_to '日記を見る', journal_path(journal), class: "px-6 py-2 bg-gray-500 text-white font-medium rounded shadow-md hover:bg-gray-600" %>
-            <!-- 編集リンク -->
-            <%= link_to "編集", edit_journal_path(journal), class: "px-6 py-2 bg-yellow-500 text-white font-medium rounded shadow-md hover:bg-yellow-600" %>
-            <!-- 削除ボタン -->
-            <%= button_to "削除", journal_path(journal), method: :delete, data: { confirm: "本当に削除しますか？" }, class: "px-6 py-2 bg-red-500 text-white font-medium rounded shadow-md hover:bg-red-600" %>
+          <div class="flex items-stretch">
+            <!-- 日記情報 -->
+            <div class="flex-grow flex flex-col justify-between">
+              <div class="text-lg font-bold">タイトル: <%= journal.title.presence || "未設定" %></div>
+              <div>作成日: <%= journal.created_at.in_time_zone('Asia/Tokyo').strftime("%Y年%m月%d日 %H:%M") %></div>
+              <div>感情: <%= journal.emotion.presence || "未設定" %></div>
+              <div>アーティスト名: <%= journal.artist_name.presence || "未設定" %></div>
+              <div>曲名: <%= journal.song_name.presence || "未設定" %></div>
+            </div>
+
+            <!-- ボタングループ -->
+            <div class="flex flex-col justify-between mr-24 gap-3">
+              <%= link_to '日記を見る', journal_path(journal), 
+                  class: "w-32 px-6 py-2 bg-gray-500 text-white font-medium rounded shadow-md hover:bg-gray-600 text-center" %>
+              <%= link_to "編集", edit_journal_path(journal), 
+                  class: "w-32 px-6 py-2 bg-yellow-500 text-white font-medium rounded shadow-md hover:bg-yellow-600 text-center" %>
+              <%= button_to "削除", journal_path(journal), 
+                  method: :delete, 
+                  data: { confirm: "本当に削除しますか？" }, 
+                  class: "w-32 px-6 py-2 bg-red-500 text-white font-medium rounded shadow-md hover:bg-red-600" %>
+            </div>
+
+            <!-- ジャケット写真 -->
+            <div class="flex-shrink-0 w-48 -m-4 ml-0">
+              <%= image_tag journal.album_image, 
+                  class: "w-full h-full object-cover rounded-tr-md rounded-br-md", 
+                  loading: "lazy",
+                  onerror: "this.onerror=null; this.src='/images/no-image.png';" 
+              %>
+            </div>
           </div>
         </li>
       <% end %>
     </ul>
+
+    <!-- ページネーション -->
+    <div class="mt-6">
+      <%= paginate @journals %>
+    </div>
 
     <!-- 日記作成ボタン -->
     <div class="flex justify-center mt-6">

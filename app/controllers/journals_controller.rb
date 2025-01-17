@@ -1,5 +1,5 @@
 class JournalsController < ApplicationController
-  before_action :authenticate_user!, except: [ :show, :index ]
+  before_action :authenticate_user!, except: [ :show, :index, :timeline ]
   before_action :set_journal, only: [ :show, :edit, :update, :destroy ]
   before_action :authorize_journal, only: [ :edit, :update, :destroy ]
 
@@ -10,6 +10,19 @@ class JournalsController < ApplicationController
     session.delete(:journal_form)
 
     @journals = current_user.journals.order(created_at: :desc)
+    @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
+    @journals = @journals.page(params[:page]).per(6)  # 1ページあたり6件表示
+
+    # デバッグログ
+    @journals.each do |journal|
+      Rails.logger.debug "Journal ID: #{journal.id}"
+      Rails.logger.debug "Album Image URL: #{journal.album_image}"
+    end
+  end
+
+  # タイムライン表示
+  def timeline
+    @journals = Journal.includes(:user).order(created_at: :desc)
     @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
   end
 
@@ -89,6 +102,11 @@ class JournalsController < ApplicationController
   def destroy
     @journal.destroy
     redirect_to journals_path, notice: "日記が削除されました."
+  end
+
+  def timeline
+    @journals = Journal.includes(:user).order(created_at: :desc)
+    @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
   end
 
   private
