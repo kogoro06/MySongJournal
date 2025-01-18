@@ -8,4 +8,8 @@ class Journal < ApplicationRecord
   validates :artist_name, presence: true, length: { maximum: 100 }
   validates :album_image, presence: true, format: { with: URI.regexp(%w[http https]), message: "must be a valid URL" }
   validates :preview_url, format: { with: URI.regexp(%w[http https]), message: "must be a valid URL" }, allow_blank: true
+
+  def album_image
+    super.presence || "no-image.png"
+  end
 end

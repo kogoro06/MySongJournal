@@ -45,11 +45,11 @@
 
             <!-- ジャケット写真 -->
             <div class="flex-shrink-0 w-48 -m-4 ml-0">
-              <%= image_tag journal.album_image, 
+              <%= image_tag(journal.album_image.presence || 'no-image.png',
                   class: "w-full h-full object-cover rounded-tr-md rounded-br-md", 
                   loading: "lazy",
-                  onerror: "this.onerror=null; this.src='/images/no-image.png';" 
-              %>
+                  alt: "アルバムジャケット画像"
+              ) %>
             </div>
           </div>
         </li>
