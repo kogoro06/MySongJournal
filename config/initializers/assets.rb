@@ -10,3 +10,22 @@ Rails.application.config.assets.version = "1.0"
 # application.js, application.css, and all non-JS/CSS in the app/assets
 # folder are already added.
 # Rails.application.config.assets.precompile += %w[ admin.js admin.css ]
+
+# Node modulesのパスを追加
+Rails.application.config.assets.paths << Rails.root.join("node_modules")
+
+# プリコンパイル対象の最適化
+Rails.application.config.assets.precompile += %w[
+  application.js
+  application.css
+  controllers/*.js
+  *.png
+  *.jpg
+  *.gif
+  *.woff
+  *.woff2
+]
+
+# 圧縮設定の追加
+Rails.application.config.assets.css_compressor = :sass
+Rails.application.config.assets.js_compressor = :terser

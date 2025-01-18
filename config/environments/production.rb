@@ -104,4 +104,20 @@ Rails.application.configure do
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
   config.time_zone = "UTC"
   config.active_record.default_timezone = :utc
+
+  # JavaScriptのコンパイル設定
+  config.assets.js_compressor = :terser
+
+  # アセットパイプラインの設定
+  config.assets.compile = true
+  config.assets.digest = true
+
+  # publicディレクトリの設定
+  config.public_file_server.enabled = true
+  config.public_file_server.headers = {
+    "Cache-Control" => "public, max-age=#{30.days.to_i}"
+  }
+
+  # ログレベルの設定
+  config.log_level = :info  # デバッグログを無効化
 end
