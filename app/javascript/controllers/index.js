@@ -4,15 +4,19 @@
 
 import { application } from "./application"
 
-// 既存のコントローラーを手動で登録
-import HelloController from "./hello_controller"
-import SpotifyAutocompleteController from "./spotify_autocomplete"
-import SpotifyInputController from "./spotify_input"
-import SpotifyModalController from "./spotify_modal"
-import SpotifySearchController from "./spotify_search_controller"
+// コントローラーを個別にインポート
+import HelloController from "./hello_controller.js"
+import SpotifyAutocompleteController from "./spotify_autocomplete.js"
+import SpotifyInputController from "./spotify_input.js"
+import SpotifyModalController from "./spotify_modal.js"
+import SpotifySearchController from "./spotify_search_controller.js"
 
+// コントローラーを登録
 application.register("hello", HelloController)
 application.register("spotify-autocomplete", SpotifyAutocompleteController)
 application.register("spotify-input", SpotifyInputController)
 application.register("spotify-modal", SpotifyModalController)
 application.register("spotify-search", SpotifySearchController)
+
+// コントローラーの読み込みが完了したことをコンソールに表示
+console.log("Stimulus controllers loaded")
