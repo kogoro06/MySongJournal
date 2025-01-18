@@ -100,33 +100,28 @@ end
   end
 
   def autocomplete
-    query = params[:query]
-    type = params[:type] || "track,artist"
-
-    return render json: [] if query.blank?
+    token = SpotifyToken.last
+    url = "https://api.spotify.com/v1/search"
+    headers = {
+      "Authorization" => "Bearer #{token.access_token}",
+      "Content-Type" => "application/json",
+      "Accept-Language" => "ja"
+    }
+    query_params = URI.encode_www_form({
+      q: params[:query],
+      type: params[:type] || "track,artist",
+      limit: 10
+    })
+    full_url = "#{url}?#{query_params}"
 
     begin
-      headers = {
-        Authorization: "Bearer #{fetch_access_token}",
-        "Accept-Language" => "ja"
-      }
-
-      response = RestClient.get(
-        "https://api.spotify.com/v1/search",
-        {
-          params: {
-            q: query,
-            type: type,
-            limit: 10
-          }
-        }.merge(headers)
-      )
+      response = RestClient.get(full_url, headers)
       results = JSON.parse(response.body)
 
       autocomplete_results = []
 
       # 検索タイプに応じて結果を整形
-      if type.include?("track") && results["tracks"] && results["tracks"]["items"]
+      if results["tracks"] && results["tracks"]["items"]
         autocomplete_results += results["tracks"]["items"].map do |track|
           {
             id: track["id"],
@@ -137,7 +132,7 @@ end
         end
       end
 
-      if type.include?("artist") && results["artists"] && results["artists"]["items"]
+      if results["artists"] && results["artists"]["items"]
         autocomplete_results += results["artists"]["items"].map do |artist|
           {
             id: artist["id"],
@@ -148,12 +143,17 @@ end
       end
 
       render json: autocomplete_results
-    rescue RestClient::ExceptionWithResponse => e
-      Rails.logger.error "🚨 Spotify Autocomplete API Error: #{e.response}"
-      render json: { error: "Spotify APIエラー: #{e.response}" }, status: :bad_request
-    rescue StandardError => e
-      Rails.logger.error "🚨 Unexpected Error: #{e.message}"
-      render json: { error: "予期しないエラーが発生しました: #{e.message}" }, status: :internal_server_error
+    rescue RestClient::Unauthorized => e
+      Rails.logger.error "🚨 Unauthorized: #{e.message}"
+      # トークンの再取得を試みる
+      SpotifyTokenRefreshWorker.new.perform
+      token.reload
+      # 再試行
+      response = RestClient.get(full_url, headers.merge("Authorization" => "Bearer #{token.access_token}"))
+      render json: JSON.parse(response.body)
+    rescue => e
+      Rails.logger.error "🚨 API Error: #{e.message}"
+      render json: { error: "検索中にエラーが発生しました" }, status: :bad_request
     end
   end
 
@@ -193,12 +193,32 @@ end
     return artist&.name if artist.nil?
 
     # Spotify APIに直接リクエストを送信し、日本語名を取得
+    token = SpotifyToken.last
     begin
       response = RestClient.get(
         "https://api.spotify.com/v1/artists/#{artist.id}",
         {
-          Authorization: "Bearer #{fetch_access_token}",
-          "Accept-Language": "ja" # 日本語のレスポンスをリクエスト
+          "Authorization" => "Bearer #{token.access_token}",
+          "Content-Type" => "application/json",
+          "Accept-Language" => "ja"
+        }
+      )
+      detailed_artist = JSON.parse(response.body)
+      Rails.logger.debug "Spotify Artist API Response: #{detailed_artist}"
+
+      # 日本語名があればそれを返し、なければデフォルトの名前を返す
+      detailed_artist["name"] || artist.name
+    rescue RestClient::Unauthorized => e
+      Rails.logger.error "🚨 Unauthorized: #{e.message}"
+      SpotifyTokenRefreshWorker.new.perform
+      token.reload
+      # 再試行
+      response = RestClient.get(
+        "https://api.spotify.com/v1/artists/#{artist.id}",
+        {
+          "Authorization" => "Bearer #{token.reload.access_token}",
+          "Content-Type" => "application/json",
+          "Accept-Language" => "ja"
         }
       )
       detailed_artist = JSON.parse(response.body)
@@ -213,43 +233,5 @@ end
       Rails.logger.error "🚨 Unexpected Error: #{e.message}"
       artist.name
     end
-  end
-
-  # 🔄 アクセストークンを取得・更新
-  def fetch_access_token
-    token = ENV["SPOTIFY_ACCESS_TOKEN"]
-
-    if token.nil? || token_expired?
-      # アクセストークンをリフレッシュ
-      refresh_access_token
-    else
-      token
-    end
-  end
-
-  def refresh_access_token
-    begin
-      response = RestClient.post(
-        "https://accounts.spotify.com/api/token",
-        {
-          grant_type: "refresh_token",
-          refresh_token: ENV["SPOTIFY_REFRESH_TOKEN"]
-        },
-        {
-          Authorization: "Basic #{Base64.strict_encode64("#{ENV['SPOTIFY_CLIENT_ID']}:#{ENV['SPOTIFY_CLIENT_SECRET']}")}"
-        }
-      )
-      new_token = JSON.parse(response.body)["access_token"]
-      ENV["SPOTIFY_ACCESS_TOKEN"] = new_token # 必要に応じて他の保存方法に変更
-      new_token
-    rescue RestClient::ExceptionWithResponse => e
-      Rails.logger.error "🚨 Spotify Token Refresh Error: #{e.response}"
-      raise "アクセストークンのリフレッシュに失敗しました"
-    end
-  end
-  def token_expired?
-    # アクセストークンの有効期限を適切に確認するロジックを実装する
-    # 例: トークンの有効期限を保存して比較する
-    false
   end
 end
