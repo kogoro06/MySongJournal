@@ -4,6 +4,15 @@
 
 import { application } from "./application"
 
-// Eager load all controllers defined in the import map under controllers/**/*_controller
-import { eagerLoadControllersFrom } from "@hotwired/stimulus-loading"
-eagerLoadControllersFrom("controllers", application)
+// 既存のコントローラーを手動で登録
+import HelloController from "./hello_controller"
+import SpotifyAutocompleteController from "./spotify_autocomplete"
+import SpotifyInputController from "./spotify_input"
+import SpotifyModalController from "./spotify_modal"
+import SpotifySearchController from "./spotify_search_controller"
+
+application.register("hello", HelloController)
+application.register("spotify-autocomplete", SpotifyAutocompleteController)
+application.register("spotify-input", SpotifyInputController)
+application.register("spotify-modal", SpotifyModalController)
+application.register("spotify-search", SpotifySearchController)
