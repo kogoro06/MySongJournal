@@ -124,6 +124,7 @@ GEM
     erubi (1.13.0)
     et-orbi (1.2.11)
       tzinfo
+    execjs (2.10.0)
     faraday (2.12.2)
       faraday-net_http (>= 2.0, < 3.5)
       json
@@ -368,6 +369,8 @@ GEM
       railties (>= 6.0.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    uglifier (4.2.1)
+      execjs (>= 0.3.0, < 3)
     unicode (0.4.4.5)
     unicode-display_width (3.1.2)
       unicode-emoji (~> 4.0, >= 4.0.4)
@@ -408,6 +411,7 @@ DEPENDENCIES
   devise-i18n
   devise-i18n-views
   dotenv-rails
+  execjs
   jbuilder
   jsbundling-rails
   kaminari
@@ -425,6 +429,7 @@ DEPENDENCIES
   stimulus-rails
   turbo-rails
   tzinfo-data
+  uglifier
   web-console
 
 BUNDLED WITH

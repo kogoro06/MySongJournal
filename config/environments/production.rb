@@ -24,7 +24,7 @@ Rails.application.configure do
   config.public_file_server.enabled = true
 
   # Compress CSS using a preprocessor.
-  # config.assets.css_compressor = :sass
+  config.assets.css_compressor = :sass
 
   # Do not fall back to assets pipeline if a precompiled asset is missed.
   config.assets.compile = true
@@ -106,7 +106,7 @@ Rails.application.configure do
   config.active_record.default_timezone = :utc
 
   # JavaScriptのコンパイル設定
-  config.assets.js_compressor = :terser
+  config.assets.js_compressor = :uglifier
 
   # アセットパイプラインの設定
   config.assets.compile = true

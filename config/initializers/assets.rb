@@ -26,6 +26,5 @@ Rails.application.config.assets.precompile += %w[
   *.woff2
 ]
 
-# 圧縮設定の追加
-Rails.application.config.assets.css_compressor = :sass
-Rails.application.config.assets.js_compressor = :terser
+# 圧縮設定の修正
+Rails.application.config.assets.js_compressor = :uglifier
