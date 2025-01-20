@@ -71,16 +71,21 @@
         <%= @journal.emotion %>
       </p>
     </div>
-
     <!-- ✏️ アクションボタン -->
-    <div class="flex justify-between items-center mt-6">
-      <%= link_to "✏️ 編集", edit_journal_path(@journal), class: "px-4 py-2 bg-yellow-500 text-white font-medium rounded-md hover:bg-yellow-600 transition" %>
-      <%= button_to "🗑️ 削除", journal_path(@journal), method: :delete, data: { confirm: "本当に削除しますか？" }, class: "px-4 py-2 bg-red-500 text-white font-medium rounded-md hover:bg-red-600 transition" %>
-    </div>
+    <% unless request.referer&.include?('timeline') %>
+      <div class="flex justify-between items-center mt-6">
+        <%= link_to "✏️ 編集", edit_journal_path(@journal), class: "px-4 py-2 bg-yellow-500 text-white font-medium rounded-md hover:bg-yellow-600 transition" %>
+        <%= button_to "🗑️ 削除", journal_path(@journal), method: :delete, data: { confirm: "本当に削除しますか？" }, class: "px-4 py-2 bg-red-500 text-white font-medium rounded-md hover:bg-red-600 transition" %>
+      </div>
+    <% end %>
 
     <!-- 🔙 戻るボタン -->
     <div class="text-center mt-6">
-      <%= link_to "← 日記一覧に戻る", journals_path, class: "text-blue-500 hover:underline text-sm font-medium" %>
+      <% if request.referer&.include?('timeline') %>
+        <%= link_to "← タイムラインに戻る", timeline_journals_path, class: "text-blue-500 hover:underline text-sm font-medium" %>
+      <% else %>
+        <%= link_to "← 日記一覧に戻る", journals_path, class: "text-blue-500 hover:underline text-sm font-medium" %>
+      <% end %>
     </div>
   </div>
 </div>

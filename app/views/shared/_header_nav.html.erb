@@ -1,5 +1,5 @@
 <nav class="flex justify-around items-center space-x-8 text-lg">
-  <%= link_to 'みんなの日記を覗きにいく', others_journal_index_path, class: 'text-center text-gray-600 font-bold' %>
+  <%= link_to 'タイムライン', timeline_journals_path, class: 'text-center text-gray-600 font-bold' %>
   <% if user_signed_in? %>
     <div class="flex items-center space-x-8">
         <%# <%= link_to 'プロフィール', "#", class: 'text-gray-600 font-bold hover:text-blue-500' %>

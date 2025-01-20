@@ -8,7 +8,11 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   # 日記関連のルート
-  resources :journals
+  resources :journals do
+    collection do
+      get "timeline", to: "journals#timeline", as: "timeline"
+    end
+  end
 
   require "sidekiq/web"
   mount Sidekiq::Web => "/sidekiq"
@@ -29,4 +33,11 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root "static_pages#top"
+
+  resources :users do
+    member do
+      post "follow"
+      delete "unfollow"
+    end
+  end
 end
