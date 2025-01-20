@@ -1,0 +1,79 @@
+<div class="min-h-screen bg-customblue text-black flex flex-col items-center pt-8 pb-8">
+  <div class="bg-white p-6 rounded shadow-md w-full max-w-7xl">
+    <!-- ページタイトルと絞り込み -->
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold">タイムライン</h1>
+      <%= form_with url: timeline_journals_path, method: :get, local: true, class: "flex items-center space-x-2 text-white", id: "emotion-filter-form" do |f| %>
+        <div class="flex flex-col">
+          <%= f.select :emotion,
+              Journal.emotions.keys.map { |key| [key.humanize, key] },
+              { include_blank: "すべて", selected: params[:emotion] },
+              { 
+                class: "px-4 py-2 border text-center rounded-md bg-customred",
+                onchange: "this.form.requestSubmit()"
+              } 
+          %>
+          <span class="text- text-gray-600 mt-1">*フォローボタンを押すと日記を書いたユーザーをフォローできます。</span>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- 一覧表示 -->
+    <ul class="grid grid-cols-2 gap-4">
+      <% @journals.each do |journal| %>
+        <li class="bg-gray-100 p-4 rounded shadow">
+          <div class="flex items-center space-x-4">
+            <!-- ジャケット写真 -->
+            <div class="w-40 h-40 flex-shrink-0">
+              <%= image_tag(journal.album_image.presence || 'no-image.png',
+                  class: "w-full h-full object-cover rounded-md", 
+                  loading: "lazy",
+                  alt: "アルバムジャケット画像"
+              ) %>
+            </div>
+
+            <!-- 日記情報 -->
+            <div class="flex-grow">
+              <div class="text-lg font-bold mb-2">タイトル: <%= journal.title.presence || "未設定" %></div>
+              <div class="text-sm text-gray-600 space-y-1">
+                <div>作成日: <%= journal.created_at.in_time_zone('Asia/Tokyo').strftime("%Y年%m月%d日 %H:%M") %></div>
+                <div>感情: <%= journal.emotion.presence || "未設定" %></div>
+                <div>アーティスト名: <%= journal.artist_name.presence || "未設定" %></div>
+                <div>曲名: <%= journal.song_name.presence || "未設定" %></div>
+              </div>
+            </div>
+
+            <!-- ボタングループ -->
+            <div class="flex flex-col gap-2">
+              <%= link_to '日記を見る', journal_path(journal), 
+                  class: "w-28 px-4 py-2 bg-gray-500 text-white font-medium rounded shadow-md hover:bg-gray-600 text-center text-sm" %>
+              <% if journal.user == current_user %>
+                <%= link_to "編集", edit_journal_path(journal), 
+                    class: "w-28 px-4 py-2 bg-yellow-500 text-white font-medium rounded shadow-md hover:bg-yellow-600 text-center text-sm" %>
+                <%= button_to "削除", journal_path(journal), 
+                    method: :delete, 
+                    data: { confirm: "本当に削除しますか？" }, 
+                    class: "w-28 px-4 py-2 bg-red-500 text-white font-medium rounded shadow-md hover:bg-red-600 text-sm" %>
+              <% else %>
+                <%= button_to "いいね", "#",
+                    class: "w-28 px-4 py-2 bg-green-500 text-white font-medium rounded shadow-md hover:bg-green-600 text-center text-sm" %>
+                <%= button_to "フォロー", "#",
+                    class: "w-28 px-4 py-2 bg-blue-500 text-white font-medium rounded shadow-md hover:bg-blue-600 text-center text-sm" %>
+              <% end %>
+            </div>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+
+    <!-- ページネーション -->
+    <div class="mt-6">
+      <%= paginate @journals %>
+    </div>
+
+    <!-- 日記作成ボタン -->
+    <div class="flex justify-center mt-6">
+      <%= link_to "新しい日記を作成", new_journal_path, class: "btn btn-primary w-full" %>
+    </div>
+  </div>
+</div>

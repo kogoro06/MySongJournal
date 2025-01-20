@@ -24,6 +24,7 @@ class JournalsController < ApplicationController
   def timeline
     @journals = Journal.includes(:user).order(created_at: :desc)
     @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
+    @journals = @journals.page(params[:page]).per(6)  # 1ページあたり6件表示
   end
 
   # 詳細表示
@@ -102,11 +103,6 @@ class JournalsController < ApplicationController
   def destroy
     @journal.destroy
     redirect_to journals_path, notice: "日記が削除されました."
-  end
-
-  def timeline
-    @journals = Journal.includes(:user).order(created_at: :desc)
-    @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
   end
 
   private
