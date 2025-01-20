@@ -1,6 +1,8 @@
 class JournalsController < ApplicationController
   before_action :authenticate_user!, except: [ :show, :index, :timeline ]
-  before_action :set_journal, only: [ :show, :edit, :update, :destroy ]
+  before_action :set_journal, only: [ :edit, :update, :destroy ]  # showを除外
+  before_action :set_journal_for_show, only: [ :show ]  # showアクション用
+  before_action :store_location, only: [ :index, :timeline ]
   before_action :authorize_journal, only: [ :edit, :update, :destroy ]
 
   # 一覧表示
@@ -29,7 +31,7 @@ class JournalsController < ApplicationController
 
   # 詳細表示
   def show
-    # `set_journal` ですでに @journal をセットしているので、ここは不要
+    # @journalは set_journal_for_show で設定済み
   end
 
   # 新規作成フォーム表示
@@ -107,19 +109,28 @@ class JournalsController < ApplicationController
 
   private
 
-  # 日記をセットする
   def set_journal
     @journal = current_user.journals.find(params[:id])
   end
 
-  # ユーザー権限の確認
+  def set_journal_for_show
+    @journal = Journal.find(params[:id])  # 全ての日記から検索
+  end
+
+  def store_location
+    session[:return_to] = request.fullpath
+  end
+
+  def return_path
+    session[:return_to] || journals_path
+  end
+
   def authorize_journal
     unless @journal.user == current_user
       redirect_back fallback_location: journals_path, alert: "削除する権限がありません。"
     end
   end
 
-  # 日記パラメータの許可
   def journal_params
     params.require(:journal).permit(
       :title, :content, :emotion, :song_name, :artist_name, :album_image, :preview_url, :spotify_track_id
