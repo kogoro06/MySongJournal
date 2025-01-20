@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   # 日記関連のルート
   resources :journals do
     collection do
-      get 'timeline', to: 'journals#timeline', as: 'timeline'
+      get "timeline", to: "journals#timeline", as: "timeline"
     end
   end
 
@@ -36,8 +36,8 @@ Rails.application.routes.draw do
 
   resources :users do
     member do
-      post 'follow'
-      delete 'unfollow'
+      post "follow"
+      delete "unfollow"
     end
   end
 end
