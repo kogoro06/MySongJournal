@@ -33,7 +33,7 @@
           <label for="password" class="block text-gray-700 text-sm font-bold mb-2">
             <%= t('activerecord.attributes.user.password', default: 'パスワード') %>
           </label>
-          <div class="relative">
+          <div data-controller="password-visibility">
             <input 
               id="password" 
               name="user[password]" 
@@ -41,11 +41,13 @@
               placeholder="<%= t('activerecord.attributes.user.password', default: 'パスワード') %>" 
               required 
               autocomplete="current-password" 
-              class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-outline bg-gray-50 placeholder-gray-400">
+              class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-outline bg-gray-50 placeholder-gray-400"
+              data-password-visibility-target="input">
             <button 
               type="button" 
-              class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none" 
-              onclick="togglePasswordVisibility('password', this)">
+              data-password-visibility-target="button"
+              data-action="click->password-visibility#toggle"
+              class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none">
               👁
             </button>
           </div>
@@ -64,16 +66,3 @@
     <% end %>
   </div>
 </div>
-
-<script>
-  function togglePasswordVisibility(inputId, button) {
-    const input = document.getElementById(inputId);
-    if (input.type === "password") {
-      input.type = "text";
-      button.textContent = "🙈"; // Hide icon
-    } else {
-      input.type = "password";
-      button.textContent = "👁"; // Show icon
-    }
-  }
-</script>
