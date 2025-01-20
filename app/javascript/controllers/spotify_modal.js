@@ -1,36 +1,45 @@
 // app/javascript/controllers/spotify_modal.js
 
-/** Spotifyモーダルの初期化 */
+/**
+ * Spotifyモーダルの初期化
+ * モーダルの開閉とコンテンツのロードを管理する
+ */
 export function initializeSpotifyModal() {
   console.log('✅ Spotifyモーダルの初期化開始');
 
+  // モーダル関連の要素を取得
   const openModalButton = document.getElementById('open-search-modal');
   const reopenModalButton = document.getElementById('reopen-search-modal');
   const closeModalButton = document.getElementById('close-search-modal');
   const spotifyModal = document.getElementById('spotify-modal');
   const modalContent = document.getElementById('spotify-modal-content');
 
+  // 必要な要素が存在しない場合は初期化を中止
   if (!spotifyModal || !modalContent) {
     console.warn('⚠️ モーダル要素が見つかりません。');
     return;
   }
 
-  /** 🎯 モーダルを開く */
+  /** 
+   * モーダルを開く
+   * フォームの値を取得してモーダルコンテンツをロードする
+   */
   async function openModal() {
     console.log('🟢 モーダルを開きます');
     try {
       spotifyModal.showModal();
       
-      // フォームの値を取得
+      // ジャーナルフォームから値を取得
       const journalForm = document.getElementById('journal-form');
       if (journalForm) {
         const formData = new FormData(journalForm);
         const params = new URLSearchParams();
         
         // フォームの値をjournalパラメータとしてエンコード
+        // 空の値は送信しない
         formData.forEach((value, key) => {
           const match = key.match(/^journal\[(.*?)\]$/);
-          if (match && value) {  // 空の値は送信しない
+          if (match && value) {
             params.append(`journal[${match[1]}]`, value);
           }
         });
@@ -45,16 +54,23 @@ export function initializeSpotifyModal() {
     }
   }
 
-  /** 🛑 モーダルを閉じる */
+  /** 
+   * モーダルを閉じる
+   * モーダルを閉じてコンテンツをクリアする
+   */
   function closeModal() {
     console.log('🛑 モーダルを閉じます');
     spotifyModal.close();
     modalContent.innerHTML = '';
   }
 
-  /** 📥 モーダルコンテンツを動的にロード */
+  /** 
+   * モーダルコンテンツを動的にロード
+   * @param {URLSearchParams} params - リクエストパラメータ
+   */
   async function loadSpotifyModalContent(params = new URLSearchParams()) {
     try {
+      // APIリクエストを実行
       const url = `/spotify/search?${params.toString()}`;
       const response = await fetch(url, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -64,12 +80,13 @@ export function initializeSpotifyModal() {
         throw new Error(`HTTPエラー! ステータス: ${response.status}`);
       }
 
+      // レスポンスをモーダルに表示
       const html = await response.text();
       modalContent.innerHTML = html;
 
       console.log('🟢 モーダルコンテンツがロードされました');
 
-      // 検索条件モジュールの初期化
+      // 関連モジュールを動的にインポートして初期化
       import('./spotify_search.js')
         .then((module) => module.initializeSearchConditions())
         .catch((error) => console.error('❌ 検索条件モジュールの読み込みエラー:', error));
@@ -83,7 +100,7 @@ export function initializeSpotifyModal() {
     }
   }
 
-  /** 🎯 イベントリスナーを設定 */
+  // イベントリスナーの設定
   if (openModalButton) {
     openModalButton.addEventListener('click', openModal);
     console.log('🟢 openModalButton イベントリスナーが設定されました');
@@ -99,5 +116,6 @@ export function initializeSpotifyModal() {
     console.log('🟢 closeModalButton イベントリスナーが設定されました');
   }
 
+  // モーダルが閉じられた時のイベントリスナー
   spotifyModal.addEventListener('close', closeModal);
 }

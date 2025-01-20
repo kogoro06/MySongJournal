@@ -1,18 +1,18 @@
-/**
- * ⚠️ 自動生成ファイル
- * このファイルは自動生成されます。手動での編集は避けてください。
- * 新しいコントローラーを追加する場合は以下のコマンドを実行：
- * ./bin/rails stimulus:manifest:update
- */
+// 🔄 このファイルは自動生成されます
+// ./bin/rails stimulus:manifest:update コマンドで生成
+// 新しいコントローラーを追加する際や、
+// ./bin/rails generate stimulus controllerName でコントローラーを作成する際に実行してください
 
-// 🎮 Stimulusアプリケーションのインポート
 import { application } from "./application"
 
-// 📝 各コントローラーのインポートと登録
-// サンプルコントローラー
+// 👋 基本的な動作確認用のHelloコントローラー
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
 
-// Spotify検索機能のコントローラー
+// 🔐 パスワードの表示/非表示を切り替えるコントローラー
+import PasswordVisibilityController from "./password_visibility_controller"
+application.register("password-visibility", PasswordVisibilityController)
+
+// 🎵 Spotify楽曲検索機能のコントローラー
 import SpotifySearchController from "./spotify_search_controller"
 application.register("spotify-search", SpotifySearchController)

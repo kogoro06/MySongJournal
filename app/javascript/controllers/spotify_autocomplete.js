@@ -1,61 +1,76 @@
-// 🎯 Spotify オートコンプリート
+/**
+ * Spotifyのオートコンプリート機能を初期化する
+ * 検索フィールドに入力があった際に、Spotify APIから候補を取得して表示する
+ */
 export function initializeSpotifyAutocomplete() {
+  // 検索条件を格納するコンテナ要素
   const searchConditionsContainer = document.getElementById('search-conditions');
-  const abortControllers = new Map(); // 各フィールドごとのリクエスト管理
+  // 各検索フィールドのリクエストを管理するMap
+  const abortControllers = new Map();
 
-// 🔄 検索条件ごとにイベントを追加
-function initializeAutoCompleteForField(queryField, typeField) {
-  queryField.addEventListener('input', (event) => {
-    const query = event.target.value.trim();
-    const type = typeField.value;
+  /**
+   * 検索フィールドごとにオートコンプリートを初期化する
+   * @param {HTMLElement} queryField - 検索クエリの入力フィールド
+   * @param {HTMLElement} typeField - 検索タイプの選択フィールド
+   */
+  function initializeAutoCompleteForField(queryField, typeField) {
+    queryField.addEventListener('input', (event) => {
+      const query = event.target.value.trim();
+      const type = typeField.value;
 
-    if (!query) {
-      console.log('ℹ️ クエリが空です。候補をクリアします。');
-      clearSuggestions(queryField);
-      return;
-    }
+      if (!query) {
+        console.log('ℹ️ クエリが空です。候補をクリアします。');
+        clearSuggestions(queryField);
+        return;
+      }
 
-    // 現在のリクエストをキャンセル
-    if (abortControllers.has(queryField)) {
-      const controller = abortControllers.get(queryField);
-      controller.abort();
-    }
+      // 進行中のリクエストがあればキャンセル
+      if (abortControllers.has(queryField)) {
+        const controller = abortControllers.get(queryField);
+        controller.abort();
+      }
 
-    // 新しいリクエストを初期化
-    const controller = new AbortController();
-    abortControllers.set(queryField, controller);
+      // 新しいリクエストのためのAbortControllerを作成
+      const controller = new AbortController();
+      abortControllers.set(queryField, controller);
 
-    console.log(`🔍 オートコンプリートリクエスト: query="${query}", type="${type}"`);
+      console.log(`🔍 オートコンプリートリクエスト: query="${query}", type="${type}"`);
 
-    fetch(`/spotify/autocomplete?query=${encodeURIComponent(query)}&type=${type}`, {
-      signal: controller.signal,
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTPエラー: ${response.status}`);
-        }
-        return response.json();
+      // Spotify APIに候補を問い合わせ
+      fetch(`/spotify/autocomplete?query=${encodeURIComponent(query)}&type=${type}`, {
+        signal: controller.signal,
       })
-      .then(data => {
-        if (data.length === 0) {
-          console.log('ℹ️ 検索結果なし。候補をクリアします。');
-          clearSuggestions(queryField);
-          return;
-        }
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTPエラー: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.length === 0) {
+            console.log('ℹ️ 検索結果なし。候補をクリアします。');
+            clearSuggestions(queryField);
+            return;
+          }
 
-        const uniqueSuggestions = filterUniqueSuggestions(data);
-        renderSuggestions(uniqueSuggestions, queryField);
-      })
-      .catch(error => {
-        if (error.name === 'AbortError') {
-          console.log('🔄 リクエストがキャンセルされました:', queryField);
-        } else {
-          console.error('❌ APIリクエストエラー:', error);
-        }
-      });
-  });
-}
-  // 🎯 重複データを除去する関数
+          const uniqueSuggestions = filterUniqueSuggestions(data);
+          renderSuggestions(uniqueSuggestions, queryField);
+        })
+        .catch(error => {
+          if (error.name === 'AbortError') {
+            console.log('🔄 リクエストがキャンセルされました:', queryField);
+          } else {
+            console.error('❌ APIリクエストエラー:', error);
+          }
+        });
+    });
+  }
+
+  /**
+   * 候補から重複を除去する
+   * @param {Array} suggestions - APIから返された候補の配列
+   * @returns {Array} 重複を除去した候補の配列
+   */
   function filterUniqueSuggestions(suggestions) {
     const seen = new Set();
     return suggestions.filter(suggestion => {
@@ -67,7 +82,11 @@ function initializeAutoCompleteForField(queryField, typeField) {
     });
   }
 
-  // 🎯 オートコンプリート候補の表示
+  /**
+   * オートコンプリートの候補リストを表示する
+   * @param {Array} suggestions - 表示する候補の配列
+   * @param {HTMLElement} queryField - 検索クエリの入力フィールド
+   */
   function renderSuggestions(suggestions, queryField) {
     let suggestionList = queryField.nextElementSibling;
     if (!suggestionList || suggestionList.tagName !== 'UL') {
@@ -98,7 +117,10 @@ function initializeAutoCompleteForField(queryField, typeField) {
     });
   }
 
-  // 🎯 オートコンプリート候補のクリア
+  /**
+   * オートコンプリートの候補リストをクリアする
+   * @param {HTMLElement} queryField - 検索クエリの入力フィールド
+   */
   function clearSuggestions(queryField) {
     const suggestionList = queryField.nextElementSibling;
     if (suggestionList && suggestionList.tagName === 'UL') {
@@ -106,14 +128,14 @@ function initializeAutoCompleteForField(queryField, typeField) {
     }
   }
 
-  // ✅ 初期検索条件のオートコンプリート
+  // 初期検索条件のオートコンプリートを設定
   const initialQueryField = document.getElementById('initial-query');
   const initialTypeField = document.getElementById('initial-search-type');
   if (initialQueryField && initialTypeField) {
     initializeAutoCompleteForField(initialQueryField, initialTypeField);
   }
 
-  // ✅ 検索条件を追加
+  // 検索条件追加ボタンのイベントハンドラを設定
   const addConditionBtn = document.getElementById('add-condition-btn');
   if (addConditionBtn) {
     addConditionBtn.addEventListener('click', () => {
@@ -127,11 +149,11 @@ function initializeAutoCompleteForField(queryField, typeField) {
         } else {
           console.warn('⚠️ 新しい検索条件の入力フィールドまたはタイプフィールドが見つかりません。');
         }
-      }, 200); // DOM更新後に実行
+      }, 200); // DOM更新を待つ
     });
   }
 
-  // ✅ 動的に追加された検索条件にもオートコンプリートを適用
+  // 動的に追加された検索条件のイベントを委譲して処理
   searchConditionsContainer?.addEventListener('input', (event) => {
     if (event.target.matches('input[name="search_values[]"]')) {
       const queryField = event.target;
