@@ -40,7 +40,7 @@
               <h3 class="font-bold text-lg mb-1"><%= journal.title %></h3>
               <div class="flex items-center gap-2 text-sm text-gray-600">
                 <span>by <%= journal.user.name %></span>
-                <% if journal.user != current_user %>
+                <% if user_signed_in? && journal.user != current_user %>
                   <%= button_to "#", 
                       method: :post,
                       class: "px-2 py-1 bg-blue-500 text-white rounded-full text-xs hover:bg-blue-600" do %>
@@ -61,22 +61,27 @@
 
             <!-- アクションボタン -->
             <div class="flex gap-2">
-              <% if journal.user == current_user %>
-                <%= link_to '詳細', journal_path(journal), 
-                    class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-gray-500 text-white text-sm rounded hover:bg-gray-600" %>
-                <%= link_to "編集", edit_journal_path(journal), 
-                    class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600" %>
-                <%= button_to "削除", journal_path(journal),
-                    method: :delete,
-                    data: { confirm: "本当に削除しますか？" },
-                    class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-red-500 text-white text-sm rounded hover:bg-red-600" %>
+              <% if user_signed_in? %>
+                <% if journal.user == current_user %>
+                  <%= link_to '詳細', journal_path(journal), 
+                      class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-gray-500 text-white text-sm rounded hover:bg-gray-600" %>
+                  <%= link_to "編集", edit_journal_path(journal), 
+                      class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600" %>
+                  <%= button_to "削除", journal_path(journal),
+                      method: :delete,
+                      data: { confirm: "本当に削除しますか？" },
+                      class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-red-500 text-white text-sm rounded hover:bg-red-600" %>
+                <% else %>
+                  <%= link_to '詳細', journal_path(journal), 
+                      class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-gray-500 text-white text-sm rounded hover:bg-gray-600" %>
+                  <%= button_to "#",
+                      class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-green-500 text-white text-sm rounded hover:bg-green-600" do %>
+                    いいね
+                  <% end %>
+                <% end %>
               <% else %>
                 <%= link_to '詳細', journal_path(journal), 
-                    class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-gray-500 text-white text-sm rounded hover:bg-gray-600" %>
-                <%= button_to "#",
-                    class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-green-500 text-white text-sm rounded hover:bg-green-600" do %>
-                  いいね
-                <% end %>
+                    class: "w-full text-center py-2 px-4 bg-gray-500 text-white text-sm rounded hover:bg-gray-600" %>
               <% end %>
             </div>
           </div>
