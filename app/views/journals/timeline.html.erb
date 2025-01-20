@@ -99,5 +99,16 @@
       <%= link_to "新しい日記を作成", new_journal_path, 
           class: "w-full block text-center py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors" %>
     </div>
+
+    <!-- Spotifyロゴ -->
+    <div class="mt-8 text-center">
+      <p class="text-sm text-gray-600 mb-2">Powered by</p>
+      <%= link_to "https://developer.spotify.com", target: "_blank", rel: "noopener noreferrer" do %>
+        <%= image_tag "spotify_logo.png", 
+            alt: "Spotify", 
+            class: "h-8 inline-block",
+            style: "max-width: 140px;" %>
+      <% end %>
+    </div>
   </div>
 </div>
