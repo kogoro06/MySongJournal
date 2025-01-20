@@ -1,20 +1,16 @@
-// Entry point for the build script in your package.json
+// ⚡️ アプリケーションのエントリーポイント
 import "@hotwired/turbo-rails"
-import { Application } from "@hotwired/stimulus"
+import "./controllers"  // Stimulusコントローラーをインポート
 
-// Stimulus設定
-const application = Application.start()
-
-// コントローラーを登録
-import SpotifySearchController from "./controllers/spotify_search_controller"
-application.register("spotify-search", SpotifySearchController)
-
-// その他のSpotify関連機能をインポート
+// 🎵 Spotify関連機能のインポート
 import { initializeSpotifyModal } from "./controllers/spotify_modal"
 import { initializeSpotifyAutocomplete } from "./controllers/spotify_autocomplete"
 import { initializeSpotifyInput } from "./controllers/spotify_input"
 
-/** ✅ Spotify関連機能の初期化 */
+/** 
+ * ✨ Spotify関連機能の初期化
+ * モーダル、オートコンプリート、入力フィールドの設定を行う
+ */
 function initializeSpotifySearch() {
   console.log('🎯 Spotify関連機能の初期化開始');
 
@@ -32,7 +28,10 @@ function initializeSpotifySearch() {
   }
 }
 
-/** 🎯 Turboイベントで初期化関数を再実行 */
+/** 
+ * 🔄 ページ遷移時の再初期化設定
+ * Turboとの連携のため、各イベントで初期化関数を実行
+ */
 document.addEventListener('turbo:load', initializeSpotifySearch);
 document.addEventListener('turbo:render', initializeSpotifySearch);
 document.addEventListener('DOMContentLoaded', initializeSpotifySearch);
