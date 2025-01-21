@@ -1,9 +1,30 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+# 管理者ユーザーの作成
+admin_user = User.find_or_create_by!(email: ENV['ADMIN_EMAIL']) do |user|
+  user.password = ENV['ADMIN_PASSWORD']
+  user.name = 'Administrator'
+  user.role = :admin
+end
+puts "管理者ユーザーを作成しました: #{admin_user.email}"
+
+# 一般ユーザーの作成
+general_users = [
+  {
+    email: 'user1@example.com',
+    password: 'password',
+    name: 'User 1'
+  },
+  {
+    email: 'user2@example.com',
+    password: 'password',
+    name: 'User 2'
+  }
+]
+
+general_users.each do |user_attrs|
+  user = User.find_or_create_by!(email: user_attrs[:email]) do |u|
+    u.password = user_attrs[:password]
+    u.name = user_attrs[:name]
+    u.role = :general
+  end
+  puts "一般ユーザーを作成しました: #{user.email}"
+end

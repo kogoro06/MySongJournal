@@ -10,10 +10,7 @@ class User < ApplicationRecord
   attribute :role, :integer, default: 0
 
   # enumの定義
-  enum :role, {
-    general: 0,
-    admin: 1
-  }, prefix: true
+  enum role: { general: 0, admin: 1 }
 
   # 管理者かどうかを判定するメソッド
   def admin?

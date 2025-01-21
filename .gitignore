@@ -39,3 +39,8 @@
 
 /node_modules
 .DS_Store
+
+# 環境変数ファイル
+.env
+.env.*
+!.env.sample
