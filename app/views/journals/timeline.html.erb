@@ -6,7 +6,7 @@
         <h1 class="text-2xl font-bold">タイムライン</h1>
         <p class="text-sm text-gray-600 mt-1">*フォローボタンを押すと日記を書いたユーザーをフォローできます。</p>
       </div>
-      <%= form_with url: timeline_journals_path, method: :get, local: true, class: "flex items-center", id: "emotion-filter-form" do |f| %>
+      <%= form_with url: timeline_path, method: :get, local: true, class: "flex items-center", id: "emotion-filter-form" do |f| %>
         <%= f.select :emotion,
             Journal.emotions.keys.map { |key| [key.humanize, key] },
             { include_blank: "すべての感情" },
@@ -62,7 +62,7 @@
             <!-- アクションボタン -->
             <div class="flex gap-2">
               <% if user_signed_in? %>
-                <% if journal.user == current_user %>
+                <% if journal.user == current_user || current_user.admin? %>
                   <%= link_to '詳細', journal_path(journal), 
                       class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-gray-500 text-white text-sm rounded hover:bg-gray-600" %>
                   <%= link_to "編集", edit_journal_path(journal), 

@@ -1,0 +1,36 @@
+<div class="admin-content">
+  <h2>日記詳細</h2>
+
+  <div class="admin-detail">
+    <dl>
+      <dt>ID</dt>
+      <dd><%= @journal.id %></dd>
+
+      <dt>ユーザー</dt>
+      <dd><%= @journal.user.name %></dd>
+
+      <dt>タイトル</dt>
+      <dd><%= @journal.title %></dd>
+
+      <dt>アーティスト</dt>
+      <dd><%= @journal.artist_name %></dd>
+
+      <dt>曲名</dt>
+      <dd><%= @journal.song_name %></dd>
+
+      <dt>感情</dt>
+      <dd><%= @journal.emotion %></dd>
+
+      <dt>作成日時</dt>
+      <dd><%= l @journal.created_at, format: :long %></dd>
+
+      <dt>更新日時</dt>
+      <dd><%= l @journal.updated_at, format: :long %></dd>
+    </dl>
+  </div>
+
+  <div class="admin-actions mt-4">
+    <%= link_to '編集', edit_admin_journal_path(@journal), class: 'admin-button' %>
+    <%= link_to '戻る', admin_journals_path, class: 'admin-button' %>
+  </div>
+</div> 

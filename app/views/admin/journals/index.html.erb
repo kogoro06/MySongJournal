@@ -1,0 +1,39 @@
+<div class="admin-content">
+  <h2>日記管理</h2>
+
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>ユーザー</th>
+        <th>タイトル</th>
+        <th>アーティスト</th>
+        <th>曲名</th>
+        <th>感情</th>
+        <th>作成日時</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @journals.each do |journal| %>
+        <tr>
+          <td><%= journal.id %></td>
+          <td><%= journal.user.name %></td>
+          <td><%= journal.title %></td>
+          <td><%= journal.artist_name %></td>
+          <td><%= journal.song_name %></td>
+          <td><%= journal.emotion %></td>
+          <td><%= l journal.created_at, format: :short %></td>
+          <td class="admin-actions">
+            <%= link_to '詳細', admin_journal_path(journal), class: 'admin-link' %>
+            <%= link_to '編集', edit_admin_journal_path(journal), class: 'admin-link' %>
+            <%= button_to '削除', admin_journal_path(journal), 
+                method: :delete, 
+                data: { confirm: '本当に削除しますか？' }, 
+                class: 'admin-delete-button' %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div> 

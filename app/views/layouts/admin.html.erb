@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>MySongJournal管理画面</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "admin", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "admin", "data-turbo-track": "reload", defer: true %>
+  </head>
+
+  <body class="admin-body">
+    <div class="admin-container">
+      <header class="admin-header">
+        <h1>MySongJournal管理画面</h1>
+        <% if user_signed_in? %>
+          <div class="admin-user-info">
+            <%= current_user.email %>
+            <%= button_to 'ログアウト', destroy_user_session_path, method: :delete, class: 'admin-logout-button' %>
+          </div>
+        <% end %>
+      </header>
+
+      <div class="admin-content">
+        <% if notice %><div class="admin-notice"><%= notice %></div><% end %>
+        <% if alert %><div class="admin-alert"><%= alert %></div><% end %>
+        <nav class="admin-nav">
+          <%= link_to 'ダッシュボード', admin_root_path %>
+          <%= link_to '管理者管理', admin_admins_path %>
+          <%= link_to 'ユーザー管理', admin_users_path %>
+          <%= link_to '日記管理', admin_journals_path %>
+        </nav>
+        <%= yield %>
+      </div>
+    </div>
+  </body>
+</html> 

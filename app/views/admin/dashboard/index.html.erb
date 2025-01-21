@@ -1,0 +1,21 @@
+<div class="admin-dashboard">
+  <h2>ダッシュボード</h2>
+  
+  <div class="admin-stats">
+    <div class="stat-card">
+      <h3>総ユーザー数</h3>
+      <p><%= @total_users %></p>
+    </div>
+    
+    <div class="stat-card">
+      <h3>総日記数</h3>
+      <p><%= @total_journals %></p>
+    </div>
+  </div>
+
+  <div class="admin-actions">
+    <%= link_to '管理者管理', admin_admins_path, class: 'admin-button' %>
+    <%= link_to 'ユーザー管理', admin_users_path, class: 'admin-button' %>
+    <%= link_to '日記管理', admin_journals_path, class: 'admin-button' %>
+  </div>
+</div> 

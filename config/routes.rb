@@ -1,18 +1,23 @@
 Rails.application.routes.draw do
-  get "others_journal/index"
   devise_for :users
 
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  get "up" => "rails/health#show", as: :rails_health_check
-
-  # 日記関連のルート
-  resources :journals do
-    collection do
-      get "timeline", to: "journals#timeline", as: "timeline"
-    end
+  # 管理者用のルートを先に定義
+  namespace :admin do
+    root to: "dashboard#index"
+    resources :admins
+    resources :users
+    resources :journals
   end
+
+  # 一般ユーザー用のルート
+  root "static_pages#top"
+  resources :journals
+  get "timeline", to: "journals#timeline"
+
+  # その他のルート
+  resources :admins
+  get "others_journal/index"
+  get "up" => "rails/health#show", as: :rails_health_check
 
   require "sidekiq/web"
   mount Sidekiq::Web => "/sidekiq"
@@ -30,9 +35,6 @@ Rails.application.routes.draw do
   get "/privacy_policy", to: "pages#privacy_policy"
   get "/contact", to: "pages#contact"
   get "/terms", to: "pages#terms"
-
-  # Defines the root path route ("/")
-  root "static_pages#top"
 
   resources :users do
     member do

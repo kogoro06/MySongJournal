@@ -1,0 +1,36 @@
+<div class="admin-content">
+  <h2>管理者一覧</h2>
+
+  <div class="admin-actions mb-4">
+    <%= link_to '新規管理者作成', new_admin_admin_path, class: 'admin-button' %>
+  </div>
+
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>名前</th>
+        <th>メールアドレス</th>
+        <th>作成日</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @users.each do |user| %>
+        <tr>
+          <td><%= user.id %></td>
+          <td><%= user.name %></td>
+          <td><%= user.email %></td>
+          <td><%= l user.created_at, format: :short %></td>
+          <td>
+            <%= link_to '詳細', admin_admin_path(user), class: 'admin-link' %>
+            <%= link_to '編集', edit_admin_admin_path(user), class: 'admin-link' %>
+            <%= button_to '削除', admin_admin_path(user), method: :delete, 
+                data: { confirm: '本当に削除しますか？' }, 
+                class: 'admin-delete-button' %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div> 
