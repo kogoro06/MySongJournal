@@ -2,16 +2,16 @@ require "rest-client"
 require "json"
 
 class SpotifyToken < ApplicationRecord
-  belongs_to :user
+  belongs_to :user, optional: true
 
   # バリデーション
-  validates :access_token, presence: true, length: { minimum: 50 }
+  validates :access_token, presence: true
   validates :refresh_token, presence: true, length: { minimum: 50 }
   validates :expires_at, presence: true
 
   # トークンが期限切れかどうかを確認
   def expired?
-    expires_at.nil? || Time.current >= expires_at
+    expires_at.present? && expires_at < Time.current
   end
 
   # アクセストークンを更新するメソッド

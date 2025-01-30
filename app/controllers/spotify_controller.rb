@@ -1,6 +1,8 @@
 class SpotifyController < ApplicationController
+  before_action :authenticate_user!
   require "rest-client"
   require "json"
+  require "net/http"
 # 🎵 検索機能
 def search
   @tracks = []
@@ -101,9 +103,23 @@ end
 
   def autocomplete
     token = SpotifyToken.last
+
+    if token.nil? || token.expired?
+      fetch_spotify_token
+      token = SpotifyToken.last
+    end
+
+    if token.nil?
+      Rails.logger.error "Spotifyトークンが取得できませんでした"
+      render json: { error: "Spotifyトークンが取得できませんでした" }, status: :internal_server_error
+      return
+    end
+
+    access_token = token.access_token
+
     url = "https://api.spotify.com/v1/search"
     headers = {
-      "Authorization" => "Bearer #{token.access_token}",
+      "Authorization" => "Bearer #{access_token}",
       "Content-Type" => "application/json",
       "Accept-Language" => "ja"
     }
@@ -145,11 +161,14 @@ end
       render json: autocomplete_results
     rescue RestClient::Unauthorized => e
       Rails.logger.error "🚨 Unauthorized: #{e.message}"
-      # トークンの再取得を試みる
-      SpotifyTokenRefreshWorker.new.perform
-      token.reload
+      # Workerではなく直接fetch_spotify_tokenを呼び出す
+      fetch_spotify_token
+      token = SpotifyToken.last
       # 再試行
-      response = RestClient.get(full_url, headers.merge("Authorization" => "Bearer #{token.access_token}"))
+      response = RestClient.get(
+        full_url,
+        headers.merge("Authorization" => "Bearer #{token.access_token}")
+      )
       render json: JSON.parse(response.body)
     rescue => e
       Rails.logger.error "🚨 API Error: #{e.message}"
@@ -232,6 +251,35 @@ end
     rescue StandardError => e
       Rails.logger.error "🚨 Unexpected Error: #{e.message}"
       artist.name
+    end
+  end
+
+  def fetch_spotify_token
+    uri = URI("https://accounts.spotify.com/api/token")
+    request = Net::HTTP::Post.new(uri)
+    request.basic_auth(ENV["SPOTIFY_CLIENT_ID"], ENV["SPOTIFY_CLIENT_SECRET"])
+    request.set_form_data(
+      "grant_type" => "refresh_token",
+      "refresh_token" => ENV["SPOTIFY_REFRESH_TOKEN"]
+    )
+
+    response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+      http.request(request)
+    end
+
+    if response.is_a?(Net::HTTPSuccess)
+      data = JSON.parse(response.body)
+      # 既存のトークンを削除
+      SpotifyToken.destroy_all
+      # 新しいトークンを作成
+      SpotifyToken.create!(
+        user_id: current_user.id,  # current_userのIDを設定
+        access_token: data["access_token"],
+        refresh_token: ENV["SPOTIFY_REFRESH_TOKEN"],
+        expires_at: Time.current + data["expires_in"].seconds
+      )
+    else
+      Rails.logger.error "トークンの取得に失敗しました: #{response.body}"
     end
   end
 end
