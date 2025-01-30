@@ -6,19 +6,21 @@ class MypagesController < ApplicationController
     @user = current_user
 
     # タブに応じて表示する投稿を切り替え
-    if params[:tab] == "liked_posts"
-      @liked_journals = current_user.liked_journals
-                                    .includes(:user)
-                                    .order(created_at: :desc)
-                                    .page(params[:page])
-                                    .per(3)
+    case params[:tab]
+    when "liked_posts"
+      @journals = []  # 自分の投稿は空配列に
+      @liked_journals = current_user.favorited_journals
+                                  .includes(:user)
+                                  .order(created_at: :desc)
+                                  .page(params[:page])
+                                  .per(3)
     else
       @journals = current_user.journals
                              .includes(:user)
                              .order(created_at: :desc)
                              .page(params[:page])
                              .per(3)
-      @liked_journals = []  # 空の配列を設定
+      @liked_journals = []  # いいねした投稿は空配列に
     end
 
     respond_to do |format|

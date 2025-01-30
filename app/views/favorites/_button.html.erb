@@ -1,0 +1,50 @@
+<div class="bg-white rounded-lg shadow-sm p-4 relative">
+  <!-- 既存のヘッダー部分 -->
+  <div class="flex gap-2 mt-4">
+    <% if user_signed_in? %>
+      <% if journal.user == current_user %>
+        <%= link_to '詳細', journal_path(journal), data: { turbo: false },
+            class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-gray-500 text-white text-sm rounded hover:bg-gray-600" %>
+        <%= link_to "編集", edit_journal_path(journal), data: { turbo: false },
+            class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600" %>
+        <%= button_to journal_path(journal),
+            method: :delete,
+            data: { turbo: false, confirm: "本当に削除しますか？" },
+            class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-red-500 text-white text-sm rounded hover:bg-red-600" %>
+      <% else %>
+        <%= link_to '詳細', journal_path(journal), data: { turbo: false },
+            class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-gray-500 text-white text-sm rounded hover:bg-gray-600" %>
+      <% end %>
+    <% else %>
+      <%= link_to '詳細', journal_path(journal), data: { turbo: false },
+          class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-gray-500 text-white text-sm rounded hover:bg-gray-600" %>
+    <% end %>
+  </div>
+
+  <%# いいねボタン - 自分の投稿以外にのみ表示 %>
+  <% unless journal.user == current_user %>
+    <div class="mt-2">
+      <% if user_signed_in? %>
+        <% if journal.favorited_by?(current_user) %>
+          <%= button_to journal_favorites_path(journal), method: :delete,
+              class: "w-full flex items-center justify-center gap-2 py-2 px-4 bg-pink-500 text-white text-sm rounded hover:bg-pink-600" do %>
+            <i class="fas fa-heart"></i>
+            <span><%= journal.favorites.count %></span>
+          <% end %>
+        <% else %>
+          <%= button_to journal_favorites_path(journal), method: :post,
+              class: "w-full flex items-center justify-center gap-2 py-2 px-4 bg-green-500 text-white text-sm rounded hover:bg-green-600" do %>
+            <i class="far fa-heart"></i>
+            <span><%= journal.favorites.count %></span>
+          <% end %>
+        <% end %>
+      <% else %>
+        <%= link_to new_user_session_path,
+            class: "w-full flex items-center justify-center gap-2 py-2 px-4 bg-gray-300 text-white text-sm rounded" do %>
+          <i class="far fa-heart"></i>
+          <span><%= journal.favorites.count %></span>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div> 

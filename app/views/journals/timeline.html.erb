@@ -6,12 +6,12 @@
         <h1 class="text-2xl font-bold">タイムライン</h1>
         <p class="text-sm text-gray-600 mt-1">*フォローボタンを押すと日記を書いたユーザーをフォローできます。</p>
       </div>
-      <%= form_with url: timeline_journals_path, method: :get, local: true, class: "flex items-center", id: "emotion-filter-form" do |f| %>
+       <%= form_with url: journals_path, method: :get, local: true, class: "flex items-center space-x-2 text-white", id: "emotion-filter-form" do |f| %>
         <%= f.select :emotion,
             Journal.emotions.keys.map { |key| [key.humanize, key] },
-            { include_blank: "すべての感情" },
+            { include_blank: "すべて", selected: params[:emotion] },
             { 
-              class: "px-4 py-2 border rounded-md bg-customred text-white",
+              class: "px-4 py-2 border rounded-md bg-customred",
               onchange: "this.form.requestSubmit()"
             } 
         %>
@@ -21,7 +21,9 @@
     <!-- 日記カード一覧 -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <% @journals.each do |journal| %>
-        <%= render 'journals/journal_card', journal: journal %>
+        <div class="flex flex-col h-full">
+          <%= render 'journals/journal_card', journal: journal %>
+        </div>
       <% end %>
     </div>
 
