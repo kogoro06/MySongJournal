@@ -34,10 +34,6 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root "static_pages#top"
 
-  resources :users do
-    member do
-      post "follow"
-      delete "unfollow"
-    end
-  end
+  # マイページ関連のルート
+  resource :mypage, only: [ :show, :edit, :update ]
 end

@@ -50,17 +50,28 @@ def search
     return render partial: "spotify/search"
   end
 
-  # Spotify APIリクエスト
   begin
+    # Spotify APIで曲を検索
     results = RSpotify::Track.search(query_string, market: "JP")
+
+    # アーティストIDを収集
+    artist_ids = results.map { |track| track.artists.map(&:id) }.flatten.uniq
+
+    # アーティスト情報を一括取得
+    token = SpotifyToken.last
+    artists_data = batch_fetch_artists(artist_ids, token)
+
+    # 検索結果の整形
     @tracks = results.map do |track|
+      artist_id = track.artists.first&.id
       {
         song_name: track.name,
-        artist_name: fetch_artist_name(track), # 日本語名を取得
+        artist_name: artists_data[artist_id] || track.artists.first&.name,
         preview_url: track.preview_url,
         album_image: track.album.images.first&.dig("url")
       }
     end
+
   rescue RestClient::BadRequest => e
     Rails.logger.error "🚨 Spotify API Error: #{e.response}"
     flash.now[:alert] = "Spotify検索中にエラーが発生しました。"
@@ -207,50 +218,34 @@ end
 
   private
 
-  def fetch_artist_name(track)
-    artist = track.artists.first
-    return artist&.name if artist.nil?
+  def batch_fetch_artists(artist_ids, token)
+    return {} if artist_ids.empty?
 
-    # Spotify APIに直接リクエストを送信し、日本語名を取得
-    token = SpotifyToken.last
-    begin
-      response = RestClient.get(
-        "https://api.spotify.com/v1/artists/#{artist.id}",
-        {
-          "Authorization" => "Bearer #{token.access_token}",
-          "Content-Type" => "application/json",
-          "Accept-Language" => "ja"
-        }
-      )
-      detailed_artist = JSON.parse(response.body)
-      Rails.logger.debug "Spotify Artist API Response: #{detailed_artist}"
+    # アーティストIDを20個ずつのグループに分割（Spotify APIの制限）
+    artist_ids.each_slice(20).reduce({}) do |result, ids_group|
+      begin
+        response = RestClient.get(
+          "https://api.spotify.com/v1/artists?ids=#{ids_group.join(',')}",
+          {
+            "Authorization" => "Bearer #{token.access_token}",
+            "Content-Type" => "application/json",
+            "Accept-Language" => "ja"
+          }
+        )
 
-      # 日本語名があればそれを返し、なければデフォルトの名前を返す
-      detailed_artist["name"] || artist.name
-    rescue RestClient::Unauthorized => e
-      Rails.logger.error "🚨 Unauthorized: #{e.message}"
-      SpotifyTokenRefreshWorker.new.perform
-      token.reload
-      # 再試行
-      response = RestClient.get(
-        "https://api.spotify.com/v1/artists/#{artist.id}",
-        {
-          "Authorization" => "Bearer #{token.reload.access_token}",
-          "Content-Type" => "application/json",
-          "Accept-Language" => "ja"
-        }
-      )
-      detailed_artist = JSON.parse(response.body)
-      Rails.logger.debug "Spotify Artist API Response: #{detailed_artist}"
+        JSON.parse(response.body)["artists"].each do |artist|
+          result[artist["id"]] = artist["name"]
+        end
+      rescue RestClient::Unauthorized
+        token.reload
+        SpotifyTokenRefreshWorker.new.perform
+        # 再試行
+        retry
+      rescue StandardError => e
+        Rails.logger.error "🚨 Batch Artist Fetch Error: #{e.message}"
+      end
 
-      # 日本語名があればそれを返し、なければデフォルトの名前を返す
-      detailed_artist["name"] || artist.name
-    rescue RestClient::ExceptionWithResponse => e
-      Rails.logger.error "🚨 Spotify Artist API Error: #{e.response}"
-      artist.name
-    rescue StandardError => e
-      Rails.logger.error "🚨 Unexpected Error: #{e.message}"
-      artist.name
+      result
     end
   end
 

@@ -9,3 +9,14 @@ ja:
     terms:
       title: "利用規約"
       date_of_enactment: "2025年1月14日 制定"
+  activerecord:
+    attributes:
+      profile:
+        name: "名前"
+        bio: "自己紹介"
+        x_link: "Xのリンク"
+        avatar: "アバター画像"
+        update: "更新"
+  time:
+    formats:
+      long: "%Y年%m月%d日 %H:%M"

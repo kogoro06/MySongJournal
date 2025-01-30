@@ -1,0 +1,35 @@
+<% if params[:tab] == "liked_posts" %>
+  <% if liked_journals.present? %>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% liked_journals.each do |journal| %>
+        <%= render 'journals/journal_card', journal: journal %>
+      <% end %>
+    </div>
+    <%# ページネーション %>
+    <div class="mt-8 flex justify-center">
+      <%= paginate liked_journals, 
+          window: 2,
+          params: { tab: params[:tab] },
+          data: { turbo_frame: "posts_content" } %>
+    </div>
+  <% else %>
+    <p class="text-center text-gray-500">いいねした投稿はありません</p>
+  <% end %>
+<% else %>
+  <% if journals.present? %>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% journals.each do |journal| %>
+        <%= render 'journals/journal_card', journal: journal %>
+      <% end %>
+    </div>
+    <%# ページネーション %>
+    <div class="mt-8 flex justify-center">
+      <%= paginate journals, 
+          window: 2,
+          params: { tab: params[:tab] },
+          data: { turbo_frame: "posts_content" } %>
+    </div>
+  <% else %>
+    <p class="text-center text-gray-500">投稿はありません</p>
+  <% end %>
+<% end %>

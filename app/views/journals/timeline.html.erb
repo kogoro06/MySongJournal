@@ -21,71 +21,7 @@
     <!-- 日記カード一覧 -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <% @journals.each do |journal| %>
-        <div class="bg-gray-50 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-          <div class="text-sm text-gray-600 text-right p-2">
-            <%= journal.created_at.strftime("%m/%d %H:%M") %>
-          </div>
-          <!-- ジャケット画像 -->
-          <div class="w-full aspect-square relative">
-            <%= image_tag(journal.album_image.presence || 'no-image.png',
-                class: "w-full h-full object-cover", 
-                loading: "lazy",
-                alt: "アルバムジャケット画像"
-            ) %>
-          </div>
-
-          <!-- 情報部分 -->
-          <div class="p-4">
-            <div class="mb-3">
-              <h3 class="font-bold text-lg mb-1"><%= journal.title %></h3>
-              <div class="flex items-center gap-2 text-sm text-gray-600">
-                <span>by <%= journal.user.name %></span>
-                <% if user_signed_in? && journal.user != current_user %>
-                  <%= button_to "#", 
-                      method: :post,
-                      class: "px-2 py-1 bg-blue-500 text-white rounded-full text-xs hover:bg-blue-600" do %>
-                    <i class="fas fa-user-plus mr-1"></i>フォロー
-                  <% end %>
-                <% end %>
-              </div>
-            </div>
-
-            <!-- 曲情報 -->
-            <div class="text-sm text-gray-600 space-y-1 mb-4">
-              <div>アーティスト: <%= journal.artist_name %></div>
-              <div>曲名: <%= journal.song_name %></div>
-              <div class="inline-block px-2 py-1 bg-gray-200 rounded-full text-xs">
-                感情: <%= journal.emotion %>
-              </div>
-            </div>
-
-            <!-- アクションボタン -->
-            <div class="flex gap-2">
-              <% if user_signed_in? %>
-                <% if journal.user == current_user %>
-                  <%= link_to '詳細', journal_path(journal), 
-                      class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-gray-500 text-white text-sm rounded hover:bg-gray-600" %>
-                  <%= link_to "編集", edit_journal_path(journal), 
-                      class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600" %>
-                  <%= button_to "削除", journal_path(journal),
-                      method: :delete,
-                      data: { confirm: "本当に削除しますか？" },
-                      class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-red-500 text-white text-sm rounded hover:bg-red-600" %>
-                <% else %>
-                  <%= link_to '詳細', journal_path(journal), 
-                      class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-gray-500 text-white text-sm rounded hover:bg-gray-600" %>
-                  <%= button_to "#",
-                      class: "flex-1 text-center py-2 px-4 min-w-[80px] bg-green-500 text-white text-sm rounded hover:bg-green-600" do %>
-                    いいね
-                  <% end %>
-                <% end %>
-              <% else %>
-                <%= link_to '詳細', journal_path(journal), 
-                    class: "w-full text-center py-2 px-4 bg-gray-500 text-white text-sm rounded hover:bg-gray-600" %>
-              <% end %>
-            </div>
-          </div>
-        </div>
+        <%= render 'journals/journal_card', journal: journal %>
       <% end %>
     </div>
 
