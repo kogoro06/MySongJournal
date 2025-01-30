@@ -4,7 +4,7 @@ class MypagesController < ApplicationController
 
   def show
     @user = current_user
-    
+
     # タブに応じて表示する投稿を切り替え
     case params[:tab]
     when "liked_posts"

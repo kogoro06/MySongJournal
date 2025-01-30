@@ -23,8 +23,8 @@ class FavoritesController < ApplicationController
   def render_favorite_button
     render turbo_stream: turbo_stream.replace(
       "journal-card-#{@journal.id}",
-      partial: 'journals/journal_card',
+      partial: "journals/journal_card",
       locals: { journal: @journal }
     )
   end
-end 
+end
