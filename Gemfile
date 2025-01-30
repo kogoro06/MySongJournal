@@ -47,8 +47,8 @@ gem "sidekiq"
 gem "sidekiq-cron"
 gem "kaminari"
 
-gem 'mini_magick'
-gem 'image_processing', '~> 1.2'
+gem "mini_magick"
+gem "image_processing", "~> 1.2"
 
 
 group :development, :test do
