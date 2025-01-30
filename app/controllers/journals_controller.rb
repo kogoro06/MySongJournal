@@ -103,8 +103,11 @@ class JournalsController < ApplicationController
 
   # 削除処理
   def destroy
+    @journal = current_user.journals.find(params[:id])
     @journal.destroy
-    redirect_to journals_path, notice: "日記が削除されました."
+    flash[:notice] = "日記を削除しました"
+    # リファラー（前のページ）が存在する場合はそこにリダイレクト
+    redirect_to request.referer.presence || journals_path
   end
 
   private
@@ -118,7 +121,19 @@ class JournalsController < ApplicationController
   end
 
   def store_location
-    session[:return_to] = request.fullpath
+    return unless request.referer
+
+    case request.referer
+    when /journals$/          # index
+      session[:return_to] = journals_path
+    when /timeline$/         # timeline
+      session[:return_to] = timeline_journals_path
+    when /mypages\/\d+$/    # mypage（数字のIDを含むパターンに修正）
+      session[:return_to] = mypage_path
+    else
+      session[:return_to] = journals_path
+    end
+    Rails.logger.info "📍 Stored return location: #{session[:return_to]} from referer: #{request.referer}"
   end
 
   def return_path
