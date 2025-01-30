@@ -36,6 +36,7 @@ Rails.application.routes.draw do
 
   resources :users do
     member do
+      get "mypage"
       post "follow"
       delete "unfollow"
     end

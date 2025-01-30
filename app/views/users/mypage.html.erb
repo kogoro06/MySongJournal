@@ -1,0 +1,65 @@
+<div class="bg-white min-h-screen overflow-auto">
+  <div class="flex flex-col justify-center items-center mt-8 mb-8 mx-4 md:mx-24 lg:mx-72">
+    <h1 class="text-3xl md:text-3xl lg:text-4xl font-bold text-accent text-center">
+      <% content_for(:title, 'マイページ') %>
+    </h1>
+  </div>
+
+  <div class="bg-gray-50 h-max m-5 p-10 flex flex-col">
+    <div class="flex flex-col justify-center items-center">
+      <div class="bg-white w-[300px] p-5">
+        <div class="flex space-x-5">
+          <div class="text-center">
+            <% if current_user.avatar.attached? %>
+              <%= image_tag current_user.avatar, class: 'w-14 h-14 rounded-full object-cover border border-primary border-300' %>
+            <% else %>
+              <%= image_tag 'profile_sample.png', class: 'w-14 h-14 rounded-full object-cover border border-primary border-300' %>
+            <% end %>
+          </div>
+          <div class="text-accent font-bold">
+            <p class="text-2xl"><%= current_user.name %></p>
+            <p class="text-gray-600 text-sm"><%= current_user.email %></p>
+            <%# フォロワー/フォロー数は後で実装 %>
+            <%# <div class="flex text-sm space-x-3">
+              <p>フォロー</p>
+              <p>フォロワー</p>
+            </div> %>
+          </div>
+        </div>
+
+        <%# SNSリンク部分は現在のモデルに実装されていないため省略 %>
+
+        <div class="bg-gray-50 text-sm mb-5 p-5 text-primary">
+          <%# bioフィールドが実装されていない場合は省略 %>
+        </div>
+
+        <div class="bg-gray-50 text-sm flex justify-center p-2 mb-3 text-primary">
+          <span class="material-symbols-outlined">edit</span>
+          <%= link_to "プロフィール編集", edit_user_registration_path %>
+        </div>
+      </div>
+    </div>
+
+    <%# 投稿一覧 %>
+    <div class="inline-flex flex-col items-center mt-8" id="paginate">
+      <% current_user.journals.order(created_at: :desc).each do |post| %>
+        <div class="bg-white rounded-lg shadow-md overflow-hidden w-full max-w-2xl mb-4">
+          <div class="p-6">
+            <p class="text-gray-800 text-lg"><%= post.content %></p>
+            <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
+              <span><%= l post.created_at, format: :long %></span>
+              
+              <%# いいねボタンは後で実装 %>
+              <%# <div class="flex items-center">
+                <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+                <span>0</span>
+              </div> %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
