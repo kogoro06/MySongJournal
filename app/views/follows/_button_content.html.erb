@@ -1,0 +1,15 @@
+<% if user_signed_in? && current_user != user %>
+  <% if current_user.following?(user) %>
+    <%= button_to unfollow_user_path(user), 
+        method: :delete,
+        class: "px-2 py-1 bg-gray-500 text-white rounded-full text-xs hover:bg-gray-600 transform-none" do %>
+      <i class="fas fa-user-minus mr-1"></i>フォロー中
+    <% end %>
+  <% else %>
+    <%= button_to follow_user_path(user), 
+        method: :post,
+        class: "px-2 py-1 bg-blue-500 text-white rounded-full text-xs hover:bg-blue-600 transform-none" do %>
+      <i class="fas fa-user-plus mr-1"></i>フォロー
+    <% end %>
+  <% end %>
+<% end %> 
