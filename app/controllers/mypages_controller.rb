@@ -4,7 +4,7 @@ class MypagesController < ApplicationController
 
   def show
     @user = current_user
-  
+
     # タブに応じて表示する投稿を切り替え
     if params[:tab] == "liked_posts"
       @liked_journals = current_user.liked_journals
@@ -20,7 +20,7 @@ class MypagesController < ApplicationController
                              .per(3)
       @liked_journals = []  # 空の配列を設定
     end
-  
+
     respond_to do |format|
       format.html
       format.turbo_stream do
@@ -34,7 +34,7 @@ class MypagesController < ApplicationController
       end
     end
   end
-  
+
   def edit
     @user = current_user
     @profile_form = @user.profile || @user.build_profile

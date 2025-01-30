@@ -4,7 +4,7 @@ class JournalsController < ApplicationController
   before_action :set_journal_for_show, only: [ :show ]  # showアクション用
   before_action :store_location, only: [ :index, :timeline ]
   before_action :authorize_journal, only: [ :edit, :update, :destroy ]
-  before_action :store_edit_source, only: [:edit]
+  before_action :store_edit_source, only: [ :edit ]
 
   # 一覧表示
   def index
@@ -99,7 +99,7 @@ class JournalsController < ApplicationController
   def update
     @journal = current_user.journals.find(params[:id])
     Rails.logger.info "🔄 Update action called with edit_source: #{session[:edit_source]}"
-    
+
     if @journal.update(journal_params)
       flash[:notice] = "日記を更新しました"
       redirect_path = get_redirect_path
@@ -116,16 +116,16 @@ class JournalsController < ApplicationController
     @journal = current_user.journals.find(params[:id])
     @journal.destroy
     flash[:notice] = "日記を削除しました"
-    
+
     # リファラーに基づいて適切なページにリダイレクト
-    redirect_path = if request.referer&.include?('mypage')
+    redirect_path = if request.referer&.include?("mypage")
                      mypage_path
-                   elsif request.referer&.include?('timeline')
+    elsif request.referer&.include?("timeline")
                      timeline_journals_path
-                   else
+    else
                      journals_path
-                   end
-    
+    end
+
     Rails.logger.info "🗑️ Redirecting after delete to: #{redirect_path} from referer: #{request.referer}"
     redirect_to redirect_path
   end
@@ -174,7 +174,7 @@ class JournalsController < ApplicationController
 
   def store_edit_source
     return unless request.referer
-    
+
     # リファラーのURLをセッションに保存
     session[:previous_url] = request.referer
     Rails.logger.info "💾 Stored previous URL: #{session[:previous_url]}"
@@ -183,10 +183,10 @@ class JournalsController < ApplicationController
   def get_redirect_path
     previous_url = session.delete(:previous_url)
     Rails.logger.info "🔍 Previous URL for redirect: #{previous_url}"
-    
-    if previous_url&.include?('mypage')
+
+    if previous_url&.include?("mypage")
       mypage_path
-    elsif previous_url&.include?('timeline')
+    elsif previous_url&.include?("timeline")
       timeline_journals_path
     else
       journals_path
