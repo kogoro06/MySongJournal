@@ -17,3 +17,6 @@ ja:
         x_link: "Xのリンク"
         avatar: "アバター画像"
         update: "更新"
+  time:
+    formats:
+      long: "%Y年%m月%d日 %H:%M"

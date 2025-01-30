@@ -5,7 +5,8 @@
     </h1>
   </div>
 
-  <div class="bg-gray-50 h-max m-5 p-10 flex flex-col">
+  <%# プロフィールセクション %>
+  <div class="bg-gray-50 mx-5 p-10">
     <div class="flex flex-col justify-center items-center">
       <div class="bg-white w-[300px] p-5 rounded-lg shadow-sm">
         <%# プロフィール上部：アバターと名前とXアイコン %>
@@ -53,27 +54,28 @@
         </div>
       </div>
     </div>
-</div>
+  </div>
 
-    <%# 投稿一覧 %>
-    <div class="inline-flex flex-col items-center mt-8" id="paginate">
-      <% current_user.journals.order(created_at: :desc).each do |post| %>
-        <div class="bg-white rounded-lg shadow-md overflow-hidden w-full max-w-2xl mb-4">
-          <div class="p-6">
-            <p class="text-gray-800 text-lg"><%= post.content %></p>
-            <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
-              <span><%= l post.created_at, format: :long %></span>
-              
-              <%# いいねボタンは後で実装 %>
-              <%# <div class="flex items-center">
-                <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                </svg>
-                <span>0</span>
-              </div> %>
-            </div>
-          </div>
-        </div>
+  <%# 投稿セクション - 上部にマージンを追加 %>
+  <div class="bg-gray-50 mx-5 mt-8 p-10">
+    <div class="bg-white p-6 rounded-lg shadow-sm">
+      <%# タブナビゲーション %>
+      <div class="border-b border-gray-200 mb-6">
+        <nav class="flex space-x-8" aria-label="Tabs">
+          <%= link_to "自分の投稿", mypage_path(tab: "my_posts"),
+              class: "tab-link #{'active' if params[:tab] != 'liked_posts'} px-3 py-2 text-sm font-medium",
+              data: { turbo_frame: "posts_content" } %>
+          <%= link_to "いいねした投稿", mypage_path(tab: "liked_posts"),
+              class: "tab-link #{'active' if params[:tab] == 'liked_posts'} px-3 py-2 text-sm font-medium",
+              data: { turbo_frame: "posts_content" } %>
+        </nav>
+      </div>
+
+      <%# 投稿内容表示エリア %>
+      <%= turbo_frame_tag "posts_content" do %>
+        <%= render "posts_content", 
+            journals: @journals,
+            liked_journals: @liked_journals %>
       <% end %>
     </div>
   </div>

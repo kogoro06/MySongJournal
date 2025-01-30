@@ -1,10 +1,37 @@
 class MypagesController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_profile, only: [:show, :edit, :update ]
+  before_action :set_profile, only: [ :show, :edit, :update ]
 
   def show
-    @user = User.includes(profile: { avatar_attachment: :blob }).find(current_user.id)
-    @profile_form = @user.profile || @user.build_profile
+    @user = current_user
+
+    # タブに応じて表示する投稿を切り替え
+    if params[:tab] == "liked_posts"
+      @liked_journals = current_user.liked_journals
+                                  .includes(:user)
+                                  .order(created_at: :desc)
+                                  .page(params[:page])
+                                  .per(3)
+    else
+      @journals = current_user.journals
+                             .includes(:user)
+                             .order(created_at: :desc)
+                             .page(params[:page])
+                             .per(3)
+    end
+
+    respond_to do |format|
+      format.html
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.update("posts_content",
+          partial: "mypages/posts_content",
+          locals: {
+            journals: @journals,
+            liked_journals: @liked_journals
+          }
+        )
+      end
+    end
   end
 
   def edit
