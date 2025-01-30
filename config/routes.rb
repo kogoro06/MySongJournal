@@ -37,4 +37,11 @@ Rails.application.routes.draw do
 
   # マイページ関連のルート
   resource :mypage, only: [ :show, :edit, :update ]
+
+  resources :users do
+    member do
+      post "follow", to: "follows#create"
+      delete "unfollow", to: "follows#destroy"
+    end
+  end
 end
