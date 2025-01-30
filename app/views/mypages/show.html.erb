@@ -7,35 +7,44 @@
 
   <div class="bg-gray-50 h-max m-5 p-10 flex flex-col">
     <div class="flex flex-col justify-center items-center">
-      <div class="bg-white w-[300px] p-5">
-        <div class="flex space-x-5">
+      <div class="bg-white w-[300px] p-5 rounded-lg shadow-sm">
+        <%# プロフィール上部：アバターと名前 %>
+        <div class="flex space-x-5 items-center mb-6">
           <div class="text-center">
             <% if current_user.avatar.attached? %>
-              <%= image_tag current_user.avatar, class: 'w-14 h-14 rounded-full object-cover border border-primary border-300' %>
+              <%= image_tag current_user.avatar, class: 'w-16 h-16 rounded-full object-cover border-2 border-primary shadow-sm' %>
             <% else %>
-              <%= image_tag 'profile_sample.png', class: 'w-14 h-14 rounded-full object-cover border border-primary border-300' %>
+              <%= image_tag 'profile_sample.png', class: 'w-16 h-16 rounded-full object-cover border-2 border-primary shadow-sm' %>
             <% end %>
           </div>
-          <div class="text-accent font-bold">
-            <p class="text-2xl"><%= current_user.name %></p>
-            <p class="text-gray-600 text-sm"><%= current_user.email %></p>
-            <%# フォロワー/フォロー数は後で実装 %>
-            <%# <div class="flex text-sm space-x-3">
-              <p>フォロー</p>
-              <p>フォロワー</p>
-            </div> %>
+          <div class="text-accent">
+            <p class="text-2xl font-bold mb-2"><%= current_user.name %></p>
+            <%# フォロー/フォロワー %>
+            <div class="flex space-x-4 text-sm text-gray-600">
+              <div class="flex flex-col items-center">
+                <span class="font-bold">0</span>
+                <span>フォロー</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <span class="font-bold">0</span>
+                <span>フォロワー</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <%# SNSリンク部分は現在のモデルに実装されていないため省略 %>
-
-        <div class="bg-gray-50 text-sm mb-5 p-5 text-primary">
-          <%# bioフィールドが実装されていない場合は省略 %>
+        <%# プロフィール文 %>
+        <div class="bg-gray-50 rounded-lg text-sm mb-5 p-4 text-gray-700">
+          <p class="text-center text-gray-400">プロフィールを入力してください</p>
         </div>
 
-        <div class="bg-gray-50 text-sm flex justify-center p-2 mb-3 text-primary">
-          <span class="material-symbols-outlined">edit</span>
-          <%= link_to "プロフィール編集", edit_user_registration_path %>
+        <%# プロフィール編集ボタン %>
+        <div class="flex justify-center">
+          <%= link_to edit_mypage_path, 
+              class: "flex items-center space-x-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-primary transition duration-200" do %>
+            <span class="material-symbols-outlined text-sm">edit</span>
+            <span class="text-sm">プロフィール編集</span>
+          <% end %>
         </div>
       </div>
     </div>

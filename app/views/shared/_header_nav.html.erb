@@ -1,7 +1,7 @@
 <nav class="flex justify-around items-center space-x-8 text-lg">
   <% if user_signed_in? %>
     <div class="flex items-center space-x-8">
-        <%= link_to mypage_user_path(current_user.id) do %>
+        <%= link_to mypage_path do %>
           <div class="text-center flex flex-col items-center">
             <% if current_user.profile.present? && current_user.profile.avatar.attached? %>
               <%= image_tag current_user.profile.user_icon, class: 'w-10 h-10 rounded-full object-cover border border-primary border-300' %>
