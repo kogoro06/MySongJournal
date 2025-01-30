@@ -8,36 +8,41 @@
   <div class="bg-gray-50 h-max m-5 p-10 flex flex-col">
     <div class="flex flex-col justify-center items-center">
       <div class="bg-white w-[300px] p-5 rounded-lg shadow-sm">
-        <%# プロフィール上部：アバターと名前 %>
+        <%# プロフィール上部：アバターと名前とXアイコン %>
         <div class="flex space-x-5 items-center mb-6">
-          <div class="text-center">
+          <div class="text-center ">
             <% if current_user.avatar.attached? %>
               <%= image_tag current_user.avatar, class: 'w-16 h-16 rounded-full object-cover border-2 border-primary shadow-sm' %>
             <% else %>
               <%= image_tag 'profile_sample.png', class: 'w-16 h-16 rounded-full object-cover border-2 border-primary shadow-sm' %>
             <% end %>
           </div>
-          <div class="text-accent">
-            <p class="text-2xl font-bold mb-2"><%= current_user.name %></p>
-            <%# フォロー/フォロワー %>
-            <div class="flex space-x-4 text-sm text-gray-600">
-              <div class="flex flex-col items-center">
-                <span class="font-bold">0</span>
-                <span>フォロー</span>
+            <div class="text-accent">
+              <div class="flex items-center space-x-8 ml-5">
+                <p class="text-3xl font-bold mb-2"><%= current_user.name %></p>
+                <%= link_to "", current_user.x_link, class: "fa-brands fa-x-twitter text-gray-400 text-2xl" %>
               </div>
-              <div class="flex flex-col items-center">
-                <span class="font-bold">0</span>
-                <span>フォロワー</span>
+              <!-- フォロー/フォロワー -->
+              <div class="flex space-x-4 text-sm text-gray-600 ml-2">
+                <div class="flex flex-col items-center">
+                  <span class="font-bold">0</span>
+                  <span>フォロー</span>
+                </div>
+                <div class="flex flex-col items-center">
+                  <span class="font-bold">0</span>
+                  <span>フォロワー</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-
         <%# プロフィール文 %>
         <div class="bg-gray-50 rounded-lg text-sm mb-5 p-4 text-gray-700">
-          <p class="text-center text-gray-400">プロフィールを入力してください</p>
+          <% if @user.bio.present? %>
+            <p class="text-center text-gray-400"><%= @user.bio %></p>
+          <% else %>
+            <p class="text-center text-gray-400">プロフィールを入力してください</p>
+          <% end %>
         </div>
-
         <%# プロフィール編集ボタン %>
         <div class="flex justify-center">
           <%= link_to edit_mypage_path, 
@@ -48,6 +53,7 @@
         </div>
       </div>
     </div>
+</div>
 
     <%# 投稿一覧 %>
     <div class="inline-flex flex-col items-center mt-8" id="paginate">

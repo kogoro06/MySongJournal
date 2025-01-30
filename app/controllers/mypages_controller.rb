@@ -4,6 +4,7 @@ class MypagesController < ApplicationController
 
   def show
     @user = User.includes(profile: { avatar_attachment: :blob }).find(current_user.id)
+    @profile_form = @user.profile || @user.build_profile
   end
 
   def edit
@@ -13,6 +14,7 @@ class MypagesController < ApplicationController
 
   def update
     @user = current_user
+    @profile_form = @user.profile || @user.build_profile
     if @user.update(user_params)
       redirect_to mypage_path, notice: "\u30D7\u30ED\u30D5\u30A3\u30FC\u30EB\u3092\u66F4\u65B0\u3057\u307E\u3057\u305F"
     else
@@ -23,7 +25,7 @@ class MypagesController < ApplicationController
   private
 
   def user_params
-    params.require(:profile).permit(:name, :email, :avatar, profile_attributes: [ :id, :bio ])
+    params.require(:profile).permit(:name, :email, :avatar, :bio, :x_link)
   end
 
   def set_profile

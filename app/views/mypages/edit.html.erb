@@ -21,14 +21,14 @@
             </div>
           <% end %>
 
-          <div class="flex flex-col justify-center items-center mt-6 mb-6 mx-72">
+          <div class="flex flex-col justify-center items-center mt-6 mb-6 mx-auto">
             <h1 class="text-3xl font-bold text-accent text-center">ユーザープロフィール編集</h1>
           </div>
 
           <%# 名前 %>
           <div class="mb-6">
             <%= f.label :name, t("activerecord.attributes.profile.name"), class: "block text-lg font-medium text-primary mb-3" %>
-            <%= f.text_field :name, class: "w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" %>
+            <%= f.text_field :name, value: @user.name, class: "w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" %>
           </div>
 
           <%# アバター画像 %>
@@ -38,20 +38,20 @@
           </div>
 
           <%# 自己紹介 %>
-          <div class="mb-6">
-            <%= f.label :bio, t("activerecord.attributes.profile.bio"), class: "block text-lg font-medium text-primary mb-3" %>
-            <%= f.text_area :bio, class: "w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary h-32" %>
-          </div>
+      <div class="mb-6">
+        <%= f.label :bio, t("activerecord.attributes.profile.bio"), class: "block text-lg font-medium text-primary mb-3" %>
+        <%= f.text_area :bio, value: @user.bio, class: "w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary h-32" %>
+      </div>
 
           <%# SNSリンク %>
           <div class="mb-6">
             <%= f.label :x_link, t("activerecord.attributes.profile.x_link"), class: "block text-lg font-medium text-primary mb-3" %>
-            <%= f.text_field :x_link, class: "w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" %>
+            <%= f.text_field :x_link, value: @user.x_link, class: "w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" %>
           </div>
 
           <%# 更新ボタン %>
           <div class="flex flex-col items-center gap-4">
-            <%= f.submit t("activerecord.attributes.profile.update"), class: "btn btn-accent text-white bg-accent w-full max-w-md text-lg font-bold py-4" %>
+            <%= f.submit t("activerecord.attributes.profile.update"), class: "btn btn-accent text-white bg-accent hover:bg-accent-dark w-full max-w-md text-lg font-bold" %>
           </div>
         <% end %>
       </div>

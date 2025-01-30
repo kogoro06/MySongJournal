@@ -15,5 +15,5 @@ ja:
         name: "名前"
         bio: "自己紹介"
         x_link: "Xのリンク"
-        user_icon: "アバター画像"
+        avatar: "アバター画像"
         update: "更新"

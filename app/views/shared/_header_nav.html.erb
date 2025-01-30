@@ -3,8 +3,8 @@
     <div class="flex items-center space-x-8">
         <%= link_to mypage_path do %>
           <div class="text-center flex flex-col items-center">
-            <% if current_user.profile.present? && current_user.profile.avatar.attached? %>
-              <%= image_tag current_user.profile.user_icon, class: 'w-10 h-10 rounded-full object-cover border border-primary border-300' %>
+            <% if current_user.profile.present? && current_user.avatar.attached? %>
+              <%= image_tag current_user.avatar, class: 'w-10 h-10 rounded-full object-cover border border-primary border-300' %>
             <% else %>
               <%= image_tag 'profile_sample.png', class: 'w-10 h-10 rounded-full object-cover border border-primary border-300' %>
             <% end %>
