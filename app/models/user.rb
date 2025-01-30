@@ -10,4 +10,6 @@ class User < ApplicationRecord
   validates :name, presence: true, length: { maximum: 50 }
   has_many :likes
   has_many :liked_journals, through: :likes, source: :journal
+  has_many :favorites, dependent: :destroy
+  has_many :favorited_journals, through: :favorites, source: :journal
 end

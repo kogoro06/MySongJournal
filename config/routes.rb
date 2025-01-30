@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     collection do
       get "timeline", to: "journals#timeline", as: "timeline"
     end
+    resource :favorites, only: [:create, :destroy]
   end
 
   require "sidekiq/web"
