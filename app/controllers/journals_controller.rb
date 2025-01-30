@@ -4,6 +4,7 @@ class JournalsController < ApplicationController
   before_action :set_journal_for_show, only: [ :show ]  # showアクション用
   before_action :store_location, only: [ :index, :timeline ]
   before_action :authorize_journal, only: [ :edit, :update, :destroy ]
+  before_action :store_edit_source, only: [ :edit ]
 
   # 一覧表示
   def index
@@ -90,21 +91,43 @@ class JournalsController < ApplicationController
 
   # 編集フォーム表示
   def edit
+    @journal = current_user.journals.find(params[:id])
+    Rails.logger.info "🔍 Edit action called with referer: #{request.referer}"
   end
 
   # 更新処理
   def update
+    @journal = current_user.journals.find(params[:id])
+    Rails.logger.info "🔄 Update action called with edit_source: #{session[:edit_source]}"
+
     if @journal.update(journal_params)
-      redirect_to journals_path, notice: "日記が更新されました."
+      flash[:notice] = "日記を更新しました"
+      redirect_path = get_redirect_path
+      Rails.logger.info "📍 Redirecting to: #{redirect_path}"
+      redirect_to redirect_path
     else
+      flash.now[:alert] = "更新に失敗しました"
       render :edit, status: :unprocessable_entity
     end
   end
 
   # 削除処理
   def destroy
+    @journal = current_user.journals.find(params[:id])
     @journal.destroy
-    redirect_to journals_path, notice: "日記が削除されました."
+    flash[:notice] = "日記を削除しました"
+
+    # リファラーに基づいて適切なページにリダイレクト
+    redirect_path = if request.referer&.include?("mypage")
+                     mypage_path
+    elsif request.referer&.include?("timeline")
+                     timeline_journals_path
+    else
+                     journals_path
+    end
+
+    Rails.logger.info "🗑️ Redirecting after delete to: #{redirect_path} from referer: #{request.referer}"
+    redirect_to redirect_path
   end
 
   private
@@ -118,7 +141,19 @@ class JournalsController < ApplicationController
   end
 
   def store_location
-    session[:return_to] = request.fullpath
+    return unless request.referer
+
+    case request.referer
+    when /journals$/          # index
+      session[:return_to] = journals_path
+    when /timeline$/         # timeline
+      session[:return_to] = timeline_journals_path
+    when /mypages\/\d+$/    # mypage（数字のIDを含むパターンに修正）
+      session[:return_to] = mypage_path
+    else
+      session[:return_to] = journals_path
+    end
+    Rails.logger.info "📍 Stored return location: #{session[:return_to]} from referer: #{request.referer}"
   end
 
   def return_path
@@ -135,5 +170,26 @@ class JournalsController < ApplicationController
     params.require(:journal).permit(
       :title, :content, :emotion, :song_name, :artist_name, :album_image, :preview_url, :spotify_track_id
     )
+  end
+
+  def store_edit_source
+    return unless request.referer
+
+    # リファラーのURLをセッションに保存
+    session[:previous_url] = request.referer
+    Rails.logger.info "💾 Stored previous URL: #{session[:previous_url]}"
+  end
+
+  def get_redirect_path
+    previous_url = session.delete(:previous_url)
+    Rails.logger.info "🔍 Previous URL for redirect: #{previous_url}"
+
+    if previous_url&.include?("mypage")
+      mypage_path
+    elsif previous_url&.include?("timeline")
+      timeline_journals_path
+    else
+      journals_path
+    end
   end
 end
