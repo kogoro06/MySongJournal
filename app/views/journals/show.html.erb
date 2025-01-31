@@ -83,6 +83,10 @@
     <div class="text-center mt-6">
       <% if request.referer&.include?('timeline') %>
         <%= link_to "← タイムラインに戻る", timeline_journals_path, class: "text-blue-500 hover:underline text-sm font-medium" %>
+      <% elsif request.referer&.include?('mypage') %>
+        <%= link_to "← マイページに戻る", mypage_path, class: "text-blue-500 hover:underline text-sm font-medium" %>
+      <% elsif request.referer&.include?('other_user') %>
+        <%= link_to "← #{@user.name}さんのページに戻る", other_user_path(@user), class: "text-blue-500 hover:underline text-sm font-medium" %>
       <% else %>
         <%= link_to "← 日記一覧に戻る", journals_path, class: "text-blue-500 hover:underline text-sm font-medium" %>
       <% end %>

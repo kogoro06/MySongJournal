@@ -63,9 +63,10 @@
       <%= paginate @journals %>
     </div>
 
-    <!-- 日記作成ボタン -->
-    <div class="flex justify-center mt-6">
-      <%= link_to "新しい日記を作成", new_journal_path, class: "btn btn-primary w-full" %>
+     <!-- 新規作成ボタン -->
+    <div class="mt-6">
+      <%= link_to "新しい日記を作成", new_journal_path, 
+          class: "w-full block text-center py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors" %>
     </div>
   </div>
 </div>

@@ -32,7 +32,9 @@ class JournalsController < ApplicationController
 
   # 詳細表示
   def show
-    # @journalは set_journal_for_show で設定済み
+    @journal = Journal.find(params[:id])
+    @user = @journal.user
+    @user_name = @user.name
   end
 
   # 新規作成フォーム表示

@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get "other_users/show"
+  get "otherusers/show"
   get "others_journal/index"
   devise_for :users
 
@@ -37,11 +39,14 @@ Rails.application.routes.draw do
 
   # マイページ関連のルート
   resource :mypage, only: [ :show, :edit, :update ]
+  resources :other_users, only: [ :show ]
 
   resources :users do
     member do
       post "follow", to: "follows#create"
       delete "unfollow", to: "follows#destroy"
+      get "following", to: "follows#following"
+      get "followers", to: "follows#followers"
     end
   end
 end

@@ -1,7 +1,7 @@
 <div class="bg-customblue min-h-screen overflow-auto">
   <div class="flex flex-col justify-center items-center mt-8 mb-8 mx-4 md:mx-24 lg:mx-72">
     <h1 class="text-3xl md:text-3xl lg:text-4xl font-bold text-accent text-center">
-      <% content_for(:title, 'マイページ') %>
+      <% content_for(:title, "#{@user.name}さんのページ") %>
     </h1>
   </div>
 
@@ -12,37 +12,37 @@
         <%# プロフィール上部：アバターと名前とXアイコン %>
         <div class="flex space-x-8 items-center mb-8 justify-center">
           <div class="text-center">
-            <% if current_user.avatar.attached? %>
-              <%= image_tag current_user.avatar, class: 'w-24 h-24 rounded-full object-cover border-2 border-primary shadow-sm' %>
+            <% if @user.avatar&.attached? %>
+              <%= image_tag @user.avatar, class: 'w-24 h-24 rounded-full object-cover border-2 border-primary shadow-sm' %>
             <% else %>
               <%= image_tag 'profile_sample.png', class: 'w-24 h-24 rounded-full object-cover border-2 border-primary shadow-sm' %>
             <% end %>
           </div>
           <div class="text-accent">
             <div class="flex items-center space-x-8">
-              <p class="text-4xl font-bold"><%= current_user.name %></p>
-              <%= link_to "", current_user.x_link, class: "fa-brands fa-x-twitter text-gray-400 text-4xl" %>
+              <p class="text-4xl font-bold"><%= @user.name %></p>
+           <% if @user.profile&.x_link.present? %>
+                <%= link_to "", @user.profile.x_link, class: "fa-brands fa-x-twitter text-gray-400 text-4xl" %>
+            <% end %>
+
+
               <!-- フォロー/フォロワー -->
               <div id="follow-stats" class="flex items-center space-x-4">
-                <%= render 'follows/stats', user: current_user %>
+                <%= render 'follows/stats', user: @user %>
               </div>
+              <!-- フォローボタン -->
+              <% if user_signed_in? && current_user != @user %>
+                <%= render 'follows/button', user: @user %>
+              <% end %>
             </div>
           </div>
         </div>
         <%# プロフィール文 %>
         <div class="bg-gray-200 rounded-lg text-base mb-8 p-6 text-gray-700">
           <% if @user.bio.present? %>
-            <p class="text-center text-gray-400"><%= @user.bio %></p>
+            <p class="text-center text-gray-700"><%= @user.bio %></p>
           <% else %>
-            <p class="text-center text-gray-400">プロフィールを入力してください</p>
-          <% end %>
-        </div>
-        <%# プロフィール編集ボタン %>
-        <div class="flex justify-center">
-          <%= link_to edit_mypage_path, 
-              class: "flex items-center space-x-2 px-6 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg text-primary transition duration-200" do %>
-            <span class="material-symbols-outlined text-base">edit</span>
-            <span class="text-base">プロフィール編集</span>
+            <p class="text-center text-gray-400">プロフィールはまだ設定されていません</p>
           <% end %>
         </div>
       </div>
@@ -57,10 +57,10 @@
         <nav class="flex space-x-8" aria-label="Tabs">
           <ul class="tab-list list-unstyled">
             <li class="tab <%= 'tab-active' if params[:tab] != 'liked_posts' %>">
-              <%= link_to "自分の投稿", mypage_path(tab: "my_posts"), data: { turbo_frame: "posts_content" } %>
+              <%= link_to "投稿一覧", other_user_path(@user, tab: "my_posts"), data: { turbo_frame: "posts_content" } %>
             </li>
             <li class="tab <%= 'tab-active' if params[:tab] == 'liked_posts' %>">
-              <%= link_to "いいねした投稿", mypage_path(tab: "liked_posts"), data: { turbo_frame: "posts_content" } %>
+              <%= link_to "いいねした投稿", other_user_path(@user, tab: "liked_posts"), data: { turbo_frame: "posts_content" } %>
             </li>
           </ul>
         </nav>
@@ -72,11 +72,6 @@
             journals: @journals,
             liked_journals: @liked_journals %>
       <% end %>
-         <!-- 新規作成ボタン -->
-    <div class="mt-6">
-      <%= link_to "新しい日記を作成", new_journal_path, 
-          class: "w-full block text-center py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors" %>
-    </div>
     </div>
   </div>
 </div>
