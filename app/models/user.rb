@@ -8,10 +8,10 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
   # バリデーション
   validates :name, presence: true, length: { maximum: 50 }
-  has_many :likes
-  has_many :liked_journals, through: :likes, source: :journal
+  
+  # favorites の関連
   has_many :favorites, dependent: :destroy
-  has_many :favorited_journals, through: :favorites, source: :journal
+  has_many :liked_journals, through: :favorites, source: :journal
 
   # フォローしている関連
   has_many :active_follows, class_name: "Follow", foreign_key: "follower_id", dependent: :destroy

@@ -9,7 +9,7 @@ class MypagesController < ApplicationController
     case params[:tab]
     when "liked_posts"
       @journals = []  # 自分の投稿は空配列に
-      @liked_journals = current_user.favorited_journals
+      @liked_journals = current_user.liked_journals
                                   .includes(:user)
                                   .order(created_at: :desc)
                                   .page(params[:page])

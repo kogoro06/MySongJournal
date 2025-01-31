@@ -14,3 +14,13 @@ window.Stimulus = application
 
 // 📤 他のファイルで使用できるようにエクスポート
 export { application }
+
+document.addEventListener('turbo:load', function() {
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelector('.tab-active').classList.remove('tab-active');
+      this.classList.add('tab-active');
+    });
+  });
+});

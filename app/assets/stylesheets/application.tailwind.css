@@ -15,4 +15,15 @@
   .tab-link.active {
     @apply border-primary text-primary border-b-2;
   }
+
+  .tab {
+    cursor: pointer;
+    padding: 10px;
+    border-bottom: 2px solid transparent;
+  }
+
+  .tab-active {
+    border-bottom: 2px solid blue;
+    color: blue;
+  }
 }
