@@ -1,6 +1,6 @@
 class FollowsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_user, except: [:following, :followers]
+  before_action :set_user, except: [ :following, :followers ]
 
   def create
     current_user.follow(@user)
@@ -15,13 +15,13 @@ class FollowsController < ApplicationController
   def following
     @user = User.find(params[:id])
     @users = @user.following.page(params[:page]).per(20)
-    render 'follows/show'
+    render "follows/show"
   end
 
   def followers
     @user = User.find(params[:id])
     @users = @user.followers.page(params[:page]).per(20)
-    render 'follows/show'
+    render "follows/show"
   end
 
   private

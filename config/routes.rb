@@ -43,10 +43,10 @@ Rails.application.routes.draw do
 
   resources :users do
     member do
-      post 'follow', to: 'follows#create'
-      delete 'unfollow', to: 'follows#destroy'
-      get 'following', to: 'follows#following'
-      get 'followers', to: 'follows#followers'
+      post "follow", to: "follows#create"
+      delete "unfollow", to: "follows#destroy"
+      get "following", to: "follows#following"
+      get "followers", to: "follows#followers"
     end
   end
 end

@@ -1,7 +1,7 @@
 class OtherUsersController < ApplicationController
   def show
     @user = User.find(params[:id])
-    
+    @user_name = @user.name
     # 自分自身のページにアクセスしようとした場合、リダイレクト
     if @user == current_user
       redirect_to mypage_path
