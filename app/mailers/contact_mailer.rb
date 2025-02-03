@@ -7,10 +7,15 @@ class ContactMailer < ApplicationMailer
   #   en.contact_mailer.notification.subject
   #
   def notification(contact)
-    @contact = contact
-    mail(
-      subject: "【MySongJournal】新しいお問い合わせがありました",
-      from: @contact.email
-    )
+    begin
+      @contact = contact
+      mail(
+        subject: "【MySongJournal】新しいお問い合わせがありました",
+        from: @contact.email
+      )
+    rescue => e
+      Rails.logger.error "メール送信エラー: #{e.message}"
+      raise
+    end
   end
 end
