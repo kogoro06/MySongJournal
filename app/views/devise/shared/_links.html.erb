@@ -20,6 +20,11 @@
 
 <%- if devise_mapping.omniauthable? %>
   <%- resource_class.omniauth_providers.each do |provider| %>
-    <%= button_to t('devise.shared.links.sign_in_with_provider', provider: OmniAuth::Utils.camelize(provider), default: "%{provider}でログイン"), omniauth_authorize_path(resource_name, provider), data: { turbo: false } %><br />
+    <%= button_to user_google_oauth2_omniauth_authorize_path, method: :post, class: "mt-4 inline-block w-full text-center bg-white text-gray-700 font-bold py-3 px-6 rounded border border-gray-300 hover:bg-gray-100 focus:outline-none focus:shadow-outline", data: { turbo: false } do %>
+      <div class="flex items-center justify-center">
+        <img src="https://www.google.com/favicon.ico" alt="Google" class="w-5 h-5 mr-2">
+        <span>Googleでログイン</span>
+      </div>
+    <% end %>
   <% end %>
 <% end %>

@@ -1,7 +1,7 @@
 <div class="flex justify-center items-center bg-customblue">
   <div class="rounded-lg p-8" style="aspect-ratio: 1 / 1; width: 90%; max-width: 400px;">
     <%= render "devise/shared/form_layout" do %>
-      <form class="space-y-6 h-full" action="<%= session_path(resource_name) %>" method="post">
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-6 h-full" }) do |form| %>
         <!-- Title -->
         <h2 class="text-2xl font-bold text-gray-700 text-center mb-6">
           <%= t('devise.sessions.new.sign_in', default: 'ログイン') %>
@@ -17,15 +17,12 @@
           <label for="email" class="block text-gray-700 text-sm font-bold mb-2">
             <%= t('activerecord.attributes.user.email', default: 'Eメール') %>
           </label>
-          <input 
-            id="email" 
-            name="user[email]" 
-            type="email" 
-            placeholder="<%= t('activerecord.attributes.user.email', default: 'Eメール') %>" 
-            required 
-            autocomplete="email" 
-            class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-outline bg-gray-50 placeholder-gray-400"
-            value="<%= resource.email if resource.present? %>">
+          <%= form.email_field :email, 
+            id: "email", 
+            placeholder: t('activerecord.attributes.user.email', default: 'Eメール'), 
+            required: true, 
+            autocomplete: "email", 
+            class: "shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-outline bg-gray-50 placeholder-gray-400" %>
         </div>
 
         <!-- Password Field -->
@@ -34,35 +31,46 @@
             <%= t('activerecord.attributes.user.password', default: 'パスワード') %>
           </label>
           <div data-controller="password-visibility">
-            <input 
-              id="password" 
-              name="user[password]" 
-              type="password" 
-              placeholder="<%= t('activerecord.attributes.user.password', default: 'パスワード') %>" 
-              required 
-              autocomplete="current-password" 
-              class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-outline bg-gray-50 placeholder-gray-400"
-              data-password-visibility-target="input">
+            <%= form.password_field :password, 
+              id: "password", 
+              placeholder: t('activerecord.attributes.user.password', default: 'パスワード'), 
+              required: true, 
+              autocomplete: "current-password", 
+              class: "shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-outline bg-gray-50 placeholder-gray-400",
+              data: { password_visibility_target: "input" } %>
             <button 
               type="button" 
               data-password-visibility-target="button"
               data-action="click->password-visibility#toggle"
-              class="absolute right-3 top-1/2 text-gray-500 hover:text-gray-700 focus:outline-none">
+              class="absolute right-3 top-1/2 transform  text-gray-500 hover:text-gray-700 focus:outline-none">
               👁
             </button>
           </div>
         </div>
 
         <!-- Submit Button -->
-        <div class="flex items-center justify-between">
-          <button 
-            type="submit" 
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded focus:outline-none focus:shadow-outline w-full">
-            <%= t('devise.sessions.new.sign_in', default: 'ログイン') %>
-          </button>
+        <div class="mt-6">
+          <%= form.button type: 'submit', class: "group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+            <%= t("devise.sessions.new.sign_in", default: "ログイン") %>
+          <% end %>
         </div>
-        <%= render "devise/shared/links" %>
-      </form>
+        <div class="mt-6">
+        <%= link_to user_google_oauth2_omniauth_authorize_path, method: :post, data: { turbo: false }, class: "w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50" do %>
+          <img class="h-5 w-5" src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google logo">
+          <span class="ml-2">Googleでログイン</span>
+        <% end %>
+        <div class="mt-4 flex items-center justify-between">
+          <div class="text-sm">
+            <%= link_to t("devise.shared.links.sign_up", default: "アカウント登録"), new_user_registration_path, class: "font-medium text-indigo-600 hover:text-indigo-500" %>
+          </div>
+        </div>
+      </div>
+        <div class="mt-4 flex items-center justify-between">
+          <div class="text-sm">
+            <%= link_to t("devise.shared.links.forgot_your_password"), new_password_path(resource_name), class: "font-medium text-indigo-600 hover:text-indigo-500" %>
+          </div>
+        </div>
+      <% end %>
     <% end %>
   </div>
 </div>

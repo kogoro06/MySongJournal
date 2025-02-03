@@ -40,6 +40,10 @@ gem "devise-i18n"
 gem "devise-i18n-views"
 gem "rest-client"
 
+# Google OAuth2認証用のGem
+gem 'omniauth-google-oauth2'
+gem 'omniauth-rails_csrf_protection'
+
 gem "rspotify"
 gem "dotenv-rails"
 gem "redis"
