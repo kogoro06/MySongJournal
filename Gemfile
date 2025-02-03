@@ -52,6 +52,7 @@ gem "sidekiq-cron"
 gem "kaminari"
 gem "mini_magick"
 gem "image_processing", "~> 1.2"
+gem "meta-tags", require: "meta_tags"
 
 # Security
 gem "rack-attack"
@@ -72,7 +73,6 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
-  gem "letter_opener"
   gem "letter_opener_web"
 end
 
