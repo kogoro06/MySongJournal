@@ -7,11 +7,11 @@ class ContactMailerTest < ActionMailer::TestCase
       email: "test@example.com",
       message: "This is a test message"
     )
-    
+
     mail = ContactMailer.notification(contact)
     assert_equal "【MySongJournal】新しいお問い合わせがありました", mail.subject
-    assert_equal ["mysongjournalconfirmable@gmail.com"], mail.to
-    assert_equal ["mysongjournalconfirmable@gmail.com"], mail.from
-    assert_equal ["test@example.com"], mail.reply_to
+    assert_equal [ "mysongjournalconfirmable@gmail.com" ], mail.to
+    assert_equal [ "mysongjournalconfirmable@gmail.com" ], mail.from
+    assert_equal [ "test@example.com" ], mail.reply_to
   end
 end
