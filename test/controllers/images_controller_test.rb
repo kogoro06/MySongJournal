@@ -19,7 +19,7 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
 
     # テスト用のダミー画像データを作成
     dummy_image = "dummy_image_data"
-    
+
     # OgpCreator.buildメソッドをスタブ化
     OgpCreator.stub(:build, dummy_image) do
       text = "Today's song 🎵 Test Song by Test Artist 🎤"
