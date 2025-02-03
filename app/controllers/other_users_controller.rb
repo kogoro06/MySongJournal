@@ -1,12 +1,13 @@
 class OtherUsersController < ApplicationController
   def show
     @user = User.find(params[:id])
-    @user_name = @user.name
-    # 自分自身のページにアクセスしようとした場合、リダイレクト
-    if @user == current_user
-      redirect_to mypage_path
+    unless @user
+      flash[:alert] = "ユーザーが見つかりません"
+      redirect_to root_path
       return
     end
+
+    flash.now[:notice] = "Xのアイコンを登録してください" if params[:show_notice].present? && !@user.x_link.present?
 
     @journals = @user.journals.order(created_at: :desc).page(params[:page]).per(3)
     @liked_journals = @user.liked_journals.order(created_at: :desc).page(params[:page]).per(3)

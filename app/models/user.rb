@@ -11,7 +11,8 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true
   validates :password, presence: true, length: { minimum: 6 }, if: :password_required?
   validates :uid, uniqueness: { scope: :provider }, if: -> { uid.present? }
-  validates :x_link, format: { with: /\A(https?:\/\/)?(www\.)?twitter\.com\/.*\z|\A(https?:\/\/)?(www\.)?x\.com\/.*\z/i, message: "正しいXのURLを入力してください" }, allow_blank: true
+  validates :x_link, uniqueness: { message: "このXアカウントは既に登録されています" },
+                    format: { with: /\A(https?:\/\/)?(www\.)?twitter\.com\/.*\z|\A(https?:\/\/)?(www\.)?x\.com\/.*\z/i, message: "正しいXのURLを入力してください" }, allow_blank: true
 
   # favorites の関連
   has_many :favorites, dependent: :destroy
