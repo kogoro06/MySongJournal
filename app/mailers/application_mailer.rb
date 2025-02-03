@@ -1,6 +1,6 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: 'mysongjournalconfirmable@gmail.com'
-  layout 'mailer'
+  default from: "mysongjournalconfirmable@gmail.com"
+  layout "mailer"
 
   def notification(contact)
     @contact = contact

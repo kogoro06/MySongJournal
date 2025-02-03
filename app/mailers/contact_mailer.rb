@@ -1,5 +1,5 @@
 class ContactMailer < ApplicationMailer
-  default to: 'mysongjournalconfirmable@gmail.com'
+  default to: "mysongjournalconfirmable@gmail.com"
 
   # Subject can be set in your I18n file at config/locales/en.yml
   # with the following lookup:

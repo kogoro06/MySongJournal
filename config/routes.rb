@@ -17,7 +17,7 @@ Rails.application.routes.draw do
   end
 
   # お問い合わせフォーム
-  resources :contacts, only: [:new, :create]
+  resources :contacts, only: [ :new, :create ]
   get "/contact", to: "contacts#new"
 
   require "sidekiq/web"
