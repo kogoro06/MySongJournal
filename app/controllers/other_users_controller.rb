@@ -16,19 +16,19 @@ class OtherUsersController < ApplicationController
 
   def x_redirect
     user = User.find(params[:id])
-    x_link = user.safe_x_link
+    return redirect_to other_user_path(user), alert: "Xのリンクが登録されていません" unless user.x_link.present?
 
-    if x_link.present?
-      uri = URI.parse(x_link)
-      if ALLOWED_REDIRECT_HOSTS.include?(uri.host)
-        redirect_to x_link, allow_other_host: true
+    begin
+      uri = URI.parse(user.x_link)
+      host = uri.host&.sub(/\Awww\./, "")
+
+      if uri.scheme.in?([ "http", "https" ]) && host.in?([ "twitter.com", "x.com" ])
+        redirect_to user.x_link, allow_other_host: true
       else
         redirect_to other_user_path(user), alert: "無効なXのリンクです"
       end
-    else
-      redirect_to other_user_path(user), alert: "Xのリンクが登録されていません"
+    rescue URI::InvalidURIError
+      redirect_to other_user_path(user), alert: "無効なXのリンクです"
     end
-  rescue URI::InvalidURIError
-    redirect_to other_user_path(user), alert: "無効なXのリンクです"
   end
 end
