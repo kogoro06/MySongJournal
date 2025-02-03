@@ -277,7 +277,8 @@ Devise.setup do |config|
                   ENV["GOOGLE_CLIENT_SECRET"],
                   {
                     provider_ignores_state: true,
-                    scope: 'email,profile'
+                    scope: 'email,profile',
+                    redirect_uri: "http://localhost:3000/users/auth/google_oauth2/callback"
                   }
 
   # Enable OmniAuth test mode in development
