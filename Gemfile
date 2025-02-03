@@ -41,8 +41,8 @@ gem "devise-i18n-views"
 gem "rest-client"
 
 # Google OAuth2認証用のGem
-gem 'omniauth-google-oauth2'
-gem 'omniauth-rails_csrf_protection'
+gem "omniauth-google-oauth2"
+gem "omniauth-rails_csrf_protection"
 
 gem "rspotify"
 gem "dotenv-rails"
@@ -50,8 +50,8 @@ gem "redis"
 gem "sidekiq"
 gem "sidekiq-cron"
 gem "kaminari"
-gem 'omniauth-google-oauth2'
-gem 'omniauth-rails_csrf_protection'
+gem "omniauth-google-oauth2"
+gem "omniauth-rails_csrf_protection"
 
 gem "mini_magick"
 gem "image_processing", "~> 1.2"

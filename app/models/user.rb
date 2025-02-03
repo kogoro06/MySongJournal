@@ -5,7 +5,7 @@ class User < ApplicationRecord
   has_one :profile
   # Deviseのモジュール
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable, :omniauthable, omniauth_providers: [:google_oauth2]
+         :recoverable, :rememberable, :validatable, :omniauthable, omniauth_providers: [ :google_oauth2 ]
   # バリデーション
   validates :name, presence: true, length: { maximum: 50 }
   validates :email, presence: true, uniqueness: true
@@ -40,10 +40,10 @@ class User < ApplicationRecord
   def self.from_omniauth(auth)
     # まず、OAuth認証情報で検索
     user = find_by(provider: auth.provider, uid: auth.uid)
-    
+
     # 見つからない場合、メールアドレスで検索
     user ||= find_by(email: auth.info.email)
-    
+
     if user
       # 既存ユーザーの場合、OAuth情報を更新
       user.update(
@@ -54,7 +54,7 @@ class User < ApplicationRecord
       # 新規ユーザーを作成
       user = new(
         email: auth.info.email,
-        name: auth.info.name || auth.info.email.split('@').first,
+        name: auth.info.name || auth.info.email.split("@").first,
         password: Devise.friendly_token[0, 20],
         provider: auth.provider,
         uid: auth.uid
@@ -64,7 +64,7 @@ class User < ApplicationRecord
     unless user.save
       Rails.logger.error "User save failed: #{user.errors.full_messages.join(', ')}"
     end
-    
+
     user
   end
   def self.create_unique_string
