@@ -1,51 +1,83 @@
 class OgpCreator
   require 'mini_magick'  
   BASE_IMAGE_PATH = Rails.root.join('app/assets/images/ogp.png').to_s
-  GRAVITY = 'center'
-  TEXT_POSITION = '0,0'
-  FONT_EN = Rails.root.join('app/assets/fonts/Bungee-Regular.ttf').to_s
-  FONT_JA = Rails.root.join('app/assets/fonts/DelaGothicOne-Regular.ttf').to_s
-  FONT_SIZE = 65
-  INDENTION_COUNT = 16
-  ROW_LIMIT = 8
+  FONT_PATH = Rails.root.join('app/assets/fonts/DelaGothicOne-Regular.ttf').to_s
+  FONT_SIZE = 35
+  SUBTITLE_FONT_SIZE = 30  # サブタイトル（曲名と歌手名）用のフォントサイズ
+  IMAGE_WIDTH = 1200
+  IMAGE_HEIGHT = 630
+  ALBUM_IMAGE_SIZE = 300
+  ALBUM_Y_OFFSET = 150
+  TITLE_Y_OFFSET = 70    # "Today's song" の位置
+  SUBTITLE_Y_OFFSET = 20  # 曲名と歌手名の位置
 
-  def self.build(text)
-    Rails.logger.debug "Building image with text: #{text}"
-    Rails.logger.debug "Base image path: #{BASE_IMAGE_PATH}"
+  def self.build(text, album_image_url = nil)
+    Rails.logger.info "=== OGP Image Generation Debug Info ==="
+    Rails.logger.info "Input text: #{text.inspect}"
+    Rails.logger.info "Album URL: #{album_image_url.inspect}"
 
-    # ベース画像の存在チェック
-    unless File.exist?(BASE_IMAGE_PATH)
-      Rails.logger.error "Base image not found at: #{BASE_IMAGE_PATH}"
-      raise "Base image not found"
+    # テキストを2行に分割
+    title = "Today's song"
+    subtitle = text.sub(/^Today's song\s*/, '').strip
+
+    # ベース画像の作成
+    image = MiniMagick::Image.new(BASE_IMAGE_PATH)
+    image.resize "#{IMAGE_WIDTH}x#{IMAGE_HEIGHT}"
+
+    # アルバム画像の追加（存在する場合）
+    if album_image_url.present?
+      begin
+        album_image = MiniMagick::Image.open(album_image_url)
+        album_image.resize "#{ALBUM_IMAGE_SIZE}x#{ALBUM_IMAGE_SIZE}"
+        
+        result = image.composite(album_image) do |c|
+          c.compose "Over"
+          c.geometry "+#{(IMAGE_WIDTH - ALBUM_IMAGE_SIZE) / 2}+#{ALBUM_Y_OFFSET}"
+        end
+        Rails.logger.info "Album image successfully added"
+      rescue => e
+        Rails.logger.error "Failed to process album image: #{e.message}"
+        result = image
+      end
+    else
+      result = image
     end
 
-    # フォントの選択（日本語文字が含まれているかどうかで判断）
-    font = text.match?(/[ぁ-んァ-ン一-龥]/) ? FONT_JA : FONT_EN
-    Rails.logger.debug "Selected font: #{font}"
+    # テキストの追加
+    temp_file = Tempfile.new(['ogp', '.png'])
+    temp_file.binmode
+    temp_file.write(result.to_blob)
+    temp_file.rewind
 
-    # フォントファイルの存在チェック
-    unless File.exist?(font)
-      Rails.logger.error "Font file not found at: #{font}"
-      raise "Font file not found"
+    begin
+      output = MiniMagick::Tool::Convert.new do |convert|
+        convert << temp_file.path
+        
+        # "Today's song" を描画
+        convert.gravity 'south'
+        convert.font FONT_PATH
+        convert.pointsize FONT_SIZE
+        convert.fill 'black'
+        convert.annotate "+0+#{TITLE_Y_OFFSET}", title
+
+        # 曲名と歌手名を描画
+        convert.gravity 'south'
+        convert.font FONT_PATH
+        convert.pointsize SUBTITLE_FONT_SIZE
+        convert.fill 'black'
+        convert.annotate "+0+#{SUBTITLE_Y_OFFSET}", subtitle
+
+        convert << 'png:-'
+      end
+
+      output
+    ensure
+      temp_file.close
+      temp_file.unlink
     end
-
-    text = prepare_text(text)
-    Rails.logger.debug "Prepared text: #{text}"
-
-    # 画像生成処理
-    MiniMagick::Tool::Convert.new do |convert|
-      convert << BASE_IMAGE_PATH
-      convert.gravity GRAVITY
-      convert.pointsize FONT_SIZE
-      convert.font font
-      convert.fill '#000000'
-      convert.draw "text #{TEXT_POSITION} '#{text}'"
-      convert << "png:-"
-    end
-  end
-
-  private
-  def self.prepare_text(text)
-    text.to_s.scan(/.{1,#{INDENTION_COUNT}}/)[0...ROW_LIMIT].join("\n")
+  rescue => e
+    Rails.logger.error "Error in OgpCreator.build: #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
+    raise
   end
 end

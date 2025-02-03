@@ -5,6 +5,7 @@ class JournalsController < ApplicationController
   before_action :store_location, only: [ :index, :timeline ]
   before_action :authorize_journal, only: [ :edit, :update, :destroy ]
   before_action :store_edit_source, only: [ :edit ]
+  helper_method :prepare_meta_tags
 
   # 一覧表示
   def index
@@ -35,6 +36,7 @@ class JournalsController < ApplicationController
     @journal = Journal.find(params[:id])
     @user = @journal.user
     @user_name = @user.name
+    prepare_meta_tags(@journal)
   end
 
   # 新規作成フォーム表示
@@ -82,8 +84,8 @@ class JournalsController < ApplicationController
       session.delete(:selected_track)
       session.delete(:journal_form)
 
-      # 保存成功後は一覧ページにリダイレクト
-      redirect_to journals_path, notice: "日記を保存しました。"
+      # 保存成功後は詳細ページにリダイレクト
+      redirect_to @journal, notice: "日記を保存しました。"
     else
       Rails.logger.error "Journal save failed: #{@journal.errors.full_messages}"
       flash.now[:alert] = "日記の保存に失敗しました。"
@@ -193,5 +195,47 @@ class JournalsController < ApplicationController
     else
       journals_path
     end
+  end
+
+  def prepare_meta_tags(journal)
+    # Spotify情報を含むテキストを生成
+    ogp_text = if journal.song_name.present? && journal.artist_name.present?
+      "Today's song 🎵 #{journal.song_name} by #{journal.artist_name} 🎤"
+    else
+      journal.title
+    end
+
+    # OGP画像のURL生成
+    image_url = if journal.album_image.present?
+      "#{request.base_url}/images/ogp.png?text=#{CGI.escape(ogp_text)}&album_image=#{CGI.escape(journal.album_image)}"
+    else
+      "#{request.base_url}/images/ogp.png?text=#{CGI.escape(ogp_text)}"
+    end
+    
+    description = if journal.song_name.present? && journal.artist_name.present?
+      "Today's song 🎵 #{journal.song_name} by #{journal.artist_name} 🎤"
+    else
+      "Music and poetry together."
+    end
+    
+    set_meta_tags(
+      site: 'MySongJournal',
+      title: journal.title,
+      description: description,
+      keywords: ['music', 'journal', 'song'],
+      canonical: journal_url(journal),
+      og: {
+        title: journal.title,
+        description: description,
+        type: 'website',
+        url: journal_url(journal),
+        image: image_url
+      },
+      twitter: {
+        card: 'summary_large_image',
+        site: '@study_kogoro',
+        image: image_url
+      }
+    )
   end
 end

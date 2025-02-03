@@ -5,9 +5,18 @@ FROM ruby:$RUBY_VERSION-slim AS base
 
 WORKDIR /rails
 
+# 必要なパッケージをインストール
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client && \
-    apt-get install -y imagemagick libmagickwand-dev && \
+    apt-get install --no-install-recommends -y \
+    curl \
+    libjemalloc2 \
+    libvips \
+    postgresql-client \
+    imagemagick \
+    libmagickwand-dev \
+    fonts-liberation \
+    fonts-liberation2 \
+    fonts-ipafont && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 ENV RAILS_ENV="production" \
