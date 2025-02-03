@@ -1,6 +1,6 @@
 module MySongJournal
-  module Whitelist
-    module Domains
+module Whitelist
+  module Domains
       SOCIAL = {
         x: {
           domains: [ "twitter.com", "x.com" ],
@@ -40,6 +40,6 @@ module MySongJournal
           nil
         end
       end
-    end
   end
+end
 end

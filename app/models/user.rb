@@ -9,7 +9,7 @@ class User < ApplicationRecord
   # バリデーション
   validates :name, presence: true, length: { maximum: 50 }
   validates :email, presence: true, uniqueness: true
-  validates :password, presence: true, length: { minimum: 6 }
+  validates :password, presence: true, length: { minimum: 6 }, if: :password_required?
   validates :uid, uniqueness: { scope: :provider }, if: -> { uid.present? }
   validates :x_link, format: { with: /\A(https?:\/\/)?(www\.)?twitter\.com\/.*\z|\A(https?:\/\/)?(www\.)?x\.com\/.*\z/i, message: "正しいXのURLを入力してください" }, allow_blank: true
 
@@ -87,6 +87,11 @@ class User < ApplicationRecord
   end
 
   private
+
+  def password_required?
+    # パスワードが必要なケースを定義
+    !persisted? || !password.nil? || !password_confirmation.nil?
+  end
 
   def format_x_link
     return if x_link.blank?
