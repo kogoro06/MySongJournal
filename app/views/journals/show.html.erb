@@ -74,14 +74,29 @@
     <!-- ✏️ アクションボタン -->
     <% if @journal.user == current_user %>
       <div class="flex justify-between items-center mt-6 space-x-4">
-        <%= link_to "✏️ 編集", edit_journal_path(@journal), class: "px-4 py-2 bg-yellow-500 text-white font-medium rounded-md hover:bg-yellow-600 transition" %>
-        <div class="text-gray-600">
-            <% twitter_share_url = "https://twitter.com/share?url=#{CGI.escape(journal_url(@journal))}" %>
-            <%= link_to twitter_share_url, target: '_blank', data: { toggle: "tooltip", placement: "bottom" }, title: "Xでシェア" do %>
-              <i class="fa-brands fa-square-x-twitter fa-2xl"></i>
-            <% end %>
-        </div>
-        <%= button_to "🗑️ 削除", journal_path(@journal), method: :delete, data: { confirm: "本当に削除しますか？" }, class: "px-4 py-2 bg-red-500 text-white font-medium rounded-md hover:bg-red-600 transition" %>
+        <%= link_to edit_journal_path(@journal), class: "px-4 py-2 bg-yellow-500 text-white font-medium rounded-md hover:bg-yellow-600 transition flex items-center" do %>
+          <span>✏️ 編集</span>
+        <% end %>
+        
+        <% share_text = "Today's song 🎵 #{@journal.song_name} by #{@journal.artist_name} 🎤\n#MySongJournal" %>
+        <%= link_to "https://twitter.com/share?text=#{CGI.escape(share_text)}&url=#{CGI.escape(journal_url(@journal))}", 
+            target: '_blank', 
+            class: "px-4 py-2 bg-black text-white font-medium rounded-md hover:bg-gray-800 transition flex items-center",
+            rel: "nofollow",
+            data: { toggle: "tooltip", placement: "bottom" }, 
+            title: "Xでシェア" do %>
+          <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+          <span>共有</span>
+        <% end %>
+
+        <%= button_to journal_path(@journal), 
+            method: :delete, 
+            data: { confirm: "本当に削除しますか？" }, 
+            class: "px-4 py-2 bg-red-500 text-white font-medium rounded-md hover:bg-red-600 transition flex items-center" do %>
+          <span>🗑️ 削除</span>
+        <% end %>
       </div>
     <% end %>
 

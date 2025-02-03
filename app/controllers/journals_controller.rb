@@ -36,7 +36,7 @@ class JournalsController < ApplicationController
     @journal = Journal.find(params[:id])
     @user = @journal.user
     @user_name = @user.name
-    prepare_meta_tags(@journal)
+    prepare_meta_tags
   end
 
   # 新規作成フォーム表示
@@ -197,45 +197,40 @@ class JournalsController < ApplicationController
     end
   end
 
-  def prepare_meta_tags(journal)
-    # Spotify情報を含むテキストを生成
-    ogp_text = if journal.song_name.present? && journal.artist_name.present?
-      "Today's song 🎵 #{journal.song_name} by #{journal.artist_name} 🎤"
+  def prepare_meta_tags
+    site_name   = "MY SONG JOURNAL"
+    title       = "Today's song 🎵 #{@journal.song_name} by #{@journal.artist_name} 🎤"
+    description = @journal.content
+    
+    # OGP画像のURLを生成
+    ogp_image_url = if @journal.album_image.present?
+      "#{request.base_url}/images/ogp.png?text=#{CGI.escape("Today's song 🎵 #{@journal.song_name} by #{@journal.artist_name} 🎤")}&album_image=#{CGI.escape(@journal.album_image)}"
     else
-      journal.title
+      "#{request.base_url}/images/ogp.png?text=#{CGI.escape("Today's song 🎵 #{@journal.song_name} by #{@journal.artist_name} 🎤")}"
     end
 
-    # OGP画像のURL生成
-    image_url = if journal.album_image.present?
-      "#{request.base_url}/images/ogp.png?text=#{CGI.escape(ogp_text)}&album_image=#{CGI.escape(journal.album_image)}"
-    else
-      "#{request.base_url}/images/ogp.png?text=#{CGI.escape(ogp_text)}"
-    end
-    
-    description = if journal.song_name.present? && journal.artist_name.present?
-      "Today's song 🎵 #{journal.song_name} by #{journal.artist_name} 🎤"
-    else
-      "Music and poetry together."
-    end
-    
-    set_meta_tags(
-      site: 'MySongJournal',
-      title: journal.title,
+    meta_tags = {
+      site:        site_name,
+      title:       title,
+      image:       ogp_image_url,
       description: description,
-      keywords: ['music', 'journal', 'song'],
-      canonical: journal_url(journal),
+      keywords:    %w[音楽 日記 MySongJournal],
       og: {
-        title: journal.title,
+        title: title,
         description: description,
-        type: 'website',
-        url: journal_url(journal),
-        image: image_url
+        image: ogp_image_url,
+        site_name: site_name,
+        type: 'article'
       },
       twitter: {
         card: 'summary_large_image',
-        site: '@study_kogoro',
-        image: image_url
+        site: '@MySongJournal',
+        title: title,
+        description: description,
+        image: ogp_image_url
       }
-    )
+    }
+
+    set_meta_tags(meta_tags)
   end
 end
