@@ -17,8 +17,11 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
   test "should get ogp" do
     Rails.logger.info "=== Starting OGP Test ==="
 
-    # OgpCreator.buildをモック化
-    OgpCreator.stub :build, @dummy_image do
+    # テスト用のダミー画像データを作成
+    dummy_image = "dummy_image_data"
+    
+    # OgpCreator.buildメソッドをスタブ化
+    OgpCreator.stub(:build, dummy_image) do
       text = "Today's song 🎵 Test Song by Test Artist 🎤"
       album_image = "https://example.com/image.jpg"
 
