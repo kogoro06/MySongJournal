@@ -15,11 +15,11 @@ class OtherUsersController < ApplicationController
   def x_redirect
     user = User.find(params[:id])
     x_link = user.safe_x_link
-    
+
     if x_link.present?
       redirect_to x_link, allow_other_host: true
     else
-      redirect_to user_path(user), alert: 'Xのリンクが登録されていません'
+      redirect_to user_path(user), alert: "Xのリンクが登録されていません"
     end
   end
 end
