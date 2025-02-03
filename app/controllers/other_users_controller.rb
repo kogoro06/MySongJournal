@@ -18,21 +18,11 @@ class OtherUsersController < ApplicationController
 
     return redirect_to other_user_path(user), alert: "Xのリンクが登録されていません" unless redirect_url.present?
 
-    begin
-      uri = URI.parse(redirect_url)
-      host = uri.host&.sub(/\Awww\./, "")
-      scheme = uri.scheme
+    safe_url = Whitelist::Domains.build_safe_url(:x, redirect_url)
 
-      unless Whitelist::Domains.allowed_schemes_for(:x).include?(scheme)
-        return redirect_to other_user_path(user), alert: "HTTPSプロトコルを使用してください"
-      end
-
-      unless Whitelist::Domains.allowed_domains_for(:x).include?(host)
-        return redirect_to other_user_path(user), alert: "許可されていないドメインです"
-      end
-
-      redirect_to redirect_url, allow_other_host: true
-    rescue URI::InvalidURIError
+    if safe_url.present?
+      redirect_to safe_url, allow_other_host: true
+    else
       redirect_to other_user_path(user), alert: "無効なURLです"
     end
   end
