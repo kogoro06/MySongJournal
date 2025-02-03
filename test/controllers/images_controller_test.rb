@@ -9,24 +9,28 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
     # ベース画像が存在することを確認
     assert File.exist?(@base_image_path), "Base image not found at #{@base_image_path}"
     assert File.exist?(@font_path), "Font file not found at #{@font_path}"
+
+    # テスト用の画像データを準備
+    @dummy_image = File.binread(@base_image_path)
   end
 
   test "should get ogp" do
     Rails.logger.info "=== Starting OGP Test ==="
-    Rails.logger.info "Base image path: #{@base_image_path}"
-    Rails.logger.info "Font path: #{@font_path}"
 
-    text = "Today's song 🎵 Test Song by Test Artist 🎤"
-    album_image = "https://example.com/image.jpg"
+    # OgpCreator.buildをモック化
+    OgpCreator.stub :build, @dummy_image do
+      text = "Today's song 🎵 Test Song by Test Artist 🎤"
+      album_image = "https://example.com/image.jpg"
 
-    get "/images/ogp.png", params: { text: text, album_image: album_image }
-    
-    if response.status == 500
-      Rails.logger.error "Response body: #{response.body}"
-      Rails.logger.error "Response headers: #{response.headers}"
+      get "/images/ogp.png", params: { text: text, album_image: album_image }
+
+      if response.status == 500
+        Rails.logger.error "Response body: #{response.body}"
+        Rails.logger.error "Response headers: #{response.headers}"
+      end
+
+      assert_response :success
+      assert_equal "image/png", response.content_type
     end
-
-    assert_response :success
-    assert_equal "image/png", response.content_type
   end
 end
