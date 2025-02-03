@@ -1,5 +1,6 @@
 class OtherUsersController < ApplicationController
-  ALLOWED_REDIRECT_HOSTS = [ "twitter.com", "x.com", "www.twitter.com", "www.x.com" ].freeze
+  ALLOWED_DOMAINS = [ "twitter.com", "x.com" ].freeze
+  URL_REGEXP = URI::DEFAULT_PARSER.make_regexp(%w[http https])
 
   def show
     @user = User.find(params[:id])
@@ -16,19 +17,22 @@ class OtherUsersController < ApplicationController
 
   def x_redirect
     user = User.find(params[:id])
-    return redirect_to other_user_path(user), alert: "Xのリンクが登録されていません" unless user.x_link.present?
+    redirect_url = user.x_link
+
+    return redirect_to other_user_path(user), alert: "Xのリンクが登録されていません" unless redirect_url.present?
+    return redirect_to other_user_path(user), alert: "無効なURLです" unless redirect_url =~ URL_REGEXP
 
     begin
-      uri = URI.parse(user.x_link)
+      uri = URI.parse(redirect_url)
       host = uri.host&.sub(/\Awww\./, "")
 
-      if uri.scheme.in?([ "http", "https" ]) && host.in?([ "twitter.com", "x.com" ])
-        redirect_to user.x_link, allow_other_host: true
+      if ALLOWED_DOMAINS.include?(host)
+        redirect_to redirect_url, allow_other_host: true
       else
-        redirect_to other_user_path(user), alert: "無効なXのリンクです"
+        redirect_to other_user_path(user), alert: "許可されていないドメインです"
       end
     rescue URI::InvalidURIError
-      redirect_to other_user_path(user), alert: "無効なXのリンクです"
+      redirect_to other_user_path(user), alert: "無効なURLです"
     end
   end
 end
