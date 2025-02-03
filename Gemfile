@@ -52,7 +52,7 @@ gem "sidekiq-cron"
 gem "kaminari"
 gem "mini_magick"
 gem "image_processing", "~> 1.2"
-gem 'meta-tags', require: 'meta_tags'
+gem "meta-tags", require: "meta_tags"
 
 # Security
 gem "rack-attack"

@@ -201,7 +201,7 @@ class JournalsController < ApplicationController
     site_name   = "MY SONG JOURNAL"
     title       = "Today's song 🎵 #{@journal.song_name} by #{@journal.artist_name} 🎤"
     description = @journal.content
-    
+
     # OGP画像のURLを生成
     ogp_image_url = if @journal.album_image.present?
       "#{request.base_url}/images/ogp.png?text=#{CGI.escape("Today's song 🎵 #{@journal.song_name} by #{@journal.artist_name} 🎤")}&album_image=#{CGI.escape(@journal.album_image)}"
@@ -220,11 +220,11 @@ class JournalsController < ApplicationController
         description: description,
         image: ogp_image_url,
         site_name: site_name,
-        type: 'article'
+        type: "article"
       },
       twitter: {
-        card: 'summary_large_image',
-        site: '@MySongJournal',
+        card: "summary_large_image",
+        site: "@MySongJournal",
         title: title,
         description: description,
         image: ogp_image_url

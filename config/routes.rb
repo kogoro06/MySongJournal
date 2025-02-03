@@ -17,8 +17,8 @@ Rails.application.routes.draw do
   end
 
   # OGP画像のルーティング
-  get 'images/ogp.png', to: 'images#ogp'
-  
+  get "images/ogp.png", to: "images#ogp"
+
   # お問い合わせフォーム
   resources :contacts, only: [ :new, :create ]
   get "/contact", to: "contacts#new"

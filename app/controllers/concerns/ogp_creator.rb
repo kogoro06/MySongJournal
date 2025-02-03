@@ -1,7 +1,7 @@
 class OgpCreator
-  require 'mini_magick'  
-  BASE_IMAGE_PATH = Rails.root.join('app/assets/images/ogp.png').to_s
-  FONT_PATH = Rails.root.join('app/assets/fonts/DelaGothicOne-Regular.ttf').to_s
+  require "mini_magick"
+  BASE_IMAGE_PATH = Rails.root.join("app/assets/images/ogp.png").to_s
+  FONT_PATH = Rails.root.join("app/assets/fonts/DelaGothicOne-Regular.ttf").to_s
   FONT_SIZE = 35
   SUBTITLE_FONT_SIZE = 30  # サブタイトル（曲名と歌手名）用のフォントサイズ
   IMAGE_WIDTH = 1200
@@ -18,7 +18,7 @@ class OgpCreator
 
     # テキストを2行に分割
     title = "Today's song"
-    subtitle = text.sub(/^Today's song\s*/, '').strip
+    subtitle = text.sub(/^Today's song\s*/, "").strip
 
     # ベース画像の作成
     image = MiniMagick::Image.new(BASE_IMAGE_PATH)
@@ -29,7 +29,7 @@ class OgpCreator
       begin
         album_image = MiniMagick::Image.open(album_image_url)
         album_image.resize "#{ALBUM_IMAGE_SIZE}x#{ALBUM_IMAGE_SIZE}"
-        
+
         result = image.composite(album_image) do |c|
           c.compose "Over"
           c.geometry "+#{(IMAGE_WIDTH - ALBUM_IMAGE_SIZE) / 2}+#{ALBUM_Y_OFFSET}"
@@ -44,7 +44,7 @@ class OgpCreator
     end
 
     # テキストの追加
-    temp_file = Tempfile.new(['ogp', '.png'])
+    temp_file = Tempfile.new([ "ogp", ".png" ])
     temp_file.binmode
     temp_file.write(result.to_blob)
     temp_file.rewind
@@ -52,22 +52,22 @@ class OgpCreator
     begin
       output = MiniMagick::Tool::Convert.new do |convert|
         convert << temp_file.path
-        
+
         # "Today's song" を描画
-        convert.gravity 'south'
+        convert.gravity "south"
         convert.font FONT_PATH
         convert.pointsize FONT_SIZE
-        convert.fill 'black'
+        convert.fill "black"
         convert.annotate "+0+#{TITLE_Y_OFFSET}", title
 
         # 曲名と歌手名を描画
-        convert.gravity 'south'
+        convert.gravity "south"
         convert.font FONT_PATH
         convert.pointsize SUBTITLE_FONT_SIZE
-        convert.fill 'black'
+        convert.fill "black"
         convert.annotate "+0+#{SUBTITLE_Y_OFFSET}", subtitle
 
-        convert << 'png:-'
+        convert << "png:-"
       end
 
       output
