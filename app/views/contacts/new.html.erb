@@ -1,0 +1,63 @@
+<div class="min-h-screen bg-gray-100 py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <h1 class="text-3xl font-bold text-accent">お問い合わせ</h1>
+      <p class="mt-4 text-gray-600">ご質問やご要望がございましたら、以下のフォームよりお気軽にお問い合わせください。</p>
+    </div>
+
+    <div class="bg-white shadow-xl rounded-lg overflow-hidden">
+      <div class="grid grid-cols-1 md:grid-cols-2">
+        <!-- 左側：イメージセクション -->
+        <div class="bg-accent p-8 text-white flex flex-col justify-center items-center">
+        <div class="mb-8 flex">
+          <%= image_tag "profile_sample.png", class: "w-64 h-64 object-cover rounded-full mr-4 mb-8" %>
+          <%= image_tag "logo.png", class: "w-64 h-64 object-cover rounded-full ml-4 mb-8" %>
+        </div>
+          <div class="text-center">
+            <h2 class="text-2xl font-bold mb-4">お気軽にご連絡ください</h2>
+            <p class="text-gray-100">
+              MySongJournalに関するご質問、<br>
+              ご要望をお待ちしております。<br>
+              通常2-3営業日以内に<br>
+              ご返信させていただきます。
+            </p>
+          </div>
+        </div>
+
+        <!-- 右側：フォームセクション -->
+        <div class="p-8">
+          <%= form_with(model: @contact, local: true, class: "space-y-6") do |f| %>
+            <% if @contact.errors.any? %>
+              <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                <ul class="list-disc list-inside">
+                  <% @contact.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+
+            <div>
+              <%= f.label :name, '名前', class: "block text-sm font-medium text-gray-700" %>
+              <%= f.text_field :name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-accent focus:ring focus:ring-accent focus:ring-opacity-50" %>
+            </div>
+
+            <div>
+              <%= f.label :email, 'メールアドレス', class: "block text-sm font-medium text-gray-700" %>
+              <%= f.email_field :email, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-accent focus:ring focus:ring-accent focus:ring-opacity-50" %>
+            </div>
+
+            <div>
+              <%= f.label :message, '本文', class: "block text-sm font-medium text-gray-700" %>
+              <%= f.text_area :message, rows: 5, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-accent focus:ring focus:ring-accent focus:ring-opacity-50" %>
+            </div>
+
+            <div class="flex justify-center">
+              <%= f.submit '送信', class: "bg-accent hover:bg-accent-dark text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
