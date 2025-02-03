@@ -1,7 +1,4 @@
 Rails.application.routes.draw do
-  get "other_users/show"
-  get "otherusers/show"
-  get "others_journal/index"
   devise_for :users, controllers: {
     omniauth_callbacks: "users/omniauth_callbacks"
   }
@@ -19,6 +16,10 @@ Rails.application.routes.draw do
     resource :favorites, only: [ :create, :destroy ]
   end
 
+  # お問い合わせフォーム
+  resources :contacts, only: [:new, :create]
+  get "/contact", to: "contacts#new"
+
   require "sidekiq/web"
   mount Sidekiq::Web => "/sidekiq"
 
@@ -33,7 +34,6 @@ Rails.application.routes.draw do
 
   # 静的ページのルート
   get "/privacy_policy", to: "pages#privacy_policy"
-  get "/contact", to: "pages#contact"
   get "/terms", to: "pages#terms"
 
   # Defines the root path route ("/")
@@ -50,5 +50,9 @@ Rails.application.routes.draw do
       get "following", to: "follows#following"
       get "followers", to: "follows#followers"
     end
+  end
+
+  if Rails.env.development?
+    mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
 end
