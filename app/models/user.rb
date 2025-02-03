@@ -95,15 +95,4 @@ class User < ApplicationRecord
       self.x_link = "https://#{x_link}"
     end
   end
-  def safe_x_link
-    return nil if x_link.blank?
-
-    uri = URI.parse(x_link)
-    return nil unless [ "http", "https" ].include?(uri.scheme)
-    return nil unless [ "twitter.com", "x.com" ].include?(uri.host&.sub(/\Awww\./, ""))
-
-    ERB::Util.html_escape(x_link)
-  rescue URI::InvalidURIError
-    nil
-  end
 end
