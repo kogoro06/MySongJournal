@@ -6,8 +6,8 @@ class OgpCreator
   SUBTITLE_FONT_SIZE = 30  # サブタイトル（曲名と歌手名）用のフォントサイズ
   IMAGE_WIDTH = 1200
   IMAGE_HEIGHT = 630
-  ALBUM_IMAGE_SIZE = 300
-  ALBUM_Y_OFFSET = 150
+  ALBUM_IMAGE_SIZE = 380
+  ALBUM_Y_OFFSET = 100
   TITLE_Y_OFFSET = 70    # "Today's song" の位置
   SUBTITLE_Y_OFFSET = 20  # 曲名と歌手名の位置
 
