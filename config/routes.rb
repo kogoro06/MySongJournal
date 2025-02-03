@@ -41,7 +41,11 @@ Rails.application.routes.draw do
 
   # マイページ関連のルート
   resource :mypage, only: [ :show, :edit, :update ]
-  resources :other_users, only: [ :show ]
+  resources :other_users, only: [ :show ] do
+    member do
+      get "x_redirect"
+    end
+  end
 
   resources :users do
     member do
@@ -49,6 +53,7 @@ Rails.application.routes.draw do
       delete "unfollow", to: "follows#destroy"
       get "following", to: "follows#following"
       get "followers", to: "follows#followers"
+      get "x_redirect", to: "users#x_redirect"
     end
   end
 

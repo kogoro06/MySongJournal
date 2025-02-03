@@ -11,6 +11,7 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true
   validates :password, presence: true, length: { minimum: 6 }
   validates :uid, uniqueness: { scope: :provider }, if: -> { uid.present? }
+  validates :x_link, format: { with: /\A(https?:\/\/)?(www\.)?twitter\.com\/.*\z|\A(https?:\/\/)?(www\.)?x\.com\/.*\z/i, message: "正しいXのURLを入力してください" }, allow_blank: true
 
   # favorites の関連
   has_many :favorites, dependent: :destroy
@@ -69,5 +70,29 @@ class User < ApplicationRecord
   end
   def self.create_unique_string
     SecureRandom.uuid
+  end
+
+  before_save :format_x_link
+
+  def safe_x_link
+    return nil if x_link.blank?
+
+    uri = URI.parse(x_link)
+    return nil unless [ "http", "https" ].include?(uri.scheme)
+    return nil unless [ "twitter.com", "x.com" ].include?(uri.host&.sub(/\Awww\./, ""))
+
+    ERB::Util.html_escape(x_link)
+  rescue URI::InvalidURIError
+    nil
+  end
+
+  private
+
+  def format_x_link
+    return if x_link.blank?
+
+    unless x_link.start_with?("http://", "https://")
+      self.x_link = "https://#{x_link}"
+    end
   end
 end
