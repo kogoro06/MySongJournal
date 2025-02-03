@@ -12,7 +12,20 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get ogp" do
-    get "/images/ogp.png", params: { text: "Test text", album_image: "https://example.com/image.jpg" }
+    Rails.logger.info "=== Starting OGP Test ==="
+    Rails.logger.info "Base image path: #{@base_image_path}"
+    Rails.logger.info "Font path: #{@font_path}"
+
+    text = "Today's song 🎵 Test Song by Test Artist 🎤"
+    album_image = "https://example.com/image.jpg"
+
+    get "/images/ogp.png", params: { text: text, album_image: album_image }
+    
+    if response.status == 500
+      Rails.logger.error "Response body: #{response.body}"
+      Rails.logger.error "Response headers: #{response.headers}"
+    end
+
     assert_response :success
     assert_equal "image/png", response.content_type
   end
