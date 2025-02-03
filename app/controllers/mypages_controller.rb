@@ -5,6 +5,8 @@ class MypagesController < ApplicationController
   def show
     @user = current_user
 
+    flash.now[:notice] = "Xのアイコンを登録してください" if params[:show_notice].present? && !current_user.x_link.present?
+
     # タブに応じて表示する投稿を切り替え
     case params[:tab]
     when "liked_posts"

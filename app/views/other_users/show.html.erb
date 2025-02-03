@@ -26,8 +26,9 @@
                   <i class="fa-brands fa-x-twitter text-gray-400 text-4xl hover:text-gray-600"></i>
                 <% end %>
               <% else %>
-                <i class="fa-brands fa-x-twitter text-gray-400 text-4xl cursor-not-allowed" 
-                   onclick="alert('Xのリンクが登録されていません')"></i>
+                <%= link_to other_user_path(@user, show_notice: true), class: "cursor-not-allowed" do %>
+                  <i class="fa-brands fa-x-twitter text-gray-400 text-4xl"></i>
+                <% end %>
               <% end %>
 
 
