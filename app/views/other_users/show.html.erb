@@ -22,7 +22,7 @@
             <div class="flex items-center space-x-8">
               <p class="text-4xl font-bold"><%= @user.name %></p>
               <% if @user.x_link.present? %>
-                <%= link_to sanitize(@user.safe_x_link), target: "_blank", rel: "noopener noreferrer", data: { turbo: false } do %>
+                <%= link_to x_redirect_other_user_path(@user), target: "_blank", rel: "noopener noreferrer", data: { turbo: false } do %>
                   <i class="fa-brands fa-x-twitter text-gray-400 text-4xl hover:text-gray-600"></i>
                 <% end %>
               <% else %>
