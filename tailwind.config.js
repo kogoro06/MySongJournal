@@ -14,6 +14,10 @@ module.exports = {
         footer: '#E5E7EB',
         button: '#13253c',
       },
+      fontFamily: {
+        Bungee: ['Bungee', 'cursive'],
+        DelaGothicOne: ['DelaGothicOne', 'cursive'],
+      },
       spacing: {
         '72': '18rem',           // カスタムの余白サイズの追加
       },

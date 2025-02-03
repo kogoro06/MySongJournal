@@ -16,6 +16,8 @@ Rails.application.routes.draw do
     resource :favorites, only: [ :create, :destroy ]
   end
 
+  get 'images/ogp.png', to: 'images#ogp', as: 'images_ogp'
+  
   # お問い合わせフォーム
   resources :contacts, only: [ :new, :create ]
   get "/contact", to: "contacts#new"
@@ -61,3 +63,5 @@ Rails.application.routes.draw do
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
 end
+
+
