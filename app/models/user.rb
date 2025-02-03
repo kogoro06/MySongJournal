@@ -81,7 +81,7 @@ class User < ApplicationRecord
     return nil unless [ "http", "https" ].include?(uri.scheme)
     return nil unless [ "twitter.com", "x.com" ].include?(uri.host&.sub(/\Awww\./, ""))
 
-    x_link
+    ERB::Util.html_escape(x_link)
   rescue URI::InvalidURIError
     nil
   end
