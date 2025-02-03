@@ -281,8 +281,8 @@ Devise.setup do |config|
                     redirect_uri: ENV["GOOGLE_REDIRECT_URI_PRODUCTION"] || "http://localhost:3000/users/auth/google_oauth2/callback"
                   }
 
-  # Enable OmniAuth test mode in development
-  OmniAuth.config.allowed_request_methods = [ :post, :get ] if Rails.env.development?
+  # 本番環境でもGETリクエストを許可
+  OmniAuth.config.allowed_request_methods = [ :post, :get ]
 
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or
