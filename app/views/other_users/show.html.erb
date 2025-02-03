@@ -21,9 +21,14 @@
           <div class="text-accent">
             <div class="flex items-center space-x-8">
               <p class="text-4xl font-bold"><%= @user.name %></p>
-           <% if @user.profile&.x_link.present? %>
-                <%= link_to "", @user.profile.x_link, class: "fa-brands fa-x-twitter text-gray-400 text-4xl" %>
-            <% end %>
+              <% if @user.x_link.present? %>
+                <%= link_to @user.x_link, target: "_blank", rel: "noopener noreferrer" do %>
+                  <i class="fa-brands fa-x-twitter text-gray-400 text-4xl hover:text-gray-600"></i>
+                <% end %>
+              <% else %>
+                <i class="fa-brands fa-x-twitter text-gray-400 text-4xl cursor-not-allowed" 
+                   onclick="alert('Xのリンクが登録されていません')"></i>
+              <% end %>
 
 
               <!-- フォロー/フォロワー -->
