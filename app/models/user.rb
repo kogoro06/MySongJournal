@@ -38,11 +38,34 @@ class User < ApplicationRecord
   end
 
   def self.from_omniauth(auth)
-    where(provider: auth.provider, uid: auth.uid).first_or_create do |user|
-      user.email = auth.info.email
-      user.name = auth.info.name
-      user.password = Devise.friendly_token[0,20]
+    # まず、OAuth認証情報で検索
+    user = find_by(provider: auth.provider, uid: auth.uid)
+    
+    # 見つからない場合、メールアドレスで検索
+    user ||= find_by(email: auth.info.email)
+    
+    if user
+      # 既存ユーザーの場合、OAuth情報を更新
+      user.update(
+        uid: auth.uid,
+        provider: auth.provider
+      ) unless user.provider == auth.provider && user.uid == auth.uid
+    else
+      # 新規ユーザーを作成
+      user = new(
+        email: auth.info.email,
+        name: auth.info.name || auth.info.email.split('@').first,
+        password: Devise.friendly_token[0, 20],
+        provider: auth.provider,
+        uid: auth.uid
+      )
     end
+
+    unless user.save
+      Rails.logger.error "User save failed: #{user.errors.full_messages.join(', ')}"
+    end
+    
+    user
   end
   def self.create_unique_string
     SecureRandom.uuid
