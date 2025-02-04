@@ -1,0 +1,3 @@
+<%= turbo_stream.replace "favorite_button_#{@journal.id}" do %>
+  <%= render partial: "journals/favorite_button", locals: { journal: @journal } %>
+<% end %>

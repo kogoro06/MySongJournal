@@ -3,28 +3,55 @@ class FavoritesController < ApplicationController
   before_action :set_journal
 
   def create
-    favorite = current_user.favorites.build(journal_id: @journal.id)
-    favorite.save
-    render_favorite_button
+    @favorite = current_user.favorites.find_or_initialize_by(journal: @journal)
+    
+    if @favorite.persisted? || @favorite.save
+      @journal.reload
+      respond_to do |format|
+        format.turbo_stream
+      end
+    else
+      render_error_response
+    end
+  rescue ActiveRecord::RecordNotUnique
+    respond_to do |format|
+      format.turbo_stream
+    end
   end
 
   def destroy
-    favorite = current_user.favorites.find_by(journal_id: @journal.id)
-    favorite.destroy
-    render_favorite_button
+    @favorite = current_user.favorites.find_by(journal: @journal)
+    
+    if @favorite&.destroy
+      @journal.reload
+      respond_to do |format|
+        format.turbo_stream
+      end
+    else
+      render_error_response
+    end
   end
 
   private
 
   def set_journal
-    @journal = Journal.find(params[:journal_id])
+    @journal = Journal.friendly.find(params[:journal_id])
+  rescue ActiveRecord::RecordNotFound
+    render_error_response
   end
 
-  def render_favorite_button
-    render turbo_stream: turbo_stream.replace(
-      "journal-card-#{@journal.id}",
-      partial: "journals/journal_card",
-      locals: { journal: @journal }
-    )
+  def render_error_response
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace(
+          "favorite_button_#{@journal.id}",
+          html: "エラーが発生しました"
+        )
+      end
+      format.html do
+        flash[:alert] = "いいねの処理中にエラーが発生しました"
+        redirect_back(fallback_location: journals_path)
+      end
+    end
   end
 end
