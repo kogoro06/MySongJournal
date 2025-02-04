@@ -29,6 +29,10 @@ services:
     environment:
       TZ: Asia/Tokyo
       REDIS_URL: redis://redis:6379/0
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+      AWS_BUCKET_NAME: ${AWS_BUCKET_NAME}
     ports:
       - "3000:3000"
     depends_on:
@@ -50,6 +54,10 @@ services:
       TZ: Asia/Tokyo
       REDIS_URL: redis://redis:6379/0
       POSTGRES_PASSWORD: password
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+      AWS_BUCKET_NAME: ${AWS_BUCKET_NAME}
     depends_on:
       - db
       - redis

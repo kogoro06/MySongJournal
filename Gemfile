@@ -53,6 +53,7 @@ gem "kaminari"
 gem "mini_magick"
 gem "image_processing", "~> 1.2"
 gem "meta-tags", require: "meta_tags"
+gem "aws-sdk-s3"
 
 # Security
 gem "rack-attack"
