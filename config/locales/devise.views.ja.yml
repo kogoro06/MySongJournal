@@ -58,17 +58,26 @@ ja:
         subject: メールアドレス確認メール
         instruction: 以下のリンクをクリックし、メールアドレスの確認手続を完了させてください。
       reset_password_instructions:
-        subject: パスワードの再設定について
-        instruction: パスワード再設定の依頼を受けたため、メールを送信しています。
+        subject: 'パスワード再設定のご案内'
+        greeting: '%{email} 様'
+        message: 'パスワードの再設定を受け付けました。以下のリンクからパスワードの再設定を行ってください。'
+        change_link: 'パスワードを再設定する'
+        ignore_message: 'このメールに心当たりがない場合は、このメールを無視してください。'
+        no_changes_message: '上記のリンクにアクセスして新しいパスワードを作成するまで、パスワードは変更されません。'
+        note: '※このメールは送信専用のメールアドレスから送信されています。ご返信いただいてもお答えできませんのでご了承ください。'
     passwords:
       edit:
-        change_my_password: パスワードを変更する
-        new_password: 新しいパスワード
-        confirm_new_password: 確認用新しいパスワード
+        change_your_password: 'パスワード再設定'
+        change_my_password: 'パスワードを変更する'
+        new_password: '新しいパスワード'
+        confirm_new_password: 'パスワード（確認用）'
       new:
-        forgot_your_password: パスワードを忘れましたか？
-        send_me_reset_password_instructions: パスワードの再設定方法を送信する
-      updated: パスワードが正しく変更されました。
+        forgot_your_password: 'パスワード再設定'
+        send_me_reset_password_instructions: 'パスワード再設定メールを送信'
+        enter_your_email_address: 'メールアドレスを入力してください'
+      updated: 'パスワードが正しく変更されました。'
+      updated_not_active: 'パスワードが正しく変更されました。'
+      send_paranoid_instructions: 'メールアドレスが登録済みの場合、パスワード再設定用のメールが数分以内に送信されます。'
     registrations:
       new:
         sign_up: アカウント登録
@@ -83,15 +92,15 @@ ja:
       signed_in: ログインしました。
       signed_out: ログアウトしました。
     shared:
+      minimum_password_length: '%{count}文字以上'
       links:
-        sign_in: ログイン
-        sign_up: アカウント登録
-        forgot_password: パスワードをお忘れですか？
+        sign_in: 'ログイン'
+        sign_up: 'サインアップ'
+        forgot_password: 'パスワード再設定'
         resend_confirmation: 確認メールが届いていませんか？
         resend_unlock: アカウントのロック解除メールを再送しますか？
         sign_in_with_provider: "%{provider}でログイン"
         back: 戻る
-      minimum_password_length: "（%{count}文字以上）"
     unlocks:
       send_instructions: アカウントのロック解除方法を数分以内にメールでご連絡します。
   errors:
