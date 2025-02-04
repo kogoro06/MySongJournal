@@ -17,24 +17,24 @@ class Journal < ApplicationRecord
 
   # 列挙型
   enum genre: {
-    j_pop: 'j-pop',
-    k_pop: 'k-pop',
-    western: 'western',
-    anime: 'anime',
-    vocaloid: 'vocaloid',
-    others: 'others'
+    j_pop: "j-pop",
+    k_pop: "k-pop",
+    western: "western",
+    anime: "anime",
+    vocaloid: "vocaloid",
+    others: "others"
   }
 
   enum emotion: [ :喜, :怒, :哀, :楽 ]
 
   # ジャンルの表示名と値のマッピング
   MAIN_GENRES = {
-    'j-pop' => 'J-POP',
-    'k-pop' => 'K-POP',
-    'western' => '洋楽',
-    'anime' => 'アニメ/特撮',
-    'vocaloid' => 'ボーカロイド',
-    'others' => 'その他'
+    "j-pop" => "J-POP",
+    "k-pop" => "K-POP",
+    "western" => "洋楽",
+    "anime" => "アニメ/特撮",
+    "vocaloid" => "ボーカロイド",
+    "others" => "その他"
   }.freeze
 
   # スコープ定義
@@ -48,12 +48,12 @@ class Journal < ApplicationRecord
   # ジャンルの表示名
   def genre_display_name
     case genre
-    when 'j-pop' then 'J-POP'
-    when 'k-pop' then 'K-POP'
-    when 'western' then '洋楽'
-    when 'anime' then 'アニメ/特撮'
-    when 'vocaloid' then 'ボーカロイド'
-    when 'others', nil then 'その他'
+    when "j-pop" then "J-POP"
+    when "k-pop" then "K-POP"
+    when "western" then "洋楽"
+    when "anime" then "アニメ/特撮"
+    when "vocaloid" then "ボーカロイド"
+    when "others", nil then "その他"
     end
   end
 
@@ -61,21 +61,21 @@ class Journal < ApplicationRecord
   def self.migrate_genres
     find_each do |journal|
       next if journal.genre.blank?
-      
+
       # 現在のジャンルに基づいて新しいジャンルを設定
       new_genre = case journal.genre.downcase
-      when 'j-pop', 'jpop', 'japanese'
-        'j-pop'
-      when 'k-pop', 'kpop', 'korean'
-        'k-pop'
-      when 'western', 'pop', 'rock', 'jazz', 'classical'
-        'western'
-      when 'anime', 'tokusatsu', 'game'
-        'anime'
-      when 'vocaloid'
-        'vocaloid'
+      when "j-pop", "jpop", "japanese"
+        "j-pop"
+      when "k-pop", "kpop", "korean"
+        "k-pop"
+      when "western", "pop", "rock", "jazz", "classical"
+        "western"
+      when "anime", "tokusatsu", "game"
+        "anime"
+      when "vocaloid"
+        "vocaloid"
       else
-        'others'
+        "others"
       end
 
       # 新しいジャンルを設定して保存
@@ -87,12 +87,12 @@ class Journal < ApplicationRecord
     group_counts = group(:genre).count
     group_counts.each do |genre, count|
       display_name = case genre
-      when 'j-pop' then 'J-POP'
-      when 'k-pop' then 'K-POP'
-      when 'western' then '洋楽'
-      when 'anime' then 'アニメ/特撮'
-      when 'vocaloid' then 'ボーカロイド'
-      else 'その他'
+      when "j-pop" then "J-POP"
+      when "k-pop" then "K-POP"
+      when "western" then "洋楽"
+      when "anime" then "アニメ/特撮"
+      when "vocaloid" then "ボーカロイド"
+      else "その他"
       end
       puts "#{display_name}: #{count}件"
     end
@@ -103,8 +103,8 @@ class Journal < ApplicationRecord
   def slug_candidates
     [
       :title,
-      [:title, :artist_name],
-      [:title, :artist_name, -> { created_at.strftime('%Y%m%d') }]
+      [ :title, :artist_name ],
+      [ :title, :artist_name, -> { created_at.strftime("%Y%m%d") } ]
     ]
   end
 
@@ -118,8 +118,8 @@ class Journal < ApplicationRecord
 
     # アーティスト名とタイトルからアニメ/特撮かどうかを判定
     title_based_genre = determine_genre_from_title
-    if title_based_genre == 'anime'
-      self.genre = 'anime'
+    if title_based_genre == "anime"
+      self.genre = "anime"
       return
     end
 
@@ -130,29 +130,29 @@ class Journal < ApplicationRecord
   def determine_genre_from_title
     artist_name_lower = artist_name.to_s.downcase
     song_name_lower = song_name.to_s.downcase
-    
+
     # アニメ/特撮関連の判定
     if artist_name_lower =~ /(?:仮面ライダー|スーパー戦隊|戦隊|ウルトラマン|プリキュア|特撮|アニメ|disney|ディズニー|ジブリ|pixar|ピクサー)/ ||
        song_name_lower =~ /(?:仮面ライダー|スーパー戦隊|戦隊|ウルトラマン|プリキュア|特撮|アニメ|disney|ディズニー)/ ||
        artist_name_lower =~ /(?:山寺宏一|水木一郎|堀江美都子|ささきいさお|串田アキラ|影山ヒロノブ|池田直樹|遠藤正明|宮内タカユキ|高橋秀幸|松本梨香|林原めぐみ|水樹奈々|田村ゆかり|堀江由衣|中川翔子|JAM Project|きただにひろし|米倉千尋|奥井雅美|鮎川麻弥|堀江晶太|岡崎律子|GRANRODEO|angela|fripSide|May\'n|藍井エイル|LiSA|ClariS|小倉唯|沢城みゆき|花澤香菜|戸松遥|相川七瀬.*仮面ライダー|アラン.*メンケン)/
-      'anime'
+      "anime"
     else
       nil
     end
   end
 
   def self.get_spotify_access_token
-    response = RestClient.post('https://accounts.spotify.com/api/token',
+    response = RestClient.post("https://accounts.spotify.com/api/token",
       {
-        grant_type: 'client_credentials',
-        client_id: ENV['SPOTIFY_CLIENT_ID'],
-        client_secret: ENV['SPOTIFY_CLIENT_SECRET']
+        grant_type: "client_credentials",
+        client_id: ENV["SPOTIFY_CLIENT_ID"],
+        client_secret: ENV["SPOTIFY_CLIENT_SECRET"]
       },
       {
-        content_type: 'application/x-www-form-urlencoded'
+        content_type: "application/x-www-form-urlencoded"
       }
     )
-    JSON.parse(response.body)['access_token']
+    JSON.parse(response.body)["access_token"]
   end
 
   # 既存の日記のジャンルを一括更新
@@ -162,20 +162,20 @@ class Journal < ApplicationRecord
 
       begin
         token = get_spotify_access_token
-        
+
         track_response = RestClient.get(
           "https://api.spotify.com/v1/tracks/#{journal.spotify_track_id}",
           { Authorization: "Bearer #{token}" }
         )
         track_data = JSON.parse(track_response.body)
-        artist_id = track_data['artists'].first['id']
+        artist_id = track_data["artists"].first["id"]
 
         artist_response = RestClient.get(
           "https://api.spotify.com/v1/artists/#{artist_id}",
           { Authorization: "Bearer #{token}" }
         )
         artist_data = JSON.parse(artist_response.body)
-        genres = artist_data['genres']
+        genres = artist_data["genres"]
 
         genre = determine_best_genre_match(genres.map(&:downcase))
         journal.update(genre: genre)
@@ -189,6 +189,6 @@ class Journal < ApplicationRecord
     end
   end
 
-  require 'rest-client'
-  require 'json'
+  require "rest-client"
+  require "json"
 end

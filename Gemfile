@@ -4,7 +4,7 @@ source "https://rubygems.org"
 gem "rails", "~> 7.2.2"
 
 # URLをわかりやすく
-gem 'friendly_id', '~> 5.5.0'
+gem "friendly_id", "~> 5.5.0"
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"

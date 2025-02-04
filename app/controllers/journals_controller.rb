@@ -10,31 +10,31 @@ class JournalsController < ApplicationController
   # 一覧表示
   def index
     @journals = current_user.journals
-    
+
     # 感情フィルター
     @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
-    
+
     # ジャンルフィルター
     @journals = @journals.where(genre: params[:genre]) if params[:genre].present?
-    
+
     # 並び替え
-    sort_direction = params[:sort] == 'asc' ? :asc : :desc
+    sort_direction = params[:sort] == "asc" ? :asc : :desc
     @journals = @journals.order(created_at: sort_direction).page(params[:page]).per(6)
   end
 
   # タイムライン表示
   def timeline
     following_user_ids = current_user.following.pluck(:id)
-    @journals = Journal.where(user_id: following_user_ids + [current_user.id])
-    
+    @journals = Journal.where(user_id: following_user_ids + [ current_user.id ])
+
     # 感情フィルター
     @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
-    
+
     # ジャンルフィルター
     @journals = @journals.where(genre: params[:genre]) if params[:genre].present?
-    
+
     # 並び替え
-    sort_direction = params[:sort] == 'asc' ? :asc : :desc
+    sort_direction = params[:sort] == "asc" ? :asc : :desc
     @journals = @journals.order(created_at: sort_direction).page(params[:page]).per(6)
   end
 
