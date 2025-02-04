@@ -4,7 +4,7 @@ class FavoritesController < ApplicationController
 
   def create
     @favorite = current_user.favorites.find_or_initialize_by(journal: @journal)
-    
+
     if @favorite.persisted? || @favorite.save
       @journal.reload
       respond_to do |format|
@@ -21,7 +21,7 @@ class FavoritesController < ApplicationController
 
   def destroy
     @favorite = current_user.favorites.find_by(journal: @journal)
-    
+
     if @favorite&.destroy
       @journal.reload
       respond_to do |format|
