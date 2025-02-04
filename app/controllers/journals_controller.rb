@@ -13,9 +13,11 @@ class JournalsController < ApplicationController
     session.delete(:selected_track)
     session.delete(:journal_form)
 
-    @journals = current_user.journals.order(created_at: :desc)
-    @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
-    @journals = @journals.page(params[:page]).per(6)  # 1ページあたり6件表示
+    @journals = current_user.journals
+      .by_genre(params[:genre])
+      .by_emotion(params[:emotion])
+      .order(created_at: :desc)
+      .page(params[:page])
 
     # デバッグログ
     @journals.each do |journal|
@@ -26,9 +28,11 @@ class JournalsController < ApplicationController
 
   # タイムライン表示
   def timeline
-    @journals = Journal.includes(:user).order(created_at: :desc)
-    @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
-    @journals = @journals.page(params[:page]).per(6)  # 1ページあたり6件表示
+    @journals = Journal.includes(:user)
+      .by_genre(params[:genre])
+      .by_emotion(params[:emotion])
+      .order(created_at: :desc)
+      .page(params[:page])
   end
 
   # 詳細表示

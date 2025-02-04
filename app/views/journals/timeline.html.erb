@@ -6,16 +6,25 @@
         <h1 class="text-2xl font-bold">タイムライン</h1>
         <p class="text-sm text-gray-600 mt-1">*フォローボタンを押すと日記を書いたユーザーをフォローできます。</p>
       </div>
-       <%= form_with url: timeline_journals_path, method: :get, local: true, class: "flex items-center space-x-2 text-white", id: "emotion-filter-form" do |f| %>
-             <%= f.select :emotion,
+      <%=
+        form_with url: timeline_journals_path, method: :get, local: true, class: "flex items-center space-x-2 text-white", id: "emotion-filter-form" do |f| %>
+          <%= f.select :emotion,
             Journal.emotions.keys.map { |key| [key.humanize, key] },
             { include_blank: "すべての感情", selected: params[:emotion] },
             { 
               class: "px-4 py-2 border rounded-md bg-customred text-white",
               onchange: "this.form.requestSubmit()"
             } 
-        %>
-      <% end %>
+          %>
+          <%= f.select :genre,
+            Journal::MAIN_GENRES.map { |key, name| [name, key] },
+            { include_blank: "すべてのジャンル", selected: params[:genre] },
+            { 
+              class: "px-4 py-2 border rounded-md bg-customred text-white",
+              onchange: "this.form.requestSubmit()"
+            } 
+          %>
+        <% end %>
     </div>
 
     <!-- 日記カード一覧 -->

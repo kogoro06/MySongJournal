@@ -8,14 +8,25 @@
       <%= form_with url: journals_path, method: :get, local: true, class: "flex items-center space-x-2 text-white", id: "emotion-filter-form" do |f| %>
         <%= f.select :emotion,
             Journal.emotions.keys.map { |key| [key.humanize, key] },
-            { include_blank: "すべて", selected: params[:emotion] },
+            { include_blank: "すべての感情", selected: params[:emotion] },
             { 
               class: "px-4 py-2 border rounded-md bg-customred",
               onchange: "this.form.requestSubmit()"
             } 
         %>
+        <%= form_with url: journals_path, method: :get, local: true, class: "flex items-center space-x-2 text-white", id: "genre-filter-form" do |f| %>
+          <%= f.select :genre,
+              Journal::MAIN_GENRES.map { |key, name| [name, key] },
+              { include_blank: "すべてのジャンル", selected: params[:genre] },
+              { 
+                class: "px-4 py-2 border rounded-md bg-customred",
+                onchange: "this.form.requestSubmit()"
+              } 
+          %>
+          <%= f.hidden_field :emotion, value: params[:emotion] if params[:emotion].present? %>
+        <% end %>
+      </div>
       <% end %>
-    </div>
 
     <!-- 一覧表示 -->
     <ul class="grid grid-cols-2 gap-4">
