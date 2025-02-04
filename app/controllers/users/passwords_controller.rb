@@ -7,9 +7,9 @@ module Users
 
       if successfully_sent?(resource)
         respond_to do |format|
-          format.html { 
-            redirect_to after_sending_reset_password_instructions_path_for(resource_name), 
-            notice: t("devise.passwords.send_paranoid_instructions") 
+          format.html {
+            redirect_to after_sending_reset_password_instructions_path_for(resource_name),
+            notice: t("devise.passwords.send_paranoid_instructions")
           }
           format.json { render json: { message: t("devise.passwords.send_paranoid_instructions") }, status: :ok }
         end
