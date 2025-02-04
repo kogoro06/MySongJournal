@@ -6,39 +6,66 @@
         <h1 class="text-2xl font-bold">タイムライン</h1>
         <p class="text-sm text-gray-600 mt-1">*フォローボタンを押すと日記を書いたユーザーをフォローできます。</p>
       </div>
-      <%=
-        form_with url: timeline_journals_path, method: :get, local: true, class: "flex items-center space-x-2 text-white", id: "emotion-filter-form" do |f| %>
-          <%= f.select :emotion,
-            Journal.emotions.keys.map { |key| [key.humanize, key] },
-            { include_blank: "すべての感情", selected: params[:emotion] },
-            { 
-              class: "px-4 py-2 border rounded-md bg-customred text-white",
-              onchange: "this.form.requestSubmit()"
-            } 
+      <div class="flex items-center gap-2">
+        <%= form_with url: timeline_journals_path, method: :get, local: true, class: "flex items-center space-x-2 text-white", id: "sort-filter-form" do |f| %>
+          <%= f.select :sort,
+              [['新しい順', 'desc'], ['古い順', 'asc']],
+              { selected: params[:sort] || 'desc' },
+              {
+                class: "px-4 py-2 border rounded-md bg-customred",
+                onchange: "this.form.requestSubmit()"
+              }
           %>
-          <%= f.select :genre,
-            Journal::MAIN_GENRES.map { |key, name| [name, key] },
-            { include_blank: "すべてのジャンル", selected: params[:genre] },
-            { 
-              class: "px-4 py-2 border rounded-md bg-customred text-white",
-              onchange: "this.form.requestSubmit()"
-            } 
-          %>
+          <%= f.hidden_field :emotion, value: params[:emotion] if params[:emotion].present? %>
+          <%= f.hidden_field :genre, value: params[:genre] if params[:genre].present? %>
         <% end %>
+
+        <%= form_with url: timeline_journals_path, method: :get, local: true, class: "flex items-center space-x-2 text-white", id: "emotion-filter-form" do |f| %>
+          <%= f.select :emotion,
+              Journal.emotions.keys.map { |key| [key.humanize, key] },
+              { include_blank: "すべての感情", selected: params[:emotion] },
+              {
+                class: "px-4 py-2 border rounded-md bg-customred",
+                onchange: "this.form.requestSubmit()"
+              }
+          %>
+          <%= f.hidden_field :genre, value: params[:genre] if params[:genre].present? %>
+          <%= f.hidden_field :sort, value: params[:sort] if params[:sort].present? %>
+        <% end %>
+
+        <%= form_with url: timeline_journals_path, method: :get, local: true, class: "flex items-center space-x-2 text-white", id: "genre-filter-form" do |f| %>
+          <%= f.select :genre,
+              Journal.genres.map { |k, v| [t("activerecord.attributes.journal.genre.#{k}"), k] },
+              { include_blank: "すべてのジャンル", selected: params[:genre] },
+              {
+                class: "px-4 py-2 border rounded-md bg-customred",
+                onchange: "this.form.requestSubmit()"
+              }
+          %>
+          <%= f.hidden_field :emotion, value: params[:emotion] if params[:emotion].present? %>
+          <%= f.hidden_field :sort, value: params[:sort] if params[:sort].present? %>
+        <% end %>
+      </div>
     </div>
 
     <!-- 日記カード一覧 -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
       <% @journals.each do |journal| %>
-        <div class="flex flex-col h-full">
+        <div class="h-full w-full">
           <%= render 'journals/journal_card', journal: journal %>
         </div>
       <% end %>
     </div>
 
     <!-- ページネーション -->
-    <div class="mt-6">
-      <%= paginate @journals %>
+    <div class="mt-6 flex justify-center">
+      <div class="flex items-center gap-2">
+        <%= paginate @journals, window: 2,
+            outer_window: 1,
+            class: "flex items-center gap-2",
+            previous_label: '前へ',
+            next_label: '次へ' %>
+      </div>
     </div>
 
     <!-- 新規作成ボタン -->

@@ -9,35 +9,38 @@ class JournalsController < ApplicationController
 
   # 一覧表示
   def index
-    # 一覧表示時にセッションをクリア
-    session.delete(:selected_track)
-    session.delete(:journal_form)
-
     @journals = current_user.journals
-      .by_genre(params[:genre])
-      .by_emotion(params[:emotion])
-      .order(created_at: :desc)
-      .page(params[:page])
-
-    # デバッグログ
-    @journals.each do |journal|
-      Rails.logger.debug "Journal ID: #{journal.id}"
-      Rails.logger.debug "Album Image URL: #{journal.album_image}"
-    end
+    
+    # 感情フィルター
+    @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
+    
+    # ジャンルフィルター
+    @journals = @journals.where(genre: params[:genre]) if params[:genre].present?
+    
+    # 並び替え
+    sort_direction = params[:sort] == 'asc' ? :asc : :desc
+    @journals = @journals.order(created_at: sort_direction).page(params[:page]).per(6)
   end
 
   # タイムライン表示
   def timeline
-    @journals = Journal.includes(:user)
-      .by_genre(params[:genre])
-      .by_emotion(params[:emotion])
-      .order(created_at: :desc)
-      .page(params[:page])
+    following_user_ids = current_user.following.pluck(:id)
+    @journals = Journal.where(user_id: following_user_ids + [current_user.id])
+    
+    # 感情フィルター
+    @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
+    
+    # ジャンルフィルター
+    @journals = @journals.where(genre: params[:genre]) if params[:genre].present?
+    
+    # 並び替え
+    sort_direction = params[:sort] == 'asc' ? :asc : :desc
+    @journals = @journals.order(created_at: sort_direction).page(params[:page]).per(6)
   end
 
   # 詳細表示
   def show
-    @journal = Journal.find(params[:id])
+    @journal = Journal.friendly.find(params[:id])
     @user = @journal.user
     @user_name = @user.name
     prepare_meta_tags
@@ -83,6 +86,8 @@ class JournalsController < ApplicationController
   def create
     @journal = current_user.journals.build(journal_params)
 
+    # ジャンルは自動的に設定される（before_create :set_genre_from_spotifyで）
+
     if @journal.save
       # セッションをクリア
       session.delete(:selected_track)
@@ -99,13 +104,13 @@ class JournalsController < ApplicationController
 
   # 編集フォーム表示
   def edit
-    @journal = current_user.journals.find(params[:id])
+    @journal = current_user.journals.friendly.find(params[:id])
     Rails.logger.info "🔍 Edit action called with referer: #{request.referer}"
   end
 
   # 更新処理
   def update
-    @journal = current_user.journals.find(params[:id])
+    @journal = current_user.journals.friendly.find(params[:id])
     Rails.logger.info "🔄 Update action called with edit_source: #{session[:edit_source]}"
 
     if @journal.update(journal_params)
@@ -121,7 +126,7 @@ class JournalsController < ApplicationController
 
   # 削除処理
   def destroy
-    @journal = current_user.journals.find(params[:id])
+    @journal = current_user.journals.friendly.find(params[:id])
     @journal.destroy
     flash[:notice] = "日記を削除しました"
 
@@ -141,11 +146,11 @@ class JournalsController < ApplicationController
   private
 
   def set_journal
-    @journal = current_user.journals.find(params[:id])
+    @journal = current_user.journals.friendly.find(params[:id])
   end
 
   def set_journal_for_show
-    @journal = Journal.find(params[:id])  # 全ての日記から検索
+    @journal = Journal.friendly.find(params[:id])  # friendly_idを使用
   end
 
   def store_location
@@ -175,9 +180,7 @@ class JournalsController < ApplicationController
   end
 
   def journal_params
-    params.require(:journal).permit(
-      :title, :content, :emotion, :song_name, :artist_name, :album_image, :preview_url, :spotify_track_id
-    )
+    params.require(:journal).permit(:title, :content, :emotion, :genre, :song_name, :artist_name, :album_name, :album_image, :preview_url, :spotify_url)
   end
 
   def store_edit_source
@@ -203,14 +206,14 @@ class JournalsController < ApplicationController
 
   def prepare_meta_tags
     site_name   = "MY SONG JOURNAL"
-    title       = "Today's song 🎵 #{@journal.song_name} by #{@journal.artist_name} 🎤"
+    title       = "Today's song #{@journal.song_name} by #{@journal.artist_name} "
     description = @journal.content
 
     # OGP画像のURLを生成
     ogp_image_url = if @journal.album_image.present?
-      "#{request.base_url}/images/ogp.png?text=#{CGI.escape("Today's song 🎵 #{@journal.song_name} by #{@journal.artist_name} 🎤")}&album_image=#{CGI.escape(@journal.album_image)}"
+      "#{request.base_url}/images/ogp.png?text=#{CGI.escape("Today's song #{@journal.song_name} by #{@journal.artist_name} ")}&album_image=#{CGI.escape(@journal.album_image)}"
     else
-      "#{request.base_url}/images/ogp.png?text=#{CGI.escape("Today's song 🎵 #{@journal.song_name} by #{@journal.artist_name} 🎤")}"
+      "#{request.base_url}/images/ogp.png?text=#{CGI.escape("Today's song #{@journal.song_name} by #{@journal.artist_name} ")}"
     end
 
     meta_tags = {
@@ -218,7 +221,7 @@ class JournalsController < ApplicationController
       title:       title,
       image:       ogp_image_url,
       description: description,
-      keywords:    %w[音楽 日記 MySongJournal],
+      keywords:    %w[ MySongJournal],
       og: {
         title: title,
         description: description,
