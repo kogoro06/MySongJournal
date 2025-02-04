@@ -1,11 +1,8 @@
 class JournalsController < ApplicationController
-  before_action :authenticate_user!, except: [ :show, :index, :timeline ]
-  before_action :set_journal, only: [ :edit, :update, :destroy ]  # showを除外
-  before_action :set_journal_for_show, only: [ :show ]  # showアクション用
-  before_action :store_location, only: [ :index, :timeline ]
-  before_action :authorize_journal, only: [ :edit, :update, :destroy ]
-  before_action :store_edit_source, only: [ :edit ]
-  helper_method :prepare_meta_tags
+  before_action :authenticate_user!, only: [:new, :create, :edit, :update, :destroy]
+  before_action :set_journal, only: [:edit, :update, :destroy]
+  before_action :set_journal_for_show, only: [:show]
+  before_action :store_location, only: [:index, :timeline]
 
   # 一覧表示
   def index
@@ -22,10 +19,9 @@ class JournalsController < ApplicationController
     @journals = @journals.order(created_at: sort_direction).page(params[:page]).per(6)
   end
 
-  # タイムライン表示
+  # タイムライン表示（常に全ての投稿を表示）
   def timeline
-    following_user_ids = current_user.following.pluck(:id)
-    @journals = Journal.where(user_id: following_user_ids + [ current_user.id ])
+    @journals = Journal.all
 
     # 感情フィルター
     @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
@@ -33,12 +29,15 @@ class JournalsController < ApplicationController
     # ジャンルフィルター
     @journals = @journals.where(genre: params[:genre]) if params[:genre].present?
 
-    # 並び替え
+    # 並び替えとページネーション
     sort_direction = params[:sort] == "asc" ? :asc : :desc
-    @journals = @journals.order(created_at: sort_direction).page(params[:page]).per(6)
+    @journals = @journals.includes(:user)
+                        .order(created_at: sort_direction)
+                        .page(params[:page])
+                        .per(6)
   end
 
-  # 詳細表示
+  # 詳細表示（公開）
   def show
     @journal = Journal.friendly.find(params[:id])
     @user = @journal.user

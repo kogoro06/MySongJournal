@@ -7,7 +7,7 @@ class Journal < ApplicationRecord
   has_many :favorited_users, through: :favorites, source: :user
 
   # バリデーション
-  validates :title, presence: true, length: { maximum: 20 } # 必須、最大20文字
+  validates :title, presence: true, length: { maximum: 30 } # 必須、最大30文字
   validates :content, presence: true, length: { maximum: 500 } # 必須、最大500文字
   validates :emotion, presence: true # 必須
   validates :song_name, presence: true, length: { maximum: 100 }

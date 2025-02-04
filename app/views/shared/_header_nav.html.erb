@@ -1,4 +1,5 @@
 <nav class="flex justify-around items-center space-x-8 text-lg">
+<%= link_to 'タイムライン', timeline_journals_path, class: 'text-center text-gray-600 font-bold' %>
   <% if user_signed_in? %>
     <div class="flex items-center space-x-8">
         <%= link_to mypage_path do %>
@@ -11,12 +12,11 @@
             <p class="text-sm text-gray-600 font-bold mt-1">マイページ</p>
           </div>
         <% end %>
-         <%= link_to 'タイムライン', timeline_journals_path, class: 'text-center text-gray-600 font-bold' %>
         <%= button_to 'ログアウト', destroy_user_session_path, method: :delete, data: { turbo_method: :delete }, class: 'text-gray-600 font-bold hover:text-red-500' %>
     </div>
   <% else %>
     <%= link_to 'ログイン', new_user_session_path, class: 'text-center text-gray-600 font-bold' %>
     <%= link_to 'サインアップ', new_user_registration_path, class: 'text-center text-gray-600 font-bold' %>
-    <%# <%= link_to 'パスワード再発行', new_user_password_path, class: 'text-center text-gray-600 font-bold' %>
+    <%= link_to 'パスワード再発行', new_user_password_path, class: 'text-center text-gray-600 font-bold' %>
   <% end %>
 </nav>

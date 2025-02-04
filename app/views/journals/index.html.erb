@@ -2,8 +2,14 @@
   <div class="bg-white p-6 rounded shadow-md w-full max-w-7xl">
     <!-- ページタイトルと絞り込み -->
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold">
-        <%= "#{current_user.name}'s Journal" %>
+      <h1 class="text-2xl font-bold flex items-center gap-2">
+        <% username = current_user.name.presence || "Your Name" %>
+        <%= "#{username}'s Journal" %>
+        <% if current_user.avatar.attached? %>
+        <%= image_tag current_user.avatar, class: 'w-10 h-10 rounded-full object-cover border border-primary border-300' %>
+      <% else %>
+        <%= image_tag 'profile_sample.png', class: 'w-10 h-10 rounded-full object-cover border border-primary border-300' %>
+      <% end %>
       </h1>
       <div class="flex items-center gap-2">
         <%= form_with url: journals_path, method: :get, local: true, class: "flex items-center space-x-2 text-white", id: "sort-filter-form" do |f| %>

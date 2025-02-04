@@ -1,17 +1,20 @@
 <div class="bg-gray-300 rounded-lg shadow h-full flex flex-col p-4">
 <!-- ヘッダー情報（タイトル、投稿者） -->
 <div class="flex flex-col">
-  <div class="flex justify-between text-sm text-gray-600 mb-1">
+  <h3 class="font-bold text-lg line-clamp-2 mb-1">
+    <%= journal.title %>
+  </h3>
+  <div class="flex justify-between text-sm text-gray-600">
     <div class="flex items-center gap-2">
-      <h3 class="font-bold text-lg line-clamp-2 flex-1">
-        <%= journal.title %>
-      </h3>
-      <div class="flex items-center gap-2">
-        <span>by <%= journal.user.name %></span>
-        <% if user_signed_in? && journal.user != current_user %>
-          <%= render 'follows/button', user: journal.user %>
-        <% end %>
-      </div>
+      <span>by <%= journal.user.name %></span>
+      <% if journal.user.avatar.attached? %>
+      <%= image_tag journal.user.avatar, class: 'w-10 h-10 rounded-full object-cover border border-primary border-300' %>
+    <% else %>
+      <%= image_tag 'profile_sample.png', class: 'w-10 h-10 rounded-full object-cover border border-primary border-300' %>
+    <% end %>
+      <% if user_signed_in? && journal.user != current_user %>
+        <%= render 'follows/button', user: journal.user %>
+      <% end %>
     </div>
   </div>
 </div>
@@ -73,12 +76,6 @@
             class: "flex-1 text-center py-2 px-4 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 min-w-[120px]" %>
         <% if user_signed_in? %>
           <%= render 'journals/favorite_button', journal: journal %>
-        <% else %>
-          <%= link_to new_user_session_path,
-              class: "flex-1 flex items-center justify-center gap-2 py-2 px-4 bg-gray-300 text-white text-sm rounded min-w-[120px]" do %>
-            <i class="far fa-heart"></i>
-            <span><%= journal.favorites.count %></span>
-          <% end %>
         <% end %>
       </div>
     <% end %>
