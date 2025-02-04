@@ -96,7 +96,7 @@ ja:
       links:
         sign_in: 'ログイン'
         sign_up: 'サインアップ'
-        forgot_password: 'パスワード再設定'
+        forgot_your_password: 'パスワード再設定'
         resend_confirmation: 確認メールが届いていませんか？
         resend_unlock: アカウントのロック解除メールを再送しますか？
         sign_in_with_provider: "%{provider}でログイン"
