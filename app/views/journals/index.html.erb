@@ -5,16 +5,46 @@
       <h1 class="text-2xl font-bold">
         <%= "#{current_user.name}'s Journal" %>
       </h1>
-      <%= form_with url: journals_path, method: :get, local: true, class: "flex items-center space-x-2 text-white", id: "emotion-filter-form" do |f| %>
-        <%= f.select :emotion,
-            Journal.emotions.keys.map { |key| [key.humanize, key] },
-            { include_blank: "すべて", selected: params[:emotion] },
-            { 
-              class: "px-4 py-2 border rounded-md bg-customred",
-              onchange: "this.form.requestSubmit()"
-            } 
-        %>
-      <% end %>
+      <div class="flex items-center gap-2">
+        <%= form_with url: journals_path, method: :get, local: true, class: "flex items-center space-x-2 text-white", id: "sort-filter-form" do |f| %>
+          <%= f.select :sort,
+              [['新しい順', 'desc'], ['古い順', 'asc']],
+              { selected: params[:sort] || 'desc' },
+              {
+                class: "px-4 py-2 border rounded-md bg-customred",
+                onchange: "this.form.requestSubmit()"
+              }
+          %>
+          <%= f.hidden_field :emotion, value: params[:emotion] if params[:emotion].present? %>
+          <%= f.hidden_field :genre, value: params[:genre] if params[:genre].present? %>
+        <% end %>
+
+        <%= form_with url: journals_path, method: :get, local: true, class: "flex items-center space-x-2 text-white", id: "emotion-filter-form" do |f| %>
+          <%= f.select :emotion,
+              Journal.emotions.keys.map { |key| [key.humanize, key] },
+              { include_blank: "すべての感情", selected: params[:emotion] },
+              {
+                class: "px-4 py-2 border rounded-md bg-customred",
+                onchange: "this.form.requestSubmit()"
+              }
+          %>
+          <%= f.hidden_field :genre, value: params[:genre] if params[:genre].present? %>
+          <%= f.hidden_field :sort, value: params[:sort] if params[:sort].present? %>
+        <% end %>
+
+        <%= form_with url: journals_path, method: :get, local: true, class: "flex items-center space-x-2 text-white", id: "genre-filter-form" do |f| %>
+          <%= f.select :genre,
+              Journal.genres.map { |k, v| [t("activerecord.attributes.journal.genre.#{k}"), k] },
+              { include_blank: "すべてのジャンル", selected: params[:genre] },
+              {
+                class: "px-4 py-2 border rounded-md bg-customred",
+                onchange: "this.form.requestSubmit()"
+              }
+          %>
+          <%= f.hidden_field :emotion, value: params[:emotion] if params[:emotion].present? %>
+          <%= f.hidden_field :sort, value: params[:sort] if params[:sort].present? %>
+        <% end %>
+      </div>
     </div>
 
     <!-- 一覧表示 -->
@@ -37,6 +67,7 @@
               <div class="text-sm text-gray-600 space-y-1">
                 <div>作成日: <%= journal.created_at.in_time_zone('Asia/Tokyo').strftime("%Y年%m月%d日 %H:%M") %></div>
                 <div>感情: <%= journal.emotion.presence || "未設定" %></div>
+                <div>ジャンル: <%= journal.genre.present? ? t("activerecord.attributes.journal.genre.#{journal.genre}") : "未設定" %></div>
                 <div>アーティスト名: <%= journal.artist_name.presence || "未設定" %></div>
                 <div>曲名: <%= journal.song_name.presence || "未設定" %></div>
               </div>

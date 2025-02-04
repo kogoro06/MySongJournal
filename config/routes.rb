@@ -34,6 +34,7 @@ Rails.application.routes.draw do
   get "/spotify/results", to: "spotify#results", as: "spotify_results"
   post "spotify/select_tracks", to: "spotify#select_tracks", as: :select_tracks
   get "spotify/autocomplete", to: "spotify#autocomplete"
+  get "spotify/artist_genres", to: "spotify#artist_genres"
 
   # 静的ページのルート
   get "/privacy_policy", to: "pages#privacy_policy"

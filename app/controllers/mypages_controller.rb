@@ -7,8 +7,16 @@ class MypagesController < ApplicationController
 
     flash.now[:notice] = "Xのアイコンを登録してください" if params[:show_notice].present? && !current_user.x_link.present?
 
+    # タブの状態を保存（ページネーションの場合は保存しない）
+    if params[:tab].present? && !params[:page].present?
+      session[:mypage_tab] = params[:tab]
+    end
+
+    # デフォルトのタブを設定
+    session[:mypage_tab] ||= "my_posts"
+
     # タブに応じて表示する投稿を切り替え
-    case params[:tab]
+    case session[:mypage_tab]
     when "liked_posts"
       @journals = []  # 自分の投稿は空配列に
       @liked_journals = current_user.liked_journals
