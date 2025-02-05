@@ -3,7 +3,7 @@ class SpotifyController < ApplicationController
   require "rest-client"
   require "json"
   require "net/http"
-# 🎵 検索機能
+# 検索機能
 def search
   @tracks = []
   query_parts = []
@@ -216,6 +216,38 @@ end
     end
   end
 
+  def artist_genres
+    return render json: { error: "Track ID is required" }, status: :bad_request if params[:track_id].blank?
+
+    begin
+      token = get_spotify_access_token
+
+      # トラック情報を取得してアーティストIDを取得
+      track_response = RestClient.get(
+        "https://api.spotify.com/v1/tracks/#{params[:track_id]}",
+        { Authorization: "Bearer #{token}" }
+      )
+      track_data = JSON.parse(track_response.body)
+      artist_id = track_data["artists"].first["id"]
+
+      # アーティスト情報からジャンルを取得
+      artist_response = RestClient.get(
+        "https://api.spotify.com/v1/artists/#{artist_id}",
+        { Authorization: "Bearer #{token}" }
+      )
+      artist_data = JSON.parse(artist_response.body)
+      genres = artist_data["genres"]
+
+      # ジャンルを判定
+      genre = determine_genre(genres)
+
+      render json: { genre: genre }
+    rescue => e
+      Rails.logger.error "Error fetching Spotify genres: #{e.message}"
+      render json: { error: "Failed to fetch genre information" }, status: :internal_server_error
+    end
+  end
+
   private
 
   def batch_fetch_artists(artist_ids, token)
@@ -276,5 +308,84 @@ end
     else
       Rails.logger.error "トークンの取得に失敗しました: #{response.body}"
     end
+  end
+
+  def get_spotify_access_token
+    response = RestClient.post("https://accounts.spotify.com/api/token",
+      {
+        grant_type: "client_credentials",
+        client_id: ENV["SPOTIFY_CLIENT_ID"],
+        client_secret: ENV["SPOTIFY_CLIENT_SECRET"]
+      },
+      {
+        content_type: "application/x-www-form-urlencoded"
+      }
+    )
+    JSON.parse(response.body)["access_token"]
+  end
+
+  def determine_genre(spotify_genres)
+    return nil if spotify_genres.blank?
+
+    spotify_genres = spotify_genres.map(&:downcase)
+
+    # ジャンルごとのスコアを計算
+    scores = Hash.new(0)
+
+    spotify_genres.each do |genre|
+      # J-POP関連
+      if genre =~ /j-pop|jpop|japanese|japan|shibuya-kei/
+        scores["j-pop"] += 1
+      end
+
+      # K-POP関連
+      if genre =~ /k-pop|kpop|korean|k-indie|k-rap/
+        scores["k-pop"] += 1
+      end
+
+      # アイドル関連
+      if genre =~ /idol|boy band|girl group/
+        scores["idol"] += 1
+      end
+
+      # ボーカロイド関連
+      if genre =~ /vocaloid|virtual singer|synthetic voice/
+        scores["vocaloid"] += 1
+      end
+
+      # ゲーム関連
+      if genre =~ /game|gaming|chiptune|8-bit|16-bit/
+        scores["game"] += 1
+      end
+
+      # クラシック関連
+      if genre =~ /classical|orchestra|symphony|chamber|baroque|opera|concerto/
+        scores["classical"] += 1
+      end
+
+      # ジャズ関連
+      if genre =~ /jazz|bebop|swing|fusion|big band/
+        scores["jazz"] += 1
+      end
+
+      # 洋楽関連
+      if genre =~ /pop|rock|hip hop|rap|r&b|dance|electronic|soul|blues|folk|country|indie|alternative|metal|punk|reggae|latin/
+        scores["western"] += 1
+      end
+    end
+
+    # スコアが最も高いジャンルを選択
+    return nil if scores.empty?
+
+    max_score = scores.values.max
+    candidates = scores.select { |k, v| v == max_score }.keys
+
+    # 優先順位: より具体的なジャンル > 一般的なジャンル
+    priority_order = [ "vocaloid", "game", "classical", "jazz", "idol", "k-pop", "j-pop", "western" ]
+    priority_order.each do |genre|
+      return genre if candidates.include?(genre)
+    end
+
+    "others"
   end
 end

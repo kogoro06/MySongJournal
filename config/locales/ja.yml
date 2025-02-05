@@ -17,6 +17,21 @@ ja:
         x_link: "Xのリンク"
         avatar: "アバター画像"
         update: "更新"
+      journal:
+        genre:
+          j_pop: "J-POP"
+          k_pop: "K-POP"
+          western: "洋楽"
+          anime: "アニメ/特撮"
+          vocaloid: "ボーカロイド"
+          others: "その他"
   time:
     formats:
       long: "%Y年%m月%d日 %H:%M"
+  views:
+    pagination:
+      first: "&laquo; 最初"
+      last: "最後 &raquo;"
+      previous: "&lsaquo; 前"
+      next: "次 &rsaquo;"
+      truncate: "..."
