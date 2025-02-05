@@ -24,11 +24,13 @@ class JournalsController < ApplicationController
 
   # タイムライン表示
   def timeline
+    base_query = Journal.where(public: true)  # 公開記事のみ
+
     if user_signed_in?
       following_user_ids = current_user.following.pluck(:id)
-      @journals = Journal.where(user_id: following_user_ids + [current_user.id])
+      @journals = base_query.where(user_id: following_user_ids + [current_user.id])
     else
-      @journals = Journal.all
+      @journals = base_query
     end
 
     # 感情フィルター
@@ -215,7 +217,8 @@ class JournalsController < ApplicationController
       :album_image,
       :preview_url,
       :spotify_url,
-      :spotify_track_id
+      :spotify_track_id,
+      :public
     )
   end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_04_140534) do
+ActiveRecord::Schema[7.2].define(version: 2025_02_05_080133) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -95,6 +95,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_04_140534) do
     t.string "spotify_track_id"
     t.string "genre"
     t.string "slug"
+    t.string "spotify_url"
+    t.boolean "public", default: true, null: false
+    t.index ["public"], name: "index_journals_on_public"
     t.index ["slug"], name: "index_journals_on_slug", unique: true
     t.index ["user_id"], name: "index_journals_on_user_id"
   end
