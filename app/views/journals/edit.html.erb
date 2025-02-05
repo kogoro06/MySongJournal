@@ -81,13 +81,6 @@
             🔄 曲を選びなおす
             </button>
           </div>
-                  <!-- Spotifyリンク -->
-          <div class="flex items-center justify-center mt-4 gap-2">
-            <a href="https://open.spotify.com/track/<%= @journal.spotify_track_id %>" target="_blank" class="flex items-center gap-2">
-              <%= image_tag 'spotify_logo.png', alt: 'Spotifyロゴ', class: 'h-6 w-auto' %>
-              <span class="text-sm text-blue-500 underline">Spotifyで聴く</span>
-            </a>
-          </div>
         </div>
       <% end %>
       <!-- 🎼 隠しフィールドで曲情報を送信 -->
