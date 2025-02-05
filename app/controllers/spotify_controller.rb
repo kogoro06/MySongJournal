@@ -63,9 +63,11 @@ def search
       "https://api.spotify.com/v1/search",
       {
         Authorization: "Bearer #{token}",
+        "Accept-Language" => "ja",  # 日本語表記を優先
         params: {
           q: query_string,
           type: 'track',
+          market: 'JP',  # 日本のマーケットに限定
           limit: @per_page,
           offset: offset
         }
