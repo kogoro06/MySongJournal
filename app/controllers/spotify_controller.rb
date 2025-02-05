@@ -8,6 +8,11 @@ def search
   @tracks = []
   query_parts = []
 
+  # ページネーションの設定
+  @per_page = 6  # タイムラインと同じく6件に設定
+  page = params[:page] || 1
+  offset = (page.to_i - 1) * @per_page
+
   # フォームの値をセッションに保存
   if params[:journal].present?
     session[:journal_form] = {
@@ -61,7 +66,8 @@ def search
         params: {
           q: query_string,
           type: 'track',
-          limit: 20
+          limit: @per_page,
+          offset: offset
         }
       }
     )
@@ -71,7 +77,7 @@ def search
     if results["tracks"] && results["tracks"]["items"].any?
       @tracks = results["tracks"]["items"].map do |track|
         {
-          spotify_track_id: track["id"],  # iframeで使用するトラックID
+          spotify_track_id: track["id"],
           song_name: track["name"],
           artist_name: track["artists"].first["name"],
           album_image: track["album"]["images"].first&.[]("url"),
@@ -79,6 +85,10 @@ def search
           spotify_url: track["external_urls"]["spotify"]
         }
       end
+
+      # ページネーション情報の設定
+      @total_count = results["tracks"]["total"]
+      @tracks = Kaminari.paginate_array(@tracks, total_count: @total_count).page(page).per(@per_page)
     else
       @tracks = []
       flash.now[:alert] = "検索結果が見つかりませんでした。"
