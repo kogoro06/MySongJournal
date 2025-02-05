@@ -84,12 +84,6 @@
           class: "flex-1 text-center py-3 px-6 bg-gray-500 text-white text-base rounded hover:bg-gray-600" %>
       <% if user_signed_in? %>
         <%= render 'journals/favorite_button', journal: journal %>
-      <% else %>
-        <%= link_to new_user_session_path,
-            class: "flex-1 flex items-center justify-center gap-3 py-3 px-6 bg-gray-300 text-white text-base rounded" do %>
-          <i class="far fa-heart"></i>
-          <span><%= journal.favorites.count %></span>
-        <% end %>
       <% end %>
     <% end %>
   </div>

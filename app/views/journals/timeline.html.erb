@@ -4,7 +4,11 @@
     <div class="flex justify-between items-center mb-6">
       <div>
         <h1 class="text-2xl font-bold">タイムライン</h1>
-        <p class="text-sm text-gray-600 mt-1">*フォローボタンを押すと日記を書いたユーザーをフォローできます。</p>
+        <% if user_signed_in? %>
+          <p class="text-sm text-gray-600 mt-1">*フォローボタンを押すと日記を書いたユーザーをフォローできます。</p>
+        <% else %>
+          <p class="text-sm text-gray-600 mt-1">*ログインするとユーザーをフォローして、フォローしたユーザーの日記を見ることができます。</p>
+        <% end %>
       </div>
       <div class="flex items-center gap-2">
         <%= form_with url: timeline_journals_path, method: :get, local: true, class: "flex items-center space-x-2 text-white", id: "sort-filter-form" do |f| %>

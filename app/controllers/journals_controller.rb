@@ -24,8 +24,12 @@ class JournalsController < ApplicationController
 
   # タイムライン表示
   def timeline
-    following_user_ids = current_user.following.pluck(:id)
-    @journals = Journal.where(user_id: following_user_ids + [ current_user.id ])
+    if user_signed_in?
+      following_user_ids = current_user.following.pluck(:id)
+      @journals = Journal.where(user_id: following_user_ids + [current_user.id])
+    else
+      @journals = Journal.all
+    end
 
     # 感情フィルター
     @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
