@@ -94,7 +94,6 @@ class JournalsController < ApplicationController
         album_image: session[:selected_track]["album_image"],
         preview_url: session[:selected_track]["preview_url"],
         spotify_track_id: session[:selected_track]["spotify_track_id"],
-        spotify_url: session[:selected_track]["spotify_url"]
       )
     end
 
