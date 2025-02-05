@@ -3,77 +3,83 @@ class OgpCreator
   BASE_IMAGE_PATH = Rails.root.join("app/assets/images/ogp.png").to_s
   FONT_PATH = Rails.root.join("app/assets/fonts/DelaGothicOne-Regular.ttf").to_s
   FONT_SIZE = 35
-  SUBTITLE_FONT_SIZE = 30  # サブタイトル（曲名と歌手名）用のフォントサイズ
+  SUBTITLE_FONT_SIZE = 30
   IMAGE_WIDTH = 1200
   IMAGE_HEIGHT = 630
   ALBUM_IMAGE_SIZE = 380
   ALBUM_Y_OFFSET = 100
-  TITLE_Y_OFFSET = 70    # "Today's song" の位置
-  SUBTITLE_Y_OFFSET = 20  # 曲名と歌手名の位置
+  TITLE_Y_OFFSET = 70
+  SUBTITLE_Y_OFFSET = 20
 
   def self.build(text, album_image_url = nil)
     Rails.logger.info "=== OGP Image Generation Debug Info ==="
     Rails.logger.info "Input text: #{text.inspect}"
     Rails.logger.info "Album URL: #{album_image_url.inspect}"
 
-    # テキストを2行に分割
     title = "Today's song"
     subtitle = text.sub(/^Today's song\s*/, "").strip
 
-    # ベース画像の作成
-    image = MiniMagick::Image.new(BASE_IMAGE_PATH)
-    image.resize "#{IMAGE_WIDTH}x#{IMAGE_HEIGHT}"
+    # ベース画像を読み込む
+    base_image = MiniMagick::Image.open(BASE_IMAGE_PATH)
+    base_image.resize "#{IMAGE_WIDTH}x#{IMAGE_HEIGHT}"
 
     # アルバム画像の追加（存在する場合）
     if album_image_url.present?
       begin
+        Rails.logger.info "Downloading album image..."
         album_image = MiniMagick::Image.open(album_image_url)
         album_image.resize "#{ALBUM_IMAGE_SIZE}x#{ALBUM_IMAGE_SIZE}"
 
-        result = image.composite(album_image) do |c|
+        # 一時ファイルに保存
+        temp_album = Tempfile.new(['album', '.png'])
+        album_image.write(temp_album.path)
+        
+        # 画像を合成
+        base_image = base_image.composite(MiniMagick::Image.open(temp_album.path)) do |c|
           c.compose "Over"
           c.geometry "+#{(IMAGE_WIDTH - ALBUM_IMAGE_SIZE) / 2}+#{ALBUM_Y_OFFSET}"
         end
-        Rails.logger.info "Album image successfully added"
+        Rails.logger.info "Album image composited successfully"
       rescue => e
         Rails.logger.error "Failed to process album image: #{e.message}"
-        result = image
+        Rails.logger.error e.backtrace.join("\n")
+      ensure
+        temp_album&.close
+        temp_album&.unlink
       end
-    else
-      result = image
     end
 
-    # テキストの追加
-    temp_file = Tempfile.new([ "ogp", ".png" ])
-    temp_file.binmode
-    temp_file.write(result.to_blob)
-    temp_file.rewind
+    # 一時ファイルに保存
+    temp_base = Tempfile.new(['base', '.png'])
+    base_image.write(temp_base.path)
 
     begin
-      output = MiniMagick::Tool::Convert.new do |convert|
-        convert << temp_file.path
-
-        # "Today's song" を描画
-        convert.gravity "south"
-        convert.font FONT_PATH
-        convert.pointsize FONT_SIZE
-        convert.fill "black"
-        convert.annotate "+0+#{TITLE_Y_OFFSET}", title
-
-        # 曲名と歌手名を描画
-        convert.gravity "south"
-        convert.font FONT_PATH
-        convert.pointsize SUBTITLE_FONT_SIZE
-        convert.fill "black"
-        convert.annotate "+0+#{SUBTITLE_Y_OFFSET}", subtitle
-
-        convert << "png:-"
+      # テキストを追加
+      result = MiniMagick::Image.open(temp_base.path)
+      
+      # タイトルを追加
+      result.combine_options do |c|
+        c.gravity "south"
+        c.font FONT_PATH
+        c.pointsize FONT_SIZE
+        c.fill "black"
+        c.annotate "+0+#{TITLE_Y_OFFSET}", title
       end
 
-      output
+      # サブタイトルを追加
+      result.combine_options do |c|
+        c.gravity "south"
+        c.font FONT_PATH
+        c.pointsize SUBTITLE_FONT_SIZE
+        c.fill "black"
+        c.annotate "+0+#{SUBTITLE_Y_OFFSET}", subtitle
+      end
+
+      # 最終画像をバイナリで返す
+      result.to_blob
     ensure
-      temp_file.close
-      temp_file.unlink
+      temp_base.close
+      temp_base.unlink
     end
   rescue => e
     Rails.logger.error "Error in OgpCreator.build: #{e.message}"
