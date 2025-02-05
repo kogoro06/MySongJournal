@@ -59,6 +59,16 @@ gem "image_processing", "~> 1.2"
 gem "meta-tags", require: "meta_tags"
 gem "aws-sdk-s3"
 
+# OpenAI API
+gem "ruby-openai"
+
+# HTTP Client
+gem "faraday"
+gem "faraday-multipart"
+
+# Timeout handling
+gem "rack-timeout"
+
 # Security
 gem "rack-attack"
 
