@@ -66,8 +66,8 @@ def search
         "Accept-Language" => "ja",  # 日本語表記を優先
         params: {
           q: query_string,
-          type: 'track',
-          market: 'JP',  # 日本のマーケットに限定
+          type: "track",
+          market: "JP",  # 日本のマーケットに限定
           limit: @per_page,
           offset: offset
         }

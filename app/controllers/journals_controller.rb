@@ -201,15 +201,15 @@ class JournalsController < ApplicationController
 
   def journal_params
     params.require(:journal).permit(
-      :title, 
-      :content, 
-      :emotion, 
-      :genre, 
-      :song_name, 
-      :artist_name, 
-      :album_name, 
-      :album_image, 
-      :preview_url, 
+      :title,
+      :content,
+      :emotion,
+      :genre,
+      :song_name,
+      :artist_name,
+      :album_name,
+      :album_image,
+      :preview_url,
       :spotify_url,
       :spotify_track_id
     )
