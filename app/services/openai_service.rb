@@ -1,7 +1,7 @@
 class OpenaiService
   def initialize
     @client = OpenAI::Client.new(
-      access_token: ENV['OPENAI_API_KEY'],
+      access_token: ENV["OPENAI_API_KEY"],
       request_timeout: 240
     )
   end
@@ -11,11 +11,11 @@ class OpenaiService
     response = @client.chat(
       parameters: {
         model: "gpt-4",
-        messages: [{ role: "user", content: prompt }],
+        messages: [ { role: "user", content: prompt } ],
         temperature: 0.7
       }
     )
-    
+
     parse_response(response)
   end
 
@@ -24,11 +24,11 @@ class OpenaiService
     response = @client.chat(
       parameters: {
         model: "gpt-4",
-        messages: [{ role: "user", content: prompt }],
+        messages: [ { role: "user", content: prompt } ],
         temperature: 0.7
       }
     )
-    
+
     parse_response(response)
   end
 
@@ -37,11 +37,11 @@ class OpenaiService
   def create_analysis_prompt(journal)
     <<~PROMPT
       以下の日記の内容から、音楽的な特徴を抽出してください。
-      
+
       タイトル: #{journal.title}
       内容: #{journal.content}
       感情: #{journal.emotion}
-      
+
       以下の形式でJSON形式で返してください：
       {
         "mood": "曲の雰囲気（明るい、暗い、エネルギッシュなど）",
@@ -56,11 +56,11 @@ class OpenaiService
     <<~PROMPT
       あなたは音楽に精通したプロのDJです。
       以下の日記の内容から、ユーザーの気分や状況に合った具体的な楽曲を5曲提案してください。
-      
+
       タイトル: #{journal.title}
       内容: #{journal.content}
       感情: #{journal.emotion}
-      
+
       以下の形式でJSON形式で返してください：
       {
         "context": "日記の内容から読み取った状況や気分の分析",

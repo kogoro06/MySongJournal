@@ -60,14 +60,14 @@ gem "meta-tags", require: "meta_tags"
 gem "aws-sdk-s3"
 
 # OpenAI API
-gem 'ruby-openai'
+gem "ruby-openai"
 
 # HTTP Client
-gem 'faraday'
-gem 'faraday-multipart'
+gem "faraday"
+gem "faraday-multipart"
 
 # Timeout handling
-gem 'rack-timeout'
+gem "rack-timeout"
 
 # Security
 gem "rack-attack"

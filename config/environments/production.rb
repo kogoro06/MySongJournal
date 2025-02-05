@@ -115,7 +115,7 @@ Rails.application.configure do
 
   # Rack::Timeout設定
   config.middleware.insert_before Rack::Runtime, Rack::Timeout
-  ENV['RACK_TIMEOUT_SERVICE_TIMEOUT'] = '30'  # 30秒
+  ENV["RACK_TIMEOUT_SERVICE_TIMEOUT"] = "30"  # 30秒
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   config.hosts << "mysongjournal.com"
