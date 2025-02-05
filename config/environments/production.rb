@@ -113,6 +113,10 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [ :id ]
 
+  # Rack::Timeout設定
+  config.middleware.insert_before Rack::Runtime, Rack::Timeout
+  ENV['RACK_TIMEOUT_SERVICE_TIMEOUT'] = '30'  # 30秒
+
   # Enable DNS rebinding protection and other `Host` header attacks.
   config.hosts << "mysongjournal.com"
   config.hosts << "mysongjournal.onrender.com" # Renderのホストも許可する
