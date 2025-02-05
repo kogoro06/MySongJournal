@@ -29,7 +29,7 @@ class ImagesController < ApplicationController
           Rails.logger.info "Parsed URI scheme: #{uri.scheme}"
           Rails.logger.info "Parsed URI host: #{uri.host}"
           Rails.logger.info "Parsed URI path: #{uri.path}"
-          
+
           unless uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
             Rails.logger.error "Invalid album image URL format: #{album_image_url}"
             render plain: "Error: Invalid album image URL", status: :bad_request
@@ -37,12 +37,12 @@ class ImagesController < ApplicationController
           end
 
           # ヘッドリクエストでURLの有効性を確認
-          response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
+          response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") do |http|
             http.head(uri.path)
           end
           Rails.logger.info "HEAD request response code: #{response.code}"
           Rails.logger.info "HEAD request content type: #{response['content-type']}"
-          
+
         rescue URI::InvalidURIError => e
           Rails.logger.error "Failed to parse album image URL: #{e.message}"
           render plain: "Error: Invalid album image URL", status: :bad_request
