@@ -1,10 +1,11 @@
 <div class="min-h-screen bg-customblue text-black flex flex-col items-center pt-8 pb-8">
   <div class="bg-white p-6 rounded shadow-md w-full max-w-[1400px]">
-    <!-- ページタイトルと絞り込み -->
+    <!-- ヘッダー部分 -->
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold">
-        <%= "#{current_user.name}'s Journal" %>
-      </h1>
+      <div>
+        <h1 class="text-2xl font-bold"><%= "#{current_user.name}'s Journal" %></h1>
+        <p class="text-sm text-gray-600 mt-1">*ジャンルは選択した曲から自動的に設定されます。</p>
+      </div>
       <div class="flex items-center gap-2">
         <%= form_with url: journals_path, method: :get, local: true, class: "flex items-center space-x-2 text-white", id: "sort-filter-form" do |f| %>
           <%= f.select :sort,
@@ -47,24 +48,41 @@
       </div>
     </div>
 
-    <!-- 一覧表示 -->
-    <div class="space-y-6">
+    <!-- 日記カード一覧 -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-[1400px] mx-auto">
       <% @journals.each do |journal| %>
-        <div class="w-full">
-          <%= render 'journal_card', journal: journal %>
+        <div class="h-full w-full">
+          <%= render 'journals/journal_card', journal: journal %>
         </div>
       <% end %>
     </div>
 
     <!-- ページネーション -->
-    <div class="mt-6">
-      <%= paginate @journals %>
+    <div class="mt-6 flex justify-center">
+      <div class="flex items-center gap-2">
+        <%= paginate @journals, window: 2,
+            outer_window: 1,
+            class: "flex items-center gap-2",
+            previous_label: '前へ',
+            next_label: '次へ' %>
+      </div>
     </div>
 
-     <!-- 新規作成ボタン -->
+    <!-- 新規作成ボタン -->
     <div class="mt-6">
-      <%= link_to "新しい日記を作成", new_journal_path, 
+      <%= link_to "新しい日記を作成", new_journal_path(from: "top"), 
           class: "w-full block text-center py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors" %>
+    </div>
+
+    <!-- Spotifyロゴ -->
+    <div class="mt-8 text-center">
+      <p class="text-sm text-gray-600 mb-2">Powered by</p>
+      <%= link_to "https://developer.spotify.com", target: "_blank", rel: "noopener noreferrer" do %>
+        <%= image_tag "spotify_logo.png", 
+            alt: "Spotify", 
+            class: "h-8 inline-block",
+            style: "max-width: 140px;" %>
+      <% end %>
     </div>
   </div>
 </div>
