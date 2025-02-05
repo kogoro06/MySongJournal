@@ -26,7 +26,7 @@ class JournalsController < ApplicationController
   def timeline
     if user_signed_in?
       following_user_ids = current_user.following.pluck(:id)
-      @journals = Journal.where(user_id: following_user_ids + [current_user.id])
+      @journals = Journal.where(user_id: following_user_ids + [ current_user.id ])
     else
       @journals = Journal.all
     end
