@@ -13,46 +13,37 @@
     </div>
 
     <!-- 🎵 曲情報（選択後のみ表示） -->
-    <% if @journal.song_name.present? || @journal.artist_name.present? || @journal.album_image.present? %>
+    <% if @journal.song_name.present? || @journal.artist_name.present? || @journal.spotify_track_id.present? %>
       <div class="bg-gray-100 p-6 text-center rounded-lg shadow-inner space-y-4">
         <h2 class="text-xl font-bold text-gray-800 mb-4">🎵 選択した曲情報</h2>
+
+        <% if @journal.song_name.present? %>
+          <p class="text-lg font-medium text-gray-800">
+            🎼 曲名: <%= @journal.song_name %>
+          </p>
+      <% end %>
+      
         
         <% if @journal.artist_name.present? %>
           <p class="text-lg font-medium text-gray-800">
             🎤 アーティスト: <%= @journal.artist_name %>
           </p>
         <% end %>
-        
-        <% if @journal.song_name.present? %>
-          <p class="text-lg font-medium text-gray-800">
-            🎼 曲名: <%= @journal.song_name %>
-          </p>
-        <% end %>
-        
-        <% if @journal.album_image.present? %>
-          <div class="text-center">
-            <a href="https://open.spotify.com/track/<%= @journal.spotify_track_id %>" target="_blank">
-              <img src="<%= @journal.album_image %>" alt="アルバム画像" class="w-64 h-64 object-cover mx-auto rounded-lg shadow-md">
-            </a>
+      
+        <% if @journal.spotify_track_id.present? %>
+          <div class="mb-4">
+            <iframe style="border-radius:12px" 
+                    src="https://open.spotify.com/embed/track/<%= @journal.spotify_track_id %>" 
+                    width="100%"
+                    height="352"
+                    frameBorder="0" 
+                    allowfullscreen="" 
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                    loading="lazy"
+                    class="w-full rounded-lg">
+            </iframe>
           </div>
         <% end %>
-        
-        <% if @journal.preview_url.present? %>
-          <div>
-            <audio controls class="w-full rounded-lg">
-              <source src="<%= @journal.preview_url %>" type="audio/mpeg">
-              お使いのブラウザは音声プレビューをサポートしていません。
-            </audio>
-          </div>
-        <% end %>
-        
-        <!-- 🌐 Spotifyリンク -->
-        <div class="flex items-center justify-center mt-4 gap-2">
-          <a href="https://open.spotify.com/track/<%= @journal.spotify_track_id %>" target="_blank" class="flex items-center gap-2 text-green-500 hover:text-green-400">
-            <%= image_tag 'spotify_logo.png', alt: 'Spotifyロゴ', class: 'h-6 w-auto' %>
-            <span class="text-sm font-medium underline">Spotifyで聴く</span>
-          </a>
-        </div>
       </div>
     <% end %>
 

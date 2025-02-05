@@ -24,8 +24,12 @@ class JournalsController < ApplicationController
 
   # タイムライン表示
   def timeline
-    following_user_ids = current_user.following.pluck(:id)
-    @journals = Journal.where(user_id: following_user_ids + [ current_user.id ])
+    if user_signed_in?
+      following_user_ids = current_user.following.pluck(:id)
+      @journals = Journal.where(user_id: following_user_ids + [current_user.id])
+    else
+      @journals = Journal.all
+    end
 
     # 感情フィルター
     @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
@@ -86,14 +90,22 @@ class JournalsController < ApplicationController
   def create
     @journal = current_user.journals.build(journal_params)
 
-    # ジャンルは自動的に設定される（before_create :set_genre_from_spotifyで）
+    # セッションから曲の情報を復元（spotify_track_idを含む）
+    if session[:selected_track].present?
+      @journal.assign_attributes(
+        song_name: session[:selected_track]["song_name"],
+        artist_name: session[:selected_track]["artist_name"],
+        album_image: session[:selected_track]["album_image"],
+        preview_url: session[:selected_track]["preview_url"],
+        spotify_track_id: session[:selected_track]["spotify_track_id"],
+      )
+    end
 
     if @journal.save
       # セッションをクリア
       session.delete(:selected_track)
       session.delete(:journal_form)
 
-      # 保存成功後は詳細ページにリダイレクト
       redirect_to @journal, notice: "日記を保存しました。"
     else
       Rails.logger.error "Journal save failed: #{@journal.errors.full_messages}"
@@ -112,6 +124,18 @@ class JournalsController < ApplicationController
   def update
     @journal = current_user.journals.friendly.find(params[:id])
     Rails.logger.info "🔄 Update action called with edit_source: #{session[:edit_source]}"
+
+    # セッションから曲の情報を復元（spotify_track_idを含む）
+    if session[:selected_track].present?
+      params[:journal].merge!(
+        song_name: session[:selected_track]["song_name"],
+        artist_name: session[:selected_track]["artist_name"],
+        album_image: session[:selected_track]["album_image"],
+        preview_url: session[:selected_track]["preview_url"],
+        spotify_track_id: session[:selected_track]["spotify_track_id"],
+        spotify_url: session[:selected_track]["spotify_url"]
+      )
+    end
 
     if @journal.update(journal_params)
       flash[:notice] = "日記を更新しました"
@@ -180,7 +204,19 @@ class JournalsController < ApplicationController
   end
 
   def journal_params
-    params.require(:journal).permit(:title, :content, :emotion, :genre, :song_name, :artist_name, :album_name, :album_image, :preview_url, :spotify_url)
+    params.require(:journal).permit(
+      :title,
+      :content,
+      :emotion,
+      :genre,
+      :song_name,
+      :artist_name,
+      :album_name,
+      :album_image,
+      :preview_url,
+      :spotify_url,
+      :spotify_track_id
+    )
   end
 
   def store_edit_source

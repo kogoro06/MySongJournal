@@ -21,6 +21,14 @@
         <div class="bg-gray-100 p-4 text-center mt-6 rounded-lg shadow-inner">
           <h2 class="text-xl font-bold text-gray-800 mb-4">🎵 選択した曲情報</h2>
 
+        <% if @journal.song_name.present? %>
+          <div class="mb-2">
+            <span id="selected-song-name" class="block text-lg font-medium text-gray-800">
+              🎵 曲名: <%= @journal.song_name %>
+            </span>
+          </div>
+        <% end %>
+
           <% if @journal.artist_name.present? %>
             <div class="mb-2">
               <span id="selected-artist-name" class="block text-lg font-medium text-gray-800">
@@ -29,23 +37,21 @@
             </div>
           <% end %>
           
-          <% if @journal.song_name.present? %>
-            <div class="mb-2">
-              <span id="selected-song-name" class="block text-lg font-medium text-gray-800">
-                🎵 曲名: <%= @journal.song_name %>
-              </span>
-            </div>
-          <% end %>
 
-          <% if @journal.album_image.present? %>
-            <div class="mb-4">
-              <a href="https://open.spotify.com/track/<%= @journal.spotify_track_id %>" target="_blank">
-                <img id="selected-album-image" src="<%= @journal.album_image %>" 
-                     alt="アルバム画像" 
-                     class="w-64 h-64 object-cover mx-auto rounded-lg shadow-md">
-              </a>
-            </div>
-          <% end %>
+           <% if @journal.spotify_track_id.present? %>
+              <div class="mb-4">
+                <iframe style="border-radius:12px" 
+                        src="https://open.spotify.com/embed/track/<%= @journal.spotify_track_id %>" 
+                        width="100%"
+                        height="352"
+                        frameBorder="0" 
+                        allowfullscreen="" 
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                        loading="lazy"
+                        class="w-full rounded-lg">
+                </iframe>
+              </div>
+            <% end %>
 
           <!-- ジャンル選択 -->
           <div class="mb-4">

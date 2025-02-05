@@ -1,54 +1,112 @@
-<!-- 📊 検索結果エリア -->
-<div class="text-xl font-bold text-white text-center flex items-center justify-center gap-2">
-  <%= image_tag 'spotify.png', alt: 'Spotify Logo', class: 'inline h-6 w-6' %>
-  検索結果
-</div>
+<div class="min-h-screen bg-customblue text-black flex flex-col items-center pt-8 pb-8">
+  <div class="bg-white p-6 rounded shadow-md w-full max-w-7xl">
+    <!-- ページタイトル -->
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold flex items-center gap-2">
+        <%= image_tag 'spotify.png', alt: 'Spotify Logo', class: 'h-8 w-8' %>
+        検索結果
+      </h1>
+    </div>
 
-<% if @tracks.present? %>
-  <div class="p-6 rounded-lg bg-gray-800 shadow-md">
-    <ul class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <% @tracks.each do |track| %>
-        <li class="p-4 border border-gray-600 rounded-lg bg-gray-700 flex flex-col items-center text-center shadow-md hover:bg-gray-600 transition">
-          <!-- 🎼 曲情報 -->
-          <div class="mb-4">
-            <p class="text-lg font-medium text-white mb-1">🎵 <strong>曲名:</strong> <%= track[:song_name] %></p>
-            <p class="text-sm text-gray-300 mb-2">🎤 <strong>アーティスト:</strong> <%= track[:artist_name] %></p>
-            <% if track[:preview_url].present? %>
-              <p>
-                <a href="<%= track[:preview_url] %>" target="_blank" class="text-blue-400 hover:underline">
-                  🌐 曲を聴く
-                </a>
-              </p>
-            <% end %>
-          </div>
-          <!-- 🎵 アルバム画像 -->
-          <% if track[:album_image].present? %>
-            <div class="w-48 h-48 mb-4">
-              <img src="<%= track[:album_image] %>" alt="アルバム画像" class="w-full h-full object-cover rounded-md shadow-md">
-            </div>
-          <% end %>
-          <!-- 🔊 試聴プレイヤー -->
-          <% if track[:preview_url].present? %>
-            <div class="w-full mb-4">
-              <audio controls class="w-full">
-                <source src="<%= track[:preview_url] %>" type="audio/mpeg">
-              </audio>
-            </div>
-          <% end %>
-
-          <!-- 🎯 曲選択ボタン -->
-          <div>
-            <%= button_to "🎯 この曲を選択", select_tracks_path(selected_track: track.to_json), method: :post, remote: true, class: "px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition text-center" %>
-          </div>
-        </li>
+    <% if @tracks.present? %>
+      <!-- 検索結果数の表示 -->
+      <% if @total_count&.positive? %>
+        <div class="text-gray-600 text-sm mb-4">
+          全<%= @total_count %>件中 <%= @tracks.offset_value + 1 %>-<%= @tracks.offset_value + @tracks.count %>件を表示
+        </div>
       <% end %>
-    </ul>
-  </div>
-<% else %>
-  <p class="text-white text-center">🔍 検索結果が見つかりませんでした。</p>
-<% end %>
 
-<!-- 🔄 検索フォーム -->
-<div class="mt-8 p-6 rounded-lg bg-gray-800 shadow-md">
-  <%= render partial: 'spotify/search' %>
+      <!-- 検索結果一覧 -->
+      <div class="grid grid-cols-2 gap-4">
+        <% @tracks.each do |track| %>
+          <div class="bg-gray-300 rounded-lg shadow h-full flex flex-col p-4">
+            <!-- Spotify Player -->
+            <div class="relative mb-4">
+              <iframe style="border-radius:12px" 
+                      src="https://open.spotify.com/embed/track/<%= track[:spotify_track_id] %>" 
+                      width="100%"
+                      height="352"
+                      frameBorder="0" 
+                      allowfullscreen="" 
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                      loading="lazy"
+                      class="w-full rounded-lg">
+              </iframe>
+            </div>
+
+            <!-- 曲情報 -->
+            <div class="space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="w-6 flex-shrink-0 text-xl">🎵</span>
+                <span class="text-lg font-bold truncate"><%= track[:song_name] %></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-6 flex-shrink-0 text-xl">🎤</span>
+                <span class="text-lg font-medium truncate"><%= track[:artist_name] %></span>
+              </div>
+            </div>
+
+            <!-- アクションボタン -->
+            <div class="mt-auto">
+              <%= button_to select_tracks_path(
+                    selected_track: {
+                      song_name: track[:song_name],
+                      artist_name: track[:artist_name],
+                      album_image: track[:album_image],
+                      preview_url: track[:preview_url],
+                      spotify_track_id: track[:spotify_track_id],
+                      spotify_url: track[:spotify_url]
+                    }.to_json
+                  ), 
+                  method: :post, 
+                  class: "w-full" do %>
+                <button type="submit" class="w-full text-center py-2 px-4 bg-gray-500 text-white text-sm rounded hover:bg-gray-600">
+                  選択
+                </button>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- ページネーション -->
+      <% if @tracks.total_pages > 1 %>
+        <div class="mt-6">
+          <%= paginate @tracks %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="bg-gray-100 p-8 rounded shadow text-center">
+        <p class="text-gray-600 text-lg">検索結果が見つかりませんでした。</p>
+      </div>
+    <% end %>
+
+    <!-- 再検索フォーム -->
+    <div class="mt-6">
+      <div class="bg-gray-300 rounded-lg shadow p-4">
+        <%= render partial: 'spotify/search' %>
+      </div>
+    </div>
+  </div>
 </div>
+
+<style>
+  .pagination {
+    @apply flex justify-center gap-2;
+  }
+  .pagination span {
+    @apply inline-block;
+  }
+  .pagination .page {
+    @apply px-4 py-2 bg-gray-500 text-white font-medium rounded shadow-md hover:bg-gray-600 text-center text-sm;
+  }
+  .pagination .page.current {
+    @apply bg-customred;
+  }
+  .pagination .prev, .pagination .next {
+    @apply px-4 py-2 bg-gray-500 text-white font-medium rounded shadow-md hover:bg-gray-600 text-center text-sm;
+  }
+  .pagination .gap {
+    @apply px-2 text-gray-600;
+  }
+</style>

@@ -1,86 +1,90 @@
-<div class="bg-gray-300 rounded-lg shadow h-full flex flex-col p-4">
-<!-- ヘッダー情報（タイトル、投稿者） -->
-<div class="flex flex-col">
-  <div class="flex justify-between text-sm text-gray-600 mb-1">
-    <div class="flex items-center gap-2">
-      <h3 class="font-bold text-lg line-clamp-2 flex-1">
+<div class="bg-gray-300 rounded-lg shadow p-6 text-gray-700">
+  <!-- ヘッダー情報（タイトル、投稿者） -->
+  <div class="flex flex-col mb-6">
+    <div class="flex justify-start gap-2 items-center">
+      <h3 class="font-bold text-xl">
         <%= journal.title %>
       </h3>
-      <div class="flex items-center gap-2">
-        <span>by <%= journal.user.name %></span>
+      <div class="flex items-center gap-4">
+        <span class="text-base">by <%= journal.user.name %></span>
         <% if user_signed_in? && journal.user != current_user %>
           <%= render 'follows/button', user: journal.user %>
         <% end %>
       </div>
     </div>
   </div>
-</div>
 
-  <!-- ジャケット画像 -->
-  <div class="relative mb-4">
-    <%= image_tag journal.album_image.presence || 'no-image.png',
-        class: "w-full aspect-square object-cover rounded-lg",
-        alt: "アルバムジャケット画像" %>
-  </div>
+  <!-- Spotifyプレーヤー -->
+  <% if journal.spotify_track_id.present? %>
+    <div class="mb-6">
+      <iframe style="border-radius:12px" 
+        src="https://open.spotify.com/embed/track/<%= journal.spotify_track_id %>?utm_source=generator" 
+        width="100%"
+        height="352"
+        frameBorder="0" 
+        allowfullscreen="" 
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+        loading="lazy"
+        class="w-full">
+      </iframe>
+    </div>
+  <% else %>
+    <!-- ジャケット画像（Spotifyプレーヤーがない場合のフォールバック） -->
+    <div class="mb-6">
+      <%= image_tag journal.album_image.presence || 'no-image.png',
+          class: "w-full max-w-2xl mx-auto aspect-square object-cover rounded-lg",
+          alt: "アルバムジャケット画像" %>
+    </div>
+  <% end %>
 
   <!-- 曲情報 -->
-  <div class="space-y-2 mb-4">
-    <div class="flex items-center gap-2 text-sm text-gray-600">
-      <span class="w-5 flex-shrink-0">🎤</span>
+  <div class="space-y-3 mb-6">
+    <div class="flex items-center gap-3 text-base">
+      <span class="w-6 flex-shrink-0">🎤</span>
       <span class="truncate"><%= journal.artist_name %></span>
     </div>
-    <div class="flex items-center gap-2 text-sm text-gray-600">
-      <span class="w-5 flex-shrink-0">🎵</span>
+    <div class="flex items-center gap-3 text-base">
+      <span class="w-6 flex-shrink-0">🎵</span>
       <span class="truncate"><%= journal.song_name %></span>
     </div>
   </div>
 
   <!-- タグ -->
-  <div class="flex flex-wrap gap-2 mb-4">
-    <div class="inline-flex items-center px-3 py-1 bg-red-500 text-white rounded-full text-xs min-w-[80px] justify-center">
+  <div class="flex flex-wrap gap-3 mb-6">
+    <div class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-full text-sm">
       <%= journal.emotion %>
     </div>
     <% if journal.genre.present? %>
-      <div class="inline-flex items-center px-3 py-1 bg-blue-500 text-white rounded-full text-xs min-w-[80px] justify-center">
+      <div class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-full text-sm">
         <%= t("activerecord.attributes.journal.genre.#{journal.genre}") %>
       </div>
-      <div class="inline-flex items-center px-3 py-1 bg-green-500 text-white rounded-full text-xs min-w-[80px] justify-center">
-      <%= journal.created_at.strftime("%m/%d %H:%M") %>
+      <div class="inline-flex items-center px-4 py-2 bg-green-500 text-white rounded-full text-sm">
+        <%= journal.created_at.strftime("%m/%d %H:%M") %>
       </div>
     <% end %>
   </div>
 
   <!-- アクションボタン -->
-  <div class="mt-auto space-y-2">
+  <div class="flex gap-3">
     <% if user_signed_in? && journal.user == current_user %>
-      <div class="flex gap-2">
-        <%= link_to '詳細', journal_path(journal), data: { turbo: false },
-            class: "flex-1 text-center py-2 px-4 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 min-w-[120px]" %>
-        <%= link_to "編集", edit_journal_path(journal), data: { turbo: false },
-            class: "flex-1 text-center py-2 px-4 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600 min-w-[120px]" %>
-        <%= button_to journal_path(journal),
-            method: :delete,
-            data: { turbo: false, confirm: "本当に削除しますか？" },
-            class: "flex-1" do %>
-          <button type="submit" class="w-full text-center py-2 px-4 bg-red-500 text-white text-sm rounded hover:bg-red-600 min-w-[120px]">
-            削除
-          </button>
-        <% end %>
-      </div>
+      <%= link_to '詳細', journal_path(journal), data: { turbo: false },
+          class: "flex-1 text-center py-3 px-6 bg-gray-500 text-white text-base rounded hover:bg-gray-600" %>
+      <%= link_to "編集", edit_journal_path(journal), data: { turbo: false },
+          class: "flex-1 text-center py-3 px-6 bg-yellow-500 text-white text-base rounded hover:bg-yellow-600" %>
+      <%= button_to journal_path(journal),
+          method: :delete,
+          data: { turbo: false, confirm: "本当に削除しますか？" },
+          class: "flex-1" do %>
+        <button type="submit" class="w-full text-center py-3 px-6 bg-red-500 text-white text-base rounded hover:bg-red-600">
+          削除
+        </button>
+      <% end %>
     <% else %>
-      <div class="flex gap-2">
-        <%= link_to '詳細', journal_path(journal), data: { turbo: false },
-            class: "flex-1 text-center py-2 px-4 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 min-w-[120px]" %>
-        <% if user_signed_in? %>
-          <%= render 'journals/favorite_button', journal: journal %>
-        <% else %>
-          <%= link_to new_user_session_path,
-              class: "flex-1 flex items-center justify-center gap-2 py-2 px-4 bg-gray-300 text-white text-sm rounded min-w-[120px]" do %>
-            <i class="far fa-heart"></i>
-            <span><%= journal.favorites.count %></span>
-          <% end %>
-        <% end %>
-      </div>
+      <%= link_to '詳細', journal_path(journal), data: { turbo: false },
+          class: "flex-1 text-center py-3 px-6 bg-gray-500 text-white text-base rounded hover:bg-gray-600" %>
+      <% if user_signed_in? %>
+        <%= render 'journals/favorite_button', journal: journal %>
+      <% end %>
     <% end %>
   </div>
 </div>

@@ -8,6 +8,11 @@ def search
   @tracks = []
   query_parts = []
 
+  # ページネーションの設定
+  @per_page = 6  # タイムラインと同じく6件に設定
+  page = params[:page] || 1
+  offset = (page.to_i - 1) * @per_page
+
   # フォームの値をセッションに保存
   if params[:journal].present?
     session[:journal_form] = {
@@ -51,25 +56,44 @@ def search
   end
 
   begin
-    # Spotify APIで曲を検索
-    results = RSpotify::Track.search(query_string, market: "JP")
+    token = get_spotify_access_token
 
-    # アーティストIDを収集
-    artist_ids = results.map { |track| track.artists.map(&:id) }.flatten.uniq
-
-    # アーティスト情報を一括取得
-    token = SpotifyToken.last
-    artists_data = batch_fetch_artists(artist_ids, token)
-
-    # 検索結果の整形
-    @tracks = results.map do |track|
-      artist_id = track.artists.first&.id
+    # Spotify APIで検索
+    response = RestClient.get(
+      "https://api.spotify.com/v1/search",
       {
-        song_name: track.name,
-        artist_name: artists_data[artist_id] || track.artists.first&.name,
-        preview_url: track.preview_url,
-        album_image: track.album.images.first&.dig("url")
+        Authorization: "Bearer #{token}",
+        "Accept-Language" => "ja",  # 日本語表記を優先
+        params: {
+          q: query_string,
+          type: "track",
+          market: "JP",  # 日本のマーケットに限定
+          limit: @per_page,
+          offset: offset
+        }
       }
+    )
+
+    results = JSON.parse(response.body)
+
+    if results["tracks"] && results["tracks"]["items"].any?
+      @tracks = results["tracks"]["items"].map do |track|
+        {
+          spotify_track_id: track["id"],
+          song_name: track["name"],
+          artist_name: track["artists"].first["name"],
+          album_image: track["album"]["images"].first&.[]("url"),
+          preview_url: track["preview_url"],
+          spotify_url: track["external_urls"]["spotify"]
+        }
+      end
+
+      # ページネーション情報の設定
+      @total_count = results["tracks"]["total"]
+      @tracks = Kaminari.paginate_array(@tracks, total_count: @total_count).page(page).per(@per_page)
+    else
+      @tracks = []
+      flash.now[:alert] = "検索結果が見つかりませんでした。"
     end
 
   rescue RestClient::BadRequest => e
