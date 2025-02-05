@@ -1,25 +1,71 @@
-<h2>Change your password</h2>
-
-<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
-  <%= f.hidden_field :reset_password_token %>
-
-  <div class="field">
-    <%= f.label :password, "New password" %><br />
-    <% if @minimum_password_length %>
-      <em>(<%= @minimum_password_length %> characters minimum)</em><br />
+<%= render "devise/shared/form_layout" do %>
+  <h2 class="text-2xl font-bold text-gray-700 text-center mb-6">
+    <%= t('.change_your_password', default: 'パスワード再設定') %>
+  </h2>
+  <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put, class: "space-y-6" }) do |form| %>
+    <% if resource.errors.any? %>
+      <%= render "devise/shared/error_messages", resource: resource %>
     <% end %>
-    <%= f.password_field :password, autofocus: true, autocomplete: "new-password" %>
-  </div>
 
-  <div class="field">
-    <%= f.label :password_confirmation, "Confirm new password" %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
-  </div>
+    <%= form.hidden_field :reset_password_token %>
 
-  <div class="actions">
-    <%= f.submit "Change my password" %>
-  </div>
+    <% if @minimum_password_length %>
+      <p class="text-sm text-gray-600 text-center mb-4">
+        <%= t('devise.shared.minimum_password_length', count: @minimum_password_length, default: "#{@minimum_password_length}文字以上") %>
+      </p>
+    <% end %>
+
+    <!-- Password Field -->
+    <div class="mb-6">
+      <label for="password" class="block text-gray-700 text-sm font-bold mb-2">
+        <%= t('activerecord.attributes.user.password', default: '新しいパスワード') %>
+      </label>
+      <div data-controller="password-visibility" class="relative">
+        <%= form.password_field :password,
+          id: "password",
+          placeholder: t('activerecord.attributes.user.password', default: '新しいパスワード'),
+          required: true,
+          autofocus: true,
+          autocomplete: "new-password",
+          class: "shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-outline bg-gray-50 placeholder-gray-400",
+          data: { password_visibility_target: "input" } %>
+        <button 
+          type="button" 
+          data-password-visibility-target="button"
+          data-action="click->password-visibility#toggle"
+          class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-600">
+          👁
+        </button>
+      </div>
+    </div>
+
+    <!-- Password Confirmation Field -->
+    <div class="mb-6">
+      <label for="password_confirmation" class="block text-gray-700 text-sm font-bold mb-2">
+        <%= t('activerecord.attributes.user.password_confirmation', default: 'パスワード（確認用）') %>
+      </label>
+      <div data-controller="password-visibility" class="relative">
+        <%= form.password_field :password_confirmation,
+          id: "password_confirmation",
+          placeholder: t('activerecord.attributes.user.password_confirmation', default: 'パスワード（確認用）'),
+          required: true,
+          autocomplete: "new-password",
+          class: "shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:shadow-outline bg-gray-50 placeholder-gray-400",
+          data: { password_visibility_target: "input" } %>
+        <button 
+          type="button" 
+          data-password-visibility-target="button"
+          data-action="click->password-visibility#toggle"
+          class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-600">
+          👁
+        </button>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="flex items-center justify-center">
+      <%= form.submit t('.change_my_password', default: 'パスワードを変更する'),
+        class: "w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200" %>
+    </div>
+  <% end %>
 <% end %>
-
-<%= render "devise/shared/links" %>
