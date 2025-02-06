@@ -61,6 +61,7 @@ class JournalsController < ApplicationController
     end
 
     @journal = Journal.new
+    @journal.emotion = nil  # 明示的にnilを設定
 
     # セッションから曲の情報を復元
     if session[:selected_track].present?
@@ -111,7 +112,8 @@ class JournalsController < ApplicationController
       redirect_to @journal, notice: "日記を保存しました。"
     else
       Rails.logger.error "Journal save failed: #{@journal.errors.full_messages}"
-      flash.now[:alert] = "日記の保存に失敗しました。"
+      error_messages = @journal.errors.map(&:message)
+      flash.now[:alert] = error_messages.join("、")
       render :new, status: :unprocessable_entity
     end
   end
@@ -145,7 +147,8 @@ class JournalsController < ApplicationController
       Rails.logger.info "📍 Redirecting to: #{redirect_path}"
       redirect_to redirect_path
     else
-      flash.now[:alert] = "更新に失敗しました"
+      error_messages = @journal.errors.map(&:message)
+      flash.now[:alert] = error_messages.join("、")
       render :edit, status: :unprocessable_entity
     end
   end
