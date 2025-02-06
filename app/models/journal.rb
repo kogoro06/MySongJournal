@@ -14,19 +14,28 @@ class Journal < ApplicationRecord
   validates :artist_name, presence: true, length: { maximum: 100 }
   validates :album_image, presence: true, format: { with: URI.regexp(%w[http https]), message: "must be a valid URL" }
   validates :preview_url, format: { with: URI.regexp(%w[http https]), message: "must be a valid URL" }, allow_blank: true
-  validates :genre, presence: true # 必須
 
   # 列挙型
   enum genre: {
-    j_pop: 0,
-    k_pop: 1,
-    western: 2,
-    anime: 3,
-    vocaloid: 4,
-    others: 5
+    j_pop: "j-pop",
+    k_pop: "k-pop",
+    western: "western",
+    anime: "anime",
+    vocaloid: "vocaloid",
+    others: "others"
   }
 
   enum emotion: [ :喜, :怒, :哀, :楽 ]
+
+  # ジャンルの表示名と値のマッピング
+  MAIN_GENRES = {
+    "j-pop" => "J-POP",
+    "k-pop" => "K-POP",
+    "western" => "洋楽",
+    "anime" => "アニメ/特撮",
+    "vocaloid" => "ボーカロイド",
+    "others" => "その他"
+  }.freeze
 
   # スコープ定義
   scope :by_emotion, ->(emotion) { where(emotion: emotion) if emotion.present? }
@@ -36,12 +45,16 @@ class Journal < ApplicationRecord
     favorites.exists?(user_id: user.id)
   end
 
-  def self.genre_name(genre_key)
-    I18n.t("genres.#{genre_key}")
-  end
-
-  def genre_name
-    self.class.genre_name(genre)
+  # ジャンルの表示名
+  def genre_display_name
+    case genre
+    when "j-pop" then "J-POP"
+    when "k-pop" then "K-POP"
+    when "western" then "洋楽"
+    when "anime" then "アニメ/特撮"
+    when "vocaloid" then "ボーカロイド"
+    when "others", nil then "その他"
+    end
   end
 
   # 既存のジャンルを新しい体系に移行

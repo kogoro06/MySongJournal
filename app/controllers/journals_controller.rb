@@ -108,11 +108,10 @@ class JournalsController < ApplicationController
       session.delete(:selected_track)
       session.delete(:journal_form)
 
-      redirect_to @journal, notice: "日記を作成しました"
+      redirect_to @journal, notice: "日記を保存しました。"
     else
-      # エラーメッセージを個別に設定（属性名を除く）
-      error_messages = @journal.errors.map(&:message)
-      flash.now[:alert] = error_messages.join("、")
+      Rails.logger.error "Journal save failed: #{@journal.errors.full_messages}"
+      flash.now[:alert] = "日記の保存に失敗しました。"
       render :new, status: :unprocessable_entity
     end
   end
@@ -146,9 +145,7 @@ class JournalsController < ApplicationController
       Rails.logger.info "📍 Redirecting to: #{redirect_path}"
       redirect_to redirect_path
     else
-      # エラーメッセージを個別に設定（属性名を除く）
-      error_messages = @journal.errors.map(&:message)
-      flash.now[:alert] = error_messages.join("、")
+      flash.now[:alert] = "更新に失敗しました"
       render :edit, status: :unprocessable_entity
     end
   end
