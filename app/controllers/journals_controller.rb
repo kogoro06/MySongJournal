@@ -293,11 +293,16 @@ class JournalsController < ApplicationController
       og: {
         site_name: site_name,
         image: ogp_image_url,
-        type: "article"
+        type: "article",
+        title: site_name,  # タイトルは必須
+        description: "音楽と一緒に日々の思い出を記録しよう"  # 説明も追加
       },
       twitter: {
         card: "summary_large_image",
-        image: ogp_image_url
+        site: "@study_kogoro",  # Twitterのユーザー名
+        image: ogp_image_url,
+        title: site_name,  # タイトルは必須
+        description: "音楽と一緒に日々の思い出を記録しよう"  # 説明も追加
       }
     }
   end
