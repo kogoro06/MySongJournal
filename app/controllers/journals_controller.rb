@@ -1,10 +1,10 @@
 class JournalsController < ApplicationController
-  before_action :authenticate_user!, except: [:show, :index, :timeline]
-  before_action :set_journal, only: [:edit, :update, :destroy]  # showを除外
-  before_action :set_journal_for_show, only: [:show]  # showアクション用
-  before_action :store_location, only: [:index, :timeline]
-  before_action :authorize_journal, only: [:edit, :update, :destroy]
-  before_action :store_edit_source, only: [:edit]
+  before_action :authenticate_user!, except: [ :show, :index, :timeline ]
+  before_action :set_journal, only: [ :edit, :update, :destroy ]  # showを除外
+  before_action :set_journal_for_show, only: [ :show ]  # showアクション用
+  before_action :store_location, only: [ :index, :timeline ]
+  before_action :authorize_journal, only: [ :edit, :update, :destroy ]
+  before_action :store_edit_source, only: [ :edit ]
   helper_method :prepare_meta_tags
 
   # 一覧表示
@@ -258,14 +258,14 @@ class JournalsController < ApplicationController
 
   def crawler?
     crawler_user_agents = [
-      'Twitterbot',
-      'facebookexternalhit',
-      'LINE-Parts/',
-      'Discordbot',
-      'Slackbot',
-      'bot',
-      'spider',
-      'crawler'
+      "Twitterbot",
+      "facebookexternalhit",
+      "LINE-Parts/",
+      "Discordbot",
+      "Slackbot",
+      "bot",
+      "spider",
+      "crawler"
     ]
     user_agent = request.user_agent.to_s.downcase
     crawler_user_agents.any? { |crawler| user_agent.include?(crawler.downcase) }
