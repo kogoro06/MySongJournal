@@ -10,6 +10,8 @@ ja:
       title: "利用規約"
       date_of_enactment: "2025年1月14日 制定"
   activerecord:
+    models:
+      journal: "日記"
     attributes:
       profile:
         name: "名前"
@@ -18,13 +20,28 @@ ja:
         avatar: "アバター画像"
         update: "更新"
       journal:
-        genre:
-          j_pop: "J-POP"
-          k_pop: "K-POP"
-          western: "洋楽"
-          anime: "アニメ/特撮"
-          vocaloid: "ボーカロイド"
-          others: "その他"
+        genre: "ジャンル"
+    errors:
+      models:
+        journal:
+          attributes:
+            genre:
+              blank: "ジャンルを選択してください"
+            title:
+              blank: "タイトルを入力してください"
+            content:
+              blank: "内容を入力してください"
+            song_name:
+              blank: "曲名を入力してください"
+            artist_name:
+              blank: "アーティスト名を入力してください"
+  genres:
+    j_pop: "JPOP"
+    k_pop: "KPOP"
+    western: "洋楽"
+    anime: "アニメ/特撮"
+    vocaloid: "ボーカロイド"
+    others: "その他"
   time:
     formats:
       long: "%Y年%m月%d日 %H:%M"
