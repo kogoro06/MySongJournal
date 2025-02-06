@@ -1,5 +1,5 @@
 class JournalsController < ApplicationController
-  before_action :authenticate_user!, except: [ :show, :index, :timeline ]
+  before_action :check_crawler_or_authenticate, except: [ :show, :index, :timeline ]
   before_action :set_journal, only: [ :edit, :update, :destroy ]  # showを除外
   before_action :set_journal_for_show, only: [ :show ]  # showアクション用
   before_action :store_location, only: [ :index, :timeline ]
@@ -254,6 +254,11 @@ class JournalsController < ApplicationController
     else
       journals_path
     end
+  end
+
+  def check_crawler_or_authenticate
+    return if action_name == 'show' && crawler?
+    authenticate_user!
   end
 
   def crawler?
