@@ -260,6 +260,34 @@ class JournalsController < ApplicationController
     end
   end
 
+  def prepare_meta_tags
+    site_name   = "MY SONG JOURNAL"
+
+    # OGP画像のURLを生成（説明テキストなし）
+    ogp_image_url = if @journal.album_image.present?
+      "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}"
+    else
+      "#{request.base_url}/images/ogp.png"
+    end
+
+    meta_tags = {
+      site:        site_name,
+      image:       ogp_image_url,
+      og: {
+        site_name: site_name,
+        image: ogp_image_url,
+        type: "article"
+      },
+      twitter: {
+        card: "summary_large_image",
+        image: ogp_image_url
+      }
+    }
+    set_meta_tags(meta_tags)
+  end
+end
+
+
   def check_crawler_or_authenticate
     return if crawler?
     authenticate_user!
@@ -279,4 +307,3 @@ class JournalsController < ApplicationController
     user_agent = request.user_agent.to_s.downcase
     crawler_user_agents.any? { |bot| user_agent.include?(bot.downcase) }
   end
-end
