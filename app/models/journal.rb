@@ -13,7 +13,7 @@ class Journal < ApplicationRecord
   validates :song_name, presence: true, length: { maximum: 100 }
   validates :artist_name, presence: true, length: { maximum: 100 }
   validates :album_image, presence: true, format: { with: URI.regexp(%w[http https]), message: "must be a valid URL" }
-  validates :preview_url, format: { with: URI.regexp(%w[http https]), message: "must be a valid URL" }, allow_blank: true
+  validates :genre, presence: true # 必須
 
   # 列挙型
   enum genre: {
@@ -47,14 +47,7 @@ class Journal < ApplicationRecord
 
   # ジャンルの表示名
   def genre_display_name
-    case genre
-    when "j-pop" then "J-POP"
-    when "k-pop" then "K-POP"
-    when "western" then "洋楽"
-    when "anime" then "アニメ/特撮"
-    when "vocaloid" then "ボーカロイド"
-    when "others", nil then "その他"
-    end
+    MAIN_GENRES[genre] || MAIN_GENRES["others"]
   end
 
   # 既存のジャンルを新しい体系に移行
@@ -64,18 +57,12 @@ class Journal < ApplicationRecord
 
       # 現在のジャンルに基づいて新しいジャンルを設定
       new_genre = case journal.genre.downcase
-      when "j-pop", "jpop", "japanese"
-        "j-pop"
-      when "k-pop", "kpop", "korean"
-        "k-pop"
-      when "western", "pop", "rock", "jazz", "classical"
-        "western"
-      when "anime", "tokusatsu", "game"
-        "anime"
-      when "vocaloid"
-        "vocaloid"
-      else
-        "others"
+      when "j-pop", "jpop", "japanese" then "j-pop"
+      when "k-pop", "kpop", "korean" then "k-pop"
+      when "western", "pop", "rock", "jazz", "classical" then "western"
+      when "anime", "tokusatsu", "game" then "anime"
+      when "vocaloid" then "vocaloid"
+      else "others"
       end
 
       # 新しいジャンルを設定して保存
@@ -84,17 +71,8 @@ class Journal < ApplicationRecord
 
     # 移行結果を表示
     puts "\n=== ジャンル移行結果 ==="
-    group_counts = group(:genre).count
-    group_counts.each do |genre, count|
-      display_name = case genre
-      when "j-pop" then "J-POP"
-      when "k-pop" then "K-POP"
-      when "western" then "洋楽"
-      when "anime" then "アニメ/特撮"
-      when "vocaloid" then "ボーカロイド"
-      else "その他"
-      end
-      puts "#{display_name}: #{count}件"
+    group(:genre).count.each do |genre, count|
+      puts "#{MAIN_GENRES[genre]}: #{count}件"
     end
   end
 

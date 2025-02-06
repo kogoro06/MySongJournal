@@ -19,6 +19,8 @@ ja:
         update: "更新"
       journal:
         genre:
+          one: "J-POP"
+          other: "%{count} その他"
           j_pop: "J-POP"
           k_pop: "K-POP"
           western: "洋楽"
