@@ -1,7 +1,7 @@
 class JournalsController < ApplicationController
-  before_action :authenticate_user!, except: [ :show, :index, :timeline ]
-  before_action :set_journal, only: [ :edit, :update, :destroy ]  # showを除外
-  before_action :set_journal_for_show, only: [ :show ]  # showアクション用
+  before_action :check_crawler_or_authenticate, except: [ :index, :timeline ]
+  before_action :set_journal, only: [ :edit, :update, :destroy ]
+  before_action :set_journal_for_show, only: [ :show ]
   before_action :store_location, only: [ :index, :timeline ]
   before_action :authorize_journal, only: [ :edit, :update, :destroy ]
   before_action :store_edit_source, only: [ :edit ]
@@ -49,7 +49,15 @@ class JournalsController < ApplicationController
     @journal = Journal.friendly.find(params[:id])
     @user = @journal.user
     @user_name = @user.name
+
+    # メタタグを設定
     prepare_meta_tags
+
+    if !user_signed_in? && !crawler?
+      store_location
+      redirect_to new_user_session_path, notice: "ログインしてください"
+      return
+    end
   end
 
   # 新規作成フォーム表示
@@ -246,6 +254,26 @@ class JournalsController < ApplicationController
     end
   end
 
+  def check_crawler_or_authenticate
+    return if crawler?
+    authenticate_user!
+  end
+
+  def crawler?
+    crawler_user_agents = [
+      "Twitterbot",
+      "facebookexternalhit",
+      "LINE-Parts/",
+      "Discordbot",
+      "Slackbot",
+      "bot",
+      "spider",
+      "crawler"
+    ]
+    user_agent = request.user_agent.to_s.downcase
+    crawler_user_agents.any? { |bot| user_agent.include?(bot.downcase) }
+  end
+
   def prepare_meta_tags
     site_name = "MY SONG JOURNAL"
     base_url = request.base_url.to_s
@@ -263,10 +291,12 @@ class JournalsController < ApplicationController
         title: site_name,
         site_name: site_name,
         type: "article",
-        image: ogp_image_url
+        image: ogp_image_url,
+        url: journal_url(@journal)  # URLを追加
       },
       twitter: {
-        card: "summary_large_image"
+        card: "summary_large_image",
+        image: ogp_image_url
       }
     }
 
