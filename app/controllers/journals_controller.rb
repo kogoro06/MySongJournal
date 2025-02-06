@@ -51,10 +51,24 @@ class JournalsController < ApplicationController
     @user_name = @user.name
 
     # OGP用の変数を設定
-    @ogp_title ="MY SONG JOURNAL"
-    @ogp_description = @journal.artist_name || "音楽と一緒に日々の思い出を記録しよう"
+    song_info = [@journal.song_name, @journal.artist_name].compact.join(" / ")
+    @ogp_title = song_info.present? ? song_info : "MY SONG JOURNAL"
+    
+    # 説明文を構築
+    description_parts = []
+    description_parts << "Today's song" if @journal.song_name.present?
+    description_parts << @journal.song_name if @journal.song_name.present?
+    description_parts << @journal.artist_name if @journal.artist_name.present?
+    description_parts << @journal.content.truncate(50) if @journal.content.present?
+    @ogp_description = description_parts.join("\n")
+
+    # OGP画像URL
     @ogp_image = if @journal.album_image.present?
-      "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}"
+      text_parts = ["Today's song"]
+      text_parts << @journal.song_name if @journal.song_name.present?
+      text_parts << @journal.artist_name if @journal.artist_name.present?
+      text = ERB::Util.url_encode(text_parts.join("\n"))
+      "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}&text=#{text}"
     else
       "#{request.base_url}/images/ogp.png"
     end
