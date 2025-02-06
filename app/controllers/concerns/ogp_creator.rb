@@ -3,18 +3,16 @@ module OgpCreator
 
   def build(album_image_url = nil, text = nil)
     begin
-      # 基本的なOGP画像の設定
-      width = 1200
-      height = 630
-      background_color = "white"
-
-      # 画像を生成
-      image = MiniMagick::Tool::Convert.new do |convert|
-        convert << "xc:#{background_color}"
-        convert.size "#{width}x#{height}"
-        convert << "png:-"
+      # デフォルトのOGP画像を読み込む
+      default_ogp_path = Rails.root.join("app/assets/images/ogp.png")
+      unless File.exist?(default_ogp_path)
+        Rails.logger.error "Default OGP image not found"
+        raise "Default OGP image not found"
       end
-      image = MiniMagick::Image.read(image)
+
+      # ベース画像として使用
+      image = MiniMagick::Image.open(default_ogp_path)
+      image.resize "1200x630!"  # 強制的にサイズを変更
 
       # アルバム画像が提供されている場合は合成
       if album_image_url.present?
@@ -27,8 +25,8 @@ module OgpCreator
           album_image.resize "#{album_size}x#{album_size}"
 
           # アルバム画像を中央に配置
-          x_offset = (width - album_size) / 2
-          y_offset = (height - album_size) / 2
+          x_offset = (1200 - album_size) / 2
+          y_offset = (630 - album_size) / 2
           
           # 画像を合成
           image.composite(album_image) do |c|
@@ -79,7 +77,6 @@ module OgpCreator
     rescue => e
       Rails.logger.error "Error in OGP generation: #{e.message}"
       # エラーが発生した場合はデフォルトのOGP画像を返す
-      default_ogp_path = Rails.root.join("app/assets/images/ogp.png")
       if File.exist?(default_ogp_path)
         File.binread(default_ogp_path)
       else
