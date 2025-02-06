@@ -277,6 +277,12 @@ class JournalsController < ApplicationController
   def prepare_meta_tags
     site_name   = "MY SONG JOURNAL"
 
+    ogp_text = if journal.song_name.present? && journal.artist_name.present?
+      "MySongJournal / #{journal.song_name} / #{journal.artist_name} "
+    else
+      journal.title
+    end
+
     # OGP画像のURLを生成（説明テキストなし）
     ogp_image_url = if @journal.album_image.present?
       "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}"
