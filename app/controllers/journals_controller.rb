@@ -258,15 +258,20 @@ class JournalsController < ApplicationController
 
     meta_tags = {
       site:        site_name,
+      title:       "",  # タイトルの重複を避けるため空にする
       image:       ogp_image_url,
       og: {
         site_name: site_name,
         image:     ogp_image_url,
-        type:      "article"
+        type:      "article",
+        url:       request.original_url,
+        description: ""  # 説明を空にする
       },
       twitter: {
         card:      "summary_large_image",
-        image:     ogp_image_url
+        image:     ogp_image_url,
+        title:     "",  # タイトルを空にする
+        description: ""  # 説明を空にする
       }
     }
 
