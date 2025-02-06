@@ -50,6 +50,15 @@ class JournalsController < ApplicationController
     @user = @journal.user
     @user_name = @user.name
 
+    # OGP用の変数を設定
+    @ogp_title = @journal.song_name || "MY SONG JOURNAL"
+    @ogp_description = @journal.artist_name || "音楽と一緒に日々の思い出を記録しよう"
+    @ogp_image = if @journal.album_image.present?
+      "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}"
+    else
+      "#{request.base_url}/images/ogp.png"
+    end
+
     if !user_signed_in? && !crawler?
       store_location
       redirect_to new_user_session_path, notice: "ログインしてください"

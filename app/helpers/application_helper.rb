@@ -11,15 +11,17 @@ module ApplicationHelper
       noindex: !Rails.env.production?,
       og: {
         site_name: "MY SONG JOURNAL",
-        title: "",
-        description: "音楽と一緒に日々の思い出を記録しよう",
-        type: "website",
+        title: @journal&.song_name.presence || "MY SONG JOURNAL",
+        description: @journal&.artist_name.presence || "音楽と一緒に日々の思い出を記録しよう",
+        type: "article",
         url: request.original_url,
         image: image_url("ogp.png").to_s,
         locale: "ja_JP"
       },
       twitter: {
-        card: "summary_large_image"
+        card: "summary_large_image",
+        title: @journal&.song_name.presence || "MY SONG JOURNAL",
+        description: @journal&.artist_name.presence || "音楽と一緒に日々の思い出を記録しよう"
       }
     }
   end

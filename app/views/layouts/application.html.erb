@@ -7,25 +7,27 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%# OGPメタタグを直接記述 %>
-    <meta property="og:title" content="MY SONG JOURNAL">
+    <%# OGPメタタグ %>
     <meta property="og:site_name" content="MY SONG JOURNAL">
+    <meta property="og:title" content="<%= @journal&.song_name || 'MY SONG JOURNAL' %>">
+    <meta property="og:description" content="<%= @journal&.artist_name || '音楽と一緒に日々の思い出を記録しよう' %>">
     <meta property="og:type" content="article">
+    <meta property="og:url" content="<%= request.original_url %>">
     <% if @journal&.album_image.present? %>
-      <meta property="og:image" content="<%= "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}" %>">
+      <meta property="og:image" content="<%= "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}&text=#{ERB::Util.url_encode("Today's song\n#{@journal.song_name}\n#{@journal.artist_name}")}" %>">
     <% else %>
-      <meta property="og:image" content="<%= "#{request.base_url}/images/ogp.png" %>">
+      <meta property="og:image" content="<%= "#{request.base_url}/images/ogp.png?text=#{ERB::Util.url_encode("Today's song\n#{@journal.song_name}\n#{@journal.artist_name}")}" %>">
     <% end %>
-    <% if @journal %>
-      <meta property="og:url" content="<%= journal_url(@journal) %>">
-    <% end %>
+    <meta property="og:locale" content="ja_JP">
 
-    <%# Twitter Card メタタグ %>
+    <%# Twitterカード %>
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= @journal&.song_name || 'MY SONG JOURNAL' %>">
+    <meta name="twitter:description" content="<%= @journal&.artist_name || '音楽と一緒に日々の思い出を記録しよう' %>">
     <% if @journal&.album_image.present? %>
-      <meta name="twitter:image" content="<%= "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}" %>">
+      <meta name="twitter:image" content="<%= "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}&text=#{ERB::Util.url_encode("Today's song\n#{@journal.song_name}\n#{@journal.artist_name}")}" %>">
     <% else %>
-      <meta name="twitter:image" content="<%= "#{request.base_url}/images/ogp.png" %>">
+      <meta name="twitter:image" content="<%= "#{request.base_url}/images/ogp.png?text=#{ERB::Util.url_encode("Today's song\n#{@journal.song_name}\n#{@journal.artist_name}")}" %>">
     <% end %>
 
     <%= yield :head %>

@@ -69,7 +69,7 @@
           <span>✏️ 編集</span>
         <% end %>
         
-        <%= link_to "https://twitter.com/share?url=#{CGI.escape(journal_url(@journal))}", 
+        <%= link_to "https://twitter.com/share?url=#{CGI.escape(journal_url(@journal))}&text=#{CGI.escape("Today's song\n#{@journal.song_name}\n#{@journal.artist_name}")}", 
             target: '_blank', 
             class: "px-4 py-2 bg-black text-white font-medium rounded-md hover:bg-gray-800 transition flex items-center",
             rel: "nofollow",
