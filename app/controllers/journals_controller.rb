@@ -292,14 +292,20 @@ class JournalsController < ApplicationController
 
     meta_tags = {
       site:        site_name,
+      title:       ogp_text,
+      description: "#MySongJournal #Today'sSong #{@journal.song_name}/#{@journal.artist_name}",
       image:       ogp_image_url,
       og: {
         site_name: site_name,
+        title:     ogp_text,
+        description: "#MySongJournal #Today'sSong #{@journal.song_name}/#{@journal.artist_name}",
         image: ogp_image_url,
         type: "article"
       },
       twitter: {
         card: "summary_large_image",
+        title: ogp_text,
+        description: "#MySongJournal #Today'sSong #{@journal.song_name}/#{@journal.artist_name}",
         image: ogp_image_url
       }
     }
