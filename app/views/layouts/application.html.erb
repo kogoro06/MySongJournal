@@ -6,16 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     
-    <!-- OGP Tags -->
-    <meta property="og:site_name" content="MySongJournal">
-    <meta property="og:title" content="<%= content_for(:title) || "MySongJournal" %>">
-    <meta property="og:description" content="<%= content_for(:description) || "音楽との思い出を記録しよう" %>">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="<%= request.original_url %>">
-    <meta property="og:image" content="<%= content_for(:og_image) || '/icon.png' %>">
-    
-    <!-- Twitter Cards -->
-    <meta name="twitter:card" content="summary_large_image">
+    <%= display_meta_tags %>
     
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -39,8 +30,6 @@
 
       gtag('config', 'G-GB55Q02M7X');
     </script>
-      <!-- meta_tag -->
-    <%= display_meta_tags(default_meta_tags) %>
   </head>
 
   <body class="flex flex-col min-h-screen">
