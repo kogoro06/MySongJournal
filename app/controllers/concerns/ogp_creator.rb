@@ -9,11 +9,12 @@ module OgpCreator
       background_color = "white"
 
       # 画像を生成
-      image = MiniMagick::Image.create do |img|
-        img.size "#{width}x#{height}"
-        img.background background_color
-        img.format "png"
+      image = MiniMagick::Tool::Convert.new do |convert|
+        convert << "xc:#{background_color}"
+        convert.size "#{width}x#{height}"
+        convert << "png:-"
       end
+      image = MiniMagick::Image.read(image)
 
       # アルバム画像が提供されている場合は合成
       if album_image_url.present?
