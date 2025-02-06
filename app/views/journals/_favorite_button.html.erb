@@ -1,15 +1,23 @@
 <%= turbo_frame_tag "favorite_button_#{journal.id}" do %>
-  <% if journal.favorited_by?(current_user) %>
-    <%= button_to journal_favorites_path(journal), method: :delete,
-        class: "flex-1 flex items-center justify-center gap-2 py-2 px-4 bg-pink-500 text-white text-sm rounded hover:bg-pink-600 min-w-[120px]",
-        data: { turbo_stream: true } do %>
-      <i class="fas fa-heart"></i>
-      <span><%= journal.favorites.count %></span>
+    <% if current_user %>
+    <% if journal.favorited_by?(current_user) %>
+      <%= button_to journal_favorites_path(journal), method: :delete,
+          class: "flex-1 flex items-center justify-center gap-2 py-3 px-6 bg-pink-500 text-white text-base rounded hover:bg-pink-600",
+          data: { turbo_stream: true } do %>
+        <i class="fas fa-heart"></i>
+        <span><%= journal.favorites.count %></span>
+      <% end %>
+    <% else %>
+      <%= button_to journal_favorites_path(journal), method: :post,
+          class: "flex-1 flex items-center justify-center gap-2 py-3 px-6 bg-green-500 text-white text-base rounded hover:bg-green-600",
+          data: { turbo_stream: true } do %>
+        <i class="far fa-heart"></i>
+        <span><%= journal.favorites.count %></span>
+      <% end %>
     <% end %>
   <% else %>
-    <%= button_to journal_favorites_path(journal),
-        class: "flex-1 flex items-center justify-center gap-2 py-2 px-4 bg-green-500 text-white text-sm rounded hover:bg-green-600 min-w-[120px]",
-        data: { turbo_stream: true } do %>
+    <%= link_to new_user_session_path,
+        class: "flex-1 flex items-center justify-center gap-2 py-3 px-6 bg-gray-300 text-white text-base rounded" do %>
       <i class="far fa-heart"></i>
       <span><%= journal.favorites.count %></span>
     <% end %>
