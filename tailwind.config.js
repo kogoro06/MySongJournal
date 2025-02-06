@@ -5,6 +5,7 @@ module.exports = {
     './app/assets/stylesheets/**/*.css',
     './app/javascript/**/*.js',
   ],
+  darkMode: 'media',  // OSの設定に基づく
   theme: {
     extend: {
       colors: {
