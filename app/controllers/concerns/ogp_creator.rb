@@ -6,18 +6,17 @@ class OgpCreator
   SUBTITLE_FONT_SIZE = 30
   IMAGE_WIDTH = 1200
   IMAGE_HEIGHT = 630
-  ALBUM_IMAGE_SIZE = 380
-  ALBUM_Y_OFFSET = 100
-  TITLE_Y_OFFSET = 70
-  SUBTITLE_Y_OFFSET = 20
+  ALBUM_IMAGE_SIZE = 400
+  ALBUM_Y_OFFSET = 130
 
   def self.build(text, album_image_url = nil)
     Rails.logger.info "=== OGP Image Generation Debug Info ==="
     Rails.logger.info "Input text: #{text.inspect}"
     Rails.logger.info "Album URL: #{album_image_url.inspect}"
 
-    title = "Today's song"
-    subtitle = text.sub(/^Today's song\s*/, "").strip
+    # テキストを行ごとに分割
+    lines = text.split("\n")
+    Rails.logger.info "Split text into lines: #{lines.inspect}"
 
     # ベース画像を読み込む
     base_image = MiniMagick::Image.open(BASE_IMAGE_PATH)
@@ -31,7 +30,7 @@ class OgpCreator
         album_image.resize "#{ALBUM_IMAGE_SIZE}x#{ALBUM_IMAGE_SIZE}"
 
         # 一時ファイルに保存
-        temp_album = Tempfile.new([ "album", ".png" ])
+        temp_album = Tempfile.new(["album", ".png"])
         album_image.write(temp_album.path)
 
         # 画像を合成
@@ -49,38 +48,33 @@ class OgpCreator
       end
     end
 
-    # 一時ファイルに保存
-    temp_base = Tempfile.new([ "base", ".png" ])
-    base_image.write(temp_base.path)
+    # テキストを追加
+    base_image.combine_options do |c|
+      c.font FONT_PATH
+      c.fill "black"
+      c.gravity "north"
 
-    begin
-      # テキストを追加
-      result = MiniMagick::Image.open(temp_base.path)
-
-      # タイトルを追加
-      result.combine_options do |c|
-        c.gravity "south"
-        c.font FONT_PATH
+      # タイトル（Today's song）
+      if lines[0].present?
         c.pointsize FONT_SIZE
-        c.fill "black"
-        c.annotate "+0+#{TITLE_Y_OFFSET}", title
+        c.draw %Q{text 0,40 "#{lines[0].gsub('"', '\\"')}"}
       end
 
-      # サブタイトルを追加
-      result.combine_options do |c|
-        c.gravity "south"
-        c.font FONT_PATH
+      # 曲名とアーティスト名（1行にまとめる）
+      if lines[1].present? && lines[2].present?
         c.pointsize SUBTITLE_FONT_SIZE
-        c.fill "black"
-        c.annotate "+0+#{SUBTITLE_Y_OFFSET}", subtitle
+        c.draw %Q{text 0,90 "#{lines[1].gsub('"', '\\"')}  #{lines[2].gsub('"', '\\"')}"}
       end
-
-      # 最終画像をバイナリで返す
-      result.to_blob
-    ensure
-      temp_base.close
-      temp_base.unlink
     end
+
+    base_image.format "png"
+    result = base_image.to_blob
+    
+    # 画像サイズをログに出力
+    size_in_mb = (result.bytesize.to_f / 1024 / 1024).round(2)
+    Rails.logger.info "Generated OGP image size: #{size_in_mb}MB"
+    
+    result
   rescue => e
     Rails.logger.error "Error in OgpCreator.build: #{e.message}"
     Rails.logger.error e.backtrace.join("\n")
