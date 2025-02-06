@@ -1,83 +1,54 @@
-class OgpCreator
-  require "mini_magick"
-  BASE_IMAGE_PATH = Rails.root.join("app/assets/images/ogp.png").to_s
-  FONT_PATH = Rails.root.join("app/assets/fonts/DelaGothicOne-Regular.ttf").to_s
-  FONT_SIZE = 35
-  SUBTITLE_FONT_SIZE = 30
-  IMAGE_WIDTH = 1200
-  IMAGE_HEIGHT = 630
-  ALBUM_IMAGE_SIZE = 400
-  ALBUM_Y_OFFSET = 130
+module OgpCreator
+  extend ActiveSupport::Concern
 
-  def self.build(text, album_image_url = nil)
-    Rails.logger.info "=== OGP Image Generation Debug Info ==="
-    Rails.logger.info "Input text: #{text.inspect}"
-    Rails.logger.info "Album URL: #{album_image_url.inspect}"
+  def build(album_image_url = nil)
+    begin
+      # 基本的なOGP画像の設定
+      width = 1200
+      height = 630
+      background_color = "white"
 
-    # テキストを行ごとに分割
-    lines = text.split("\n")
-    Rails.logger.info "Split text into lines: #{lines.inspect}"
+      # 画像を生成
+      image = MiniMagick::Image.create(width: width, height: height, type: "xc:#{background_color}")
 
-    # ベース画像を読み込む
-    base_image = MiniMagick::Image.open(BASE_IMAGE_PATH)
-    base_image.resize "#{IMAGE_WIDTH}x#{IMAGE_HEIGHT}"
+      # アルバム画像が提供されている場合は合成
+      if album_image_url.present?
+        begin
+          # アルバム画像をダウンロード
+          album_image = MiniMagick::Image.open(album_image_url)
 
-    # アルバム画像の追加（存在する場合）
-    if album_image_url.present?
-      begin
-        Rails.logger.info "Downloading album image..."
-        album_image = MiniMagick::Image.open(album_image_url)
-        album_image.resize "#{ALBUM_IMAGE_SIZE}x#{ALBUM_IMAGE_SIZE}"
+          # アルバム画像のサイズを調整（アスペクト比を保持）
+          album_size = 400
+          album_image.resize "#{album_size}x#{album_size}"
 
-        # 一時ファイルに保存
-        temp_album = Tempfile.new([ "album", ".png" ])
-        album_image.write(temp_album.path)
+          # アルバム画像を中央に配置
+          x_offset = (width - album_size) / 2
+          y_offset = (height - album_size) / 2
 
-        # 画像を合成
-        base_image = base_image.composite(MiniMagick::Image.open(temp_album.path)) do |c|
-          c.compose "Over"
-          c.geometry "+#{(IMAGE_WIDTH - ALBUM_IMAGE_SIZE) / 2}+#{ALBUM_Y_OFFSET}"
+          # 画像を合成
+          image.composite(album_image) do |c|
+            c.compose "Over"
+            c.geometry "+#{x_offset}+#{y_offset}"
+          end
+        rescue => e
+          Rails.logger.error "Error processing album image: #{e.message}"
+          # アルバム画像の処理に失敗した場合はデフォルト画像のまま続行
         end
-        Rails.logger.info "Album image composited successfully"
-      rescue => e
-        Rails.logger.error "Failed to process album image: #{e.message}"
-        Rails.logger.error e.backtrace.join("\n")
-      ensure
-        temp_album&.close
-        temp_album&.unlink
+      end
+
+      # 画像をBLOBとして返す
+      image.format "png"
+      image.to_blob
+
+    rescue => e
+      Rails.logger.error "Error in OGP generation: #{e.message}"
+      # エラーが発生した場合はデフォルトのOGP画像を返す
+      default_ogp_path = Rails.root.join("app/assets/images/ogp.png")
+      if File.exist?(default_ogp_path)
+        File.binread(default_ogp_path)
+      else
+        raise "Default OGP image not found"
       end
     end
-
-    # テキストを追加
-    base_image.combine_options do |c|
-      c.font FONT_PATH
-      c.fill "black"
-      c.gravity "north"
-
-      # タイトル（Today's song）
-      if lines[0].present?
-        c.pointsize FONT_SIZE
-        c.draw %Q(text 0,40 "#{lines[0].gsub('"', '\\"')}")
-      end
-
-      # 曲名とアーティスト名（1行にまとめる）
-      if lines[1].present? && lines[2].present?
-        c.pointsize SUBTITLE_FONT_SIZE
-        c.draw %Q(text 0,90 "#{lines[1].gsub('"', '\\"')}  #{lines[2].gsub('"', '\\"')}")
-      end
-    end
-
-    base_image.format "png"
-    result = base_image.to_blob
-
-    # 画像サイズをログに出力
-    size_in_mb = (result.bytesize.to_f / 1024 / 1024).round(2)
-    Rails.logger.info "Generated OGP image size: #{size_in_mb}MB"
-
-    result
-  rescue => e
-    Rails.logger.error "Error in OgpCreator.build: #{e.message}"
-    Rails.logger.error e.backtrace.join("\n")
-    raise
   end
 end

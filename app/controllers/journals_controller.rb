@@ -53,7 +53,7 @@ class JournalsController < ApplicationController
     if !user_signed_in? && !crawler?
       store_location
       redirect_to new_user_session_path, notice: "ログインしてください"
-      return
+      nil
     end
   end
 
