@@ -9,7 +9,11 @@ module OgpCreator
       background_color = "white"
 
       # 画像を生成
-      image = MiniMagick::Image.create(width: width, height: height, type: "xc:#{background_color}")
+      image = MiniMagick::Image.create do |img|
+        img.size "#{width}x#{height}"
+        img.background background_color
+        img.format "png"
+      end
 
       # アルバム画像が提供されている場合は合成
       if album_image_url.present?
@@ -46,18 +50,20 @@ module OgpCreator
             c.gravity "north"
             
             # テキストを安全に分割
-            lines = text.to_s.split("\n")
+            lines = text.to_s.split("\n").map { |line| 
+              line.gsub(/(['"\\])/, '\\\\\1') # エスケープ処理を強化
+            }
             
             # タイトル（Today's song）
             if lines[0].present?
               c.pointsize 35
-              c.draw %Q{text 0,40 "#{lines[0].gsub('"', '\\"')}"}
+              c.draw %Q{text 0,40 "#{lines[0]}"}
             end
             
             # 曲名とアーティスト名
             if lines[1].present? && lines[2].present?
               c.pointsize 30
-              c.draw %Q{text 0,90 "#{lines[1].gsub('"', '\\"')}  #{lines[2].gsub('"', '\\"')}"}
+              c.draw %Q{text 0,90 "#{lines[1]}  #{lines[2]}"}
             end
           end
         rescue => e
