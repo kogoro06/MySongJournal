@@ -1,10 +1,10 @@
 class JournalsController < ApplicationController
-  before_action :authenticate_user!, except: [ :show, :index, :timeline ]
-  before_action :set_journal, only: [ :edit, :update, :destroy ]  # showを除外
-  before_action :set_journal_for_show, only: [ :show ]  # showアクション用
-  before_action :store_location, only: [ :index, :timeline ]
-  before_action :authorize_journal, only: [ :edit, :update, :destroy ]
-  before_action :store_edit_source, only: [ :edit ]
+  before_action :authenticate_user!, except: [:show, :index, :timeline]
+  before_action :set_journal, only: [:edit, :update, :destroy]  # showを除外
+  before_action :set_journal_for_show, only: [:show]  # showアクション用
+  before_action :store_location, only: [:index, :timeline]
+  before_action :authorize_journal, only: [:edit, :update, :destroy]
+  before_action :store_edit_source, only: [:edit]
   helper_method :prepare_meta_tags
 
   # 一覧表示
@@ -46,6 +46,11 @@ class JournalsController < ApplicationController
 
   # 詳細表示
   def show
+    if !user_signed_in? && !crawler?
+      authenticate_user!
+      return
+    end
+
     @journal = Journal.friendly.find(params[:id])
     @user = @journal.user
     @user_name = @user.name
@@ -180,6 +185,11 @@ class JournalsController < ApplicationController
 
   def set_journal_for_show
     @journal = Journal.friendly.find(params[:id])  # friendly_idを使用
+    if !user_signed_in? && !crawler?
+      unless @journal.user == current_user
+        redirect_to journals_path, alert: "アクセス権限がありません"
+      end
+    end
   end
 
   def store_location
@@ -246,14 +256,30 @@ class JournalsController < ApplicationController
     end
   end
 
+  def crawler?
+    crawler_user_agents = [
+      'Twitterbot',
+      'facebookexternalhit',
+      'LINE-Parts/',
+      'Discordbot',
+      'Slackbot',
+      'bot',
+      'spider',
+      'crawler'
+    ]
+    user_agent = request.user_agent.to_s.downcase
+    crawler_user_agents.any? { |crawler| user_agent.include?(crawler.downcase) }
+  end
+
   def prepare_meta_tags
-    site_name   = "MY SONG JOURNAL"
+    site_name = "MY SONG JOURNAL"
+    base_url = request.base_url.to_s
 
     # OGP画像のURLを生成
-    ogp_image_url = if @journal.album_image.present?
-      "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}"
+    ogp_image_url = if @journal&.album_image.present?
+      "#{base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}"
     else
-      "#{request.base_url}/images/ogp.png"
+      "#{base_url}/images/ogp.png"
     end
 
     meta_tags = {
@@ -263,15 +289,11 @@ class JournalsController < ApplicationController
       og: {
         site_name: site_name,
         image:     ogp_image_url,
-        type:      "article",
-        url:       request.original_url,
-        description: ""  # 説明を空にする
+        type:      "article"
       },
       twitter: {
         card:      "summary_large_image",
-        image:     ogp_image_url,
-        title:     "",  # タイトルを空にする
-        description: ""  # 説明を空にする
+        image:     ogp_image_url
       }
     }
 
