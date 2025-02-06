@@ -245,34 +245,25 @@ class JournalsController < ApplicationController
 
   def prepare_meta_tags
     site_name   = "MY SONG JOURNAL"
-    title       = "Today's song #{@journal.song_name} by #{@journal.artist_name} "
-    description = @journal.content
 
     # OGP画像のURLを生成
+    ogp_text = "Today's song\n#{@journal.song_name} by #{@journal.artist_name}"
     ogp_image_url = if @journal.album_image.present?
-      "#{request.base_url}/images/ogp.png?text=#{CGI.escape("Today's song #{@journal.song_name} by #{@journal.artist_name} ")}&album_image=#{CGI.escape(@journal.album_image)}"
+      "#{request.base_url}/images/ogp.png?text=#{ERB::Util.url_encode(ogp_text)}&album_image=#{ERB::Util.url_encode(@journal.album_image)}"
     else
-      "#{request.base_url}/images/ogp.png?text=#{CGI.escape("Today's song #{@journal.song_name} by #{@journal.artist_name} ")}"
+      "#{request.base_url}/images/ogp.png?text=#{ERB::Util.url_encode(ogp_text)}"
     end
 
     meta_tags = {
       site:        site_name,
-      title:       title,
       image:       ogp_image_url,
-      description: description,
-      keywords:    %w[ MySongJournal],
       og: {
-        title: title,
-        description: description,
-        image: ogp_image_url,
         site_name: site_name,
+        image: ogp_image_url,
         type: "article"
       },
       twitter: {
         card: "summary_large_image",
-        site: "@MySongJournal",
-        title: title,
-        description: description,
         image: ogp_image_url
       }
     }
