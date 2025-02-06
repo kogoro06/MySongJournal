@@ -249,7 +249,7 @@ class JournalsController < ApplicationController
   def prepare_meta_tags
     site_name   = "MY SONG JOURNAL"
 
-    # OGP画像のURLを生成（説明テキストなし）
+    # OGP画像のURLを生成
     ogp_image_url = if @journal.album_image.present?
       "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}"
     else
@@ -261,12 +261,12 @@ class JournalsController < ApplicationController
       image:       ogp_image_url,
       og: {
         site_name: site_name,
-        image: ogp_image_url,
-        type: "article"
+        image:     ogp_image_url,
+        type:      "article"
       },
       twitter: {
-        card: "summary_large_image",
-        image: ogp_image_url
+        card:      "summary_large_image",
+        image:     ogp_image_url
       }
     }
 
