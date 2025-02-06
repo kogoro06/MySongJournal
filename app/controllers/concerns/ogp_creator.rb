@@ -30,7 +30,7 @@ class OgpCreator
         album_image.resize "#{ALBUM_IMAGE_SIZE}x#{ALBUM_IMAGE_SIZE}"
 
         # 一時ファイルに保存
-        temp_album = Tempfile.new(["album", ".png"])
+        temp_album = Tempfile.new([ "album", ".png" ])
         album_image.write(temp_album.path)
 
         # 画像を合成
@@ -57,23 +57,23 @@ class OgpCreator
       # タイトル（Today's song）
       if lines[0].present?
         c.pointsize FONT_SIZE
-        c.draw %Q{text 0,40 "#{lines[0].gsub('"', '\\"')}"}
+        c.draw %Q(text 0,40 "#{lines[0].gsub('"', '\\"')}")
       end
 
       # 曲名とアーティスト名（1行にまとめる）
       if lines[1].present? && lines[2].present?
         c.pointsize SUBTITLE_FONT_SIZE
-        c.draw %Q{text 0,90 "#{lines[1].gsub('"', '\\"')}  #{lines[2].gsub('"', '\\"')}"}
+        c.draw %Q(text 0,90 "#{lines[1].gsub('"', '\\"')}  #{lines[2].gsub('"', '\\"')}")
       end
     end
 
     base_image.format "png"
     result = base_image.to_blob
-    
+
     # 画像サイズをログに出力
     size_in_mb = (result.bytesize.to_f / 1024 / 1024).round(2)
     Rails.logger.info "Generated OGP image size: #{size_in_mb}MB"
-    
+
     result
   rescue => e
     Rails.logger.error "Error in OgpCreator.build: #{e.message}"
