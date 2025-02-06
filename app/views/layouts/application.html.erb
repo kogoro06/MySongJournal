@@ -12,7 +12,7 @@
     <meta property="og:description" content="<%= content_for(:description) || "音楽との思い出を記録しよう" %>">
     <meta property="og:type" content="website">
     <meta property="og:url" content="<%= request.original_url %>">
-    <meta property="og:image" content="<%= content_for(:og_image) || asset_url('icon.png') %>">
+    <meta property="og:image" content="<%= content_for(:og_image) || '/icon.png' %>">
     
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image">
