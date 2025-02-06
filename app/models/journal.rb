@@ -52,8 +52,8 @@ class Journal < ApplicationRecord
   def slug_candidates
     [
       :title,
-      [:title, :artist_name],
-      [:title, :artist_name, -> { (created_at || Time.current).strftime("%Y%m%d") }]
+      [ :title, :artist_name ],
+      [ :title, :artist_name, -> { (created_at || Time.current).strftime("%Y%m%d") } ]
     ]
   end
 
