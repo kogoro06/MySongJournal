@@ -14,9 +14,6 @@ class OgpCreator
     Rails.logger.info "Input text: #{text.inspect}"
     Rails.logger.info "Album URL: #{album_image_url.inspect}"
 
-    # テキストを行ごとに分割
-    lines = text.split("\n")
-    Rails.logger.info "Split text into lines: #{lines.inspect}"
 
     # ベース画像を読み込む
     base_image = MiniMagick::Image.open(BASE_IMAGE_PATH)
