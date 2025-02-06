@@ -112,7 +112,7 @@ class JournalsController < ApplicationController
     else
       # エラーメッセージを個別に設定（属性名を除く）
       error_messages = @journal.errors.map(&:message)
-      flash.now[:alert] = error_messages.join('、')
+      flash.now[:alert] = error_messages.join("、")
       render :new, status: :unprocessable_entity
     end
   end
@@ -148,7 +148,7 @@ class JournalsController < ApplicationController
     else
       # エラーメッセージを個別に設定（属性名を除く）
       error_messages = @journal.errors.map(&:message)
-      flash.now[:alert] = error_messages.join('、')
+      flash.now[:alert] = error_messages.join("、")
       render :edit, status: :unprocessable_entity
     end
   end
