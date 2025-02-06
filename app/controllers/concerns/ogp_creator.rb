@@ -2,21 +2,14 @@ class OgpCreator
   require "mini_magick"
   BASE_IMAGE_PATH = Rails.root.join("app/assets/images/ogp.png").to_s
   FONT_PATH = Rails.root.join("app/assets/fonts/DelaGothicOne-Regular.ttf").to_s
-  FONT_SIZE = 35
-  SUBTITLE_FONT_SIZE = 30
   IMAGE_WIDTH = 1200
   IMAGE_HEIGHT = 630
   ALBUM_IMAGE_SIZE = 400
   ALBUM_Y_OFFSET = 130
 
-  def self.build(text, album_image_url = nil)
+  def self.build(text = nil, album_image_url = nil)
     Rails.logger.info "=== OGP Image Generation Debug Info ==="
-    Rails.logger.info "Input text: #{text.inspect}"
     Rails.logger.info "Album URL: #{album_image_url.inspect}"
-
-    # テキストを行ごとに分割
-    lines = text.split("\n")
-    Rails.logger.info "Split text into lines: #{lines.inspect}"
 
     # ベース画像を読み込む
     base_image = MiniMagick::Image.open(BASE_IMAGE_PATH)
@@ -45,25 +38,6 @@ class OgpCreator
       ensure
         temp_album&.close
         temp_album&.unlink
-      end
-    end
-
-    # テキストを追加
-    base_image.combine_options do |c|
-      c.font FONT_PATH
-      c.fill "black"
-      c.gravity "north"
-
-      # タイトル（Today's song）
-      if lines[0].present?
-        c.pointsize FONT_SIZE
-        c.draw %Q(text 0,40 "#{lines[0].gsub('"', '\\"')}")
-      end
-
-      # 曲名とアーティスト名（1行にまとめる）
-      if lines[1].present? && lines[2].present?
-        c.pointsize SUBTITLE_FONT_SIZE
-        c.draw %Q(text 0,90 "#{lines[1].gsub('"', '\\"')}  #{lines[2].gsub('"', '\\"')}")
       end
     end
 
