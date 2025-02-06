@@ -1,7 +1,7 @@
 module OgpCreator
   extend ActiveSupport::Concern
 
-  def build(album_image_url = nil)
+  def build(album_image_url = nil, text = nil)
     begin
       # 基本的なOGP画像の設定
       width = 1200
@@ -16,7 +16,7 @@ module OgpCreator
         begin
           # アルバム画像をダウンロード
           album_image = MiniMagick::Image.open(album_image_url)
-
+          
           # アルバム画像のサイズを調整（アスペクト比を保持）
           album_size = 400
           album_image.resize "#{album_size}x#{album_size}"
@@ -24,7 +24,7 @@ module OgpCreator
           # アルバム画像を中央に配置
           x_offset = (width - album_size) / 2
           y_offset = (height - album_size) / 2
-
+          
           # 画像を合成
           image.composite(album_image) do |c|
             c.compose "Over"
@@ -32,7 +32,36 @@ module OgpCreator
           end
         rescue => e
           Rails.logger.error "Error processing album image: #{e.message}"
-          # アルバム画像の処理に失敗した場合はデフォルト画像のまま続行
+        end
+      end
+
+      # テキストを追加（テキストが提供されている場合）
+      if text.present?
+        begin
+          font_path = Rails.root.join("app/assets/fonts/DelaGothicOne-Regular.ttf").to_s
+          
+          image.combine_options do |c|
+            c.font font_path
+            c.fill "black"
+            c.gravity "north"
+            
+            # テキストを安全に分割
+            lines = text.to_s.split("\n")
+            
+            # タイトル（Today's song）
+            if lines[0].present?
+              c.pointsize 35
+              c.draw %Q{text 0,40 "#{lines[0].gsub('"', '\\"')}"}
+            end
+            
+            # 曲名とアーティスト名
+            if lines[1].present? && lines[2].present?
+              c.pointsize 30
+              c.draw %Q{text 0,90 "#{lines[1].gsub('"', '\\"')}  #{lines[2].gsub('"', '\\"')}"}
+            end
+          end
+        rescue => e
+          Rails.logger.error "Error adding text to image: #{e.message}"
         end
       end
 
