@@ -7,6 +7,27 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <%# OGPメタタグを直接記述 %>
+    <meta property="og:title" content="MY SONG JOURNAL">
+    <meta property="og:site_name" content="MY SONG JOURNAL">
+    <meta property="og:type" content="article">
+    <% if @journal&.album_image.present? %>
+      <meta property="og:image" content="<%= "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}" %>">
+    <% else %>
+      <meta property="og:image" content="<%= "#{request.base_url}/images/ogp.png" %>">
+    <% end %>
+    <% if @journal %>
+      <meta property="og:url" content="<%= journal_url(@journal) %>">
+    <% end %>
+
+    <%# Twitter Card メタタグ %>
+    <meta name="twitter:card" content="summary_large_image">
+    <% if @journal&.album_image.present? %>
+      <meta name="twitter:image" content="<%= "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}" %>">
+    <% else %>
+      <meta name="twitter:image" content="<%= "#{request.base_url}/images/ogp.png" %>">
+    <% end %>
+
     <%= yield :head %>
 
     <link rel="manifest" href="/manifest.json">
@@ -26,8 +47,6 @@
 
       gtag('config', 'G-GB55Q02M7X');
     </script>
-      <!-- meta_tag -->
-    <%= display_meta_tags(default_meta_tags) %>
   </head>
 
   <body class="flex flex-col min-h-screen">

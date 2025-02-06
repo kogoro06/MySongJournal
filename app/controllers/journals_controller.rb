@@ -50,9 +50,6 @@ class JournalsController < ApplicationController
     @user = @journal.user
     @user_name = @user.name
 
-    # メタタグを設定
-    prepare_meta_tags
-
     if !user_signed_in? && !crawler?
       store_location
       redirect_to new_user_session_path, notice: "ログインしてください"
@@ -272,34 +269,5 @@ class JournalsController < ApplicationController
     ]
     user_agent = request.user_agent.to_s.downcase
     crawler_user_agents.any? { |bot| user_agent.include?(bot.downcase) }
-  end
-
-  def prepare_meta_tags
-    site_name = "MY SONG JOURNAL"
-    base_url = request.base_url.to_s
-
-    # OGP画像のURLを生成（説明テキストなし）
-    ogp_image_url = if @journal&.album_image.present?
-      "#{base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}"
-    else
-      "#{base_url}/images/ogp.png"
-    end
-
-    # 最小限のメタタグのみを設定
-    meta_tags = {
-      og: {
-        title: site_name,
-        site_name: site_name,
-        type: "article",
-        image: ogp_image_url,
-        url: journal_url(@journal)  # URLを追加
-      },
-      twitter: {
-        card: "summary_large_image",
-        image: ogp_image_url
-      }
-    }
-
-    set_meta_tags(meta_tags)
   end
 end
