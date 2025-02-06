@@ -19,12 +19,30 @@ ja:
         update: "更新"
       journal:
         genre:
+          one: "J-POP"
+          other: "%{count} その他"
           j_pop: "J-POP"
           k_pop: "K-POP"
           western: "洋楽"
           anime: "アニメ/特撮"
           vocaloid: "ボーカロイド"
           others: "その他"
+  errors:
+    models:
+      journal:
+        attributes:
+          genre:
+            blank: "音楽のジャンルを選択してください"
+          title:
+            blank: "日記のタイトルを入力してください"
+          content:
+            blank: "日記の内容を入力してください"
+          song_name:
+            blank: "思い出の曲名を入力してください"
+          artist_name:
+            blank: "アーティスト名を入力してください"
+          emotion:
+            blank: "感情を選択してください"
   time:
     formats:
       long: "%Y年%m月%d日 %H:%M"

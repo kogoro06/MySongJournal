@@ -5,6 +5,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Dela+Gothic+One&display=swap');
 
+/* カスタムダークモードクラス */
+@media (prefers-color-scheme: dark) {
+  .dark-mode-text {
+    color: #ffffff;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .dark-mode-text {
+    color: #000000;
+  }
+}
+
 .material-symbols-outlined.md-18 { font-size: 18px; }
 .material-symbols-outlined.md-24 { font-size: 24px; }
 .material-symbols-outlined.md-36 { font-size: 36px; }
