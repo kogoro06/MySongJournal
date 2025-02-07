@@ -1,11 +1,10 @@
 class JournalsController < ApplicationController
-  before_action :authenticate_user!, except: [ :show, :index, :timeline ]
-  before_action :set_journal, only: [ :edit, :update, :destroy ]  # showを除外
-  before_action :set_journal_for_show, only: [ :show ]  # showアクション用
-  before_action :store_location, only: [ :index, :timeline ]
+  before_action :set_journal, only: [ :edit, :update, :destroy ]
+  before_action :set_journal_for_show, only: [ :show ]
+  before_action :store_location, only: [ :index ]
+  before_action :authenticate_user!, except: [ :show, :timeline ]
   before_action :authorize_journal, only: [ :edit, :update, :destroy ]
-  before_action :store_edit_source, only: [ :edit ]
-  helper_method :prepare_meta_tags
+  before_action :prepare_meta_tags, only: [ :show ]
 
   # 一覧表示
   def index
@@ -24,7 +23,7 @@ class JournalsController < ApplicationController
 
   # タイムライン表示
   def timeline
-    base_query = Journal.where(public: true)  # 公開記事のみ
+    base_query = Journal.where(public: true)
 
     if user_signed_in?
       following_user_ids = current_user.following.pluck(:id)
@@ -49,6 +48,16 @@ class JournalsController < ApplicationController
     @journal = Journal.friendly.find(params[:id])
     @user = @journal.user
     @user_name = @user.name
+
+    # 非公開記事の場合はログインチェック
+    unless @journal.public?
+      if !user_signed_in? && !crawler?
+        store_location
+        redirect_to new_user_session_path, notice: "ログインしてください"
+        return
+      end
+    end
+
     prepare_meta_tags
   end
 
@@ -61,7 +70,7 @@ class JournalsController < ApplicationController
     end
 
     @journal = Journal.new
-    @journal.emotion = nil  # 明示的にnilを設定
+    @journal.emotion = nil
 
     # セッションから曲の情報を復元
     if session[:selected_track].present?
@@ -79,7 +88,9 @@ class JournalsController < ApplicationController
       form_data = session[:journal_form]
       @journal.assign_attributes(
         title: form_data["title"],
-        content: form_data["content"]
+        content: form_data["content"],
+        emotion: form_data["emotion"],
+        public: form_data["public"]
       )
       # emotionを数値から文字列キーに変換
       if form_data["emotion"].present?
@@ -121,13 +132,40 @@ class JournalsController < ApplicationController
   # 編集フォーム表示
   def edit
     @journal = current_user.journals.friendly.find(params[:id])
-    Rails.logger.info "🔍 Edit action called with referer: #{request.referer}"
+
+    # トップページからのアクセス時はセッションをクリア
+    if params[:from] == "top"
+      session.delete(:selected_track)
+      session.delete(:journal_form)
+    end
+
+    # セッションから曲の情報を復元
+    if session[:selected_track].present?
+      @journal.assign_attributes(
+        song_name: session[:selected_track]["song_name"],
+        artist_name: session[:selected_track]["artist_name"],
+        album_image: session[:selected_track]["album_image"],
+        preview_url: session[:selected_track]["preview_url"],
+        spotify_track_id: session[:selected_track]["spotify_track_id"]
+      )
+    end
+
+    # セッションからフォームの入力値を復元
+    if session[:journal_form].present?
+      form_data = session[:journal_form]
+      @journal.assign_attributes(
+        title: form_data["title"],
+        content: form_data["content"],
+        emotion: form_data["emotion"],
+        public: form_data["public"]
+      )
+    end
   end
 
   # 更新処理
   def update
     @journal = current_user.journals.friendly.find(params[:id])
-    Rails.logger.info "🔄 Update action called with edit_source: #{session[:edit_source]}"
+    Rails.logger.info " Update action called with edit_source: #{session[:edit_source]}"
 
     # セッションから曲の情報を復元（spotify_track_idを含む）
     if session[:selected_track].present?
@@ -144,7 +182,7 @@ class JournalsController < ApplicationController
     if @journal.update(journal_params)
       flash[:notice] = "日記を更新しました"
       redirect_path = get_redirect_path
-      Rails.logger.info "📍 Redirecting to: #{redirect_path}"
+      Rails.logger.info " Redirecting to: #{redirect_path}"
       redirect_to redirect_path
     else
       error_messages = @journal.errors.map(&:message)
@@ -168,7 +206,7 @@ class JournalsController < ApplicationController
                      journals_path
     end
 
-    Rails.logger.info "🗑️ Redirecting after delete to: #{redirect_path} from referer: #{request.referer}"
+    Rails.logger.info " Redirecting after delete to: #{redirect_path} from referer: #{request.referer}"
     redirect_to redirect_path
   end
 
@@ -179,7 +217,9 @@ class JournalsController < ApplicationController
   end
 
   def set_journal_for_show
-    @journal = Journal.friendly.find(params[:id])  # friendly_idを使用
+    @journal = Journal.friendly.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to journals_path, alert: "指定された日記は存在しません"
   end
 
   def store_location
@@ -188,14 +228,12 @@ class JournalsController < ApplicationController
     case request.referer
     when /journals$/          # index
       session[:return_to] = journals_path
-    when /timeline$/         # timeline
-      session[:return_to] = timeline_journals_path
     when /mypages\/\d+$/    # mypage（数字のIDを含むパターンに修正）
       session[:return_to] = mypage_path
     else
       session[:return_to] = journals_path
     end
-    Rails.logger.info "📍 Stored return location: #{session[:return_to]} from referer: #{request.referer}"
+    Rails.logger.info " Stored return location: #{session[:return_to]} from referer: #{request.referer}"
   end
 
   def return_path
@@ -230,12 +268,12 @@ class JournalsController < ApplicationController
 
     # リファラーのURLをセッションに保存
     session[:previous_url] = request.referer
-    Rails.logger.info "💾 Stored previous URL: #{session[:previous_url]}"
+    Rails.logger.info " Stored previous URL: #{session[:previous_url]}"
   end
 
   def get_redirect_path
     previous_url = session.delete(:previous_url)
-    Rails.logger.info "🔍 Previous URL for redirect: #{previous_url}"
+    Rails.logger.info " Previous URL for redirect: #{previous_url}"
 
     if previous_url&.include?("mypage")
       mypage_path
@@ -247,29 +285,51 @@ class JournalsController < ApplicationController
   end
 
   def prepare_meta_tags
-    site_name   = "MY SONG JOURNAL"
+    return unless @journal
 
-    # OGP画像のURLを生成（説明テキストなし）
-    ogp_image_url = if @journal.album_image.present?
-      "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}"
-    else
-      "#{request.base_url}/images/ogp.png"
-    end
+    @ogp_title = @journal.song_name.presence || "MY SONG JOURNAL"
+    @ogp_description = @journal.artist_name.presence || "音楽と一緒に日々の思い出を記録しよう"
 
-    meta_tags = {
-      site:        site_name,
-      image:       ogp_image_url,
-      og: {
-        site_name: site_name,
-        image: ogp_image_url,
-        type: "article"
-      },
-      twitter: {
-        card: "summary_large_image",
-        image: ogp_image_url
-      }
-    }
+    # 更新日時をクエリパラメータとして追加
+    cache_key = @journal.updated_at.to_i.to_s
 
-    set_meta_tags(meta_tags)
+    @ogp_image = url_for(
+      controller: :images,
+      action: :ogp,
+      text: "#{@journal.song_name} - #{@journal.artist_name}",
+      album_image: @journal.album_image,
+      v: cache_key  # versionパラメータとして更新日時を使用
+    )
+  end
+
+  def check_crawler_or_authenticate
+    return if crawler?
+    authenticate_user!
+  end
+
+  def crawler?
+    crawler_user_agents = [
+      "Twitterbot",
+      "facebookexternalhit",
+      "LINE-Parts/",
+      "Discordbot",
+      "Slackbot",
+      "bot",
+      "spider",
+      "crawler",
+      "OGP Checker"
+    ]
+
+    # リファラーによるチェックを追加
+    crawler_referrers = [
+      "ogp.buta3.net"
+    ]
+
+    user_agent = request.user_agent.to_s.downcase
+    referer = request.referer.to_s.downcase
+
+    # User-Agentまたはリファラーのどちらかがクローラーと判定された場合にtrueを返す
+    crawler_user_agents.any? { |bot| user_agent.include?(bot.downcase) } ||
+    crawler_referrers.any? { |ref| referer.include?(ref) }
   end
 end

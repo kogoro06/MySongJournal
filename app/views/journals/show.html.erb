@@ -63,8 +63,8 @@
       </p>
     </div>
     <!-- ✏️ アクションボタン -->
-    <% if @journal.user == current_user %>
-      <div class="flex justify-between items-center mt-6 space-x-4">
+    <div class="flex justify-between items-center mt-6 space-x-4">
+      <% if @journal.user == current_user %>
         <%= link_to edit_journal_path(@journal), class: "px-4 py-2 bg-yellow-500 text-white font-medium rounded-md hover:bg-yellow-600 transition flex items-center" do %>
           <span>✏️ 編集</span>
         <% end %>
@@ -73,7 +73,7 @@
             target: '_blank', 
             class: "px-4 py-2 bg-black text-white font-medium rounded-md hover:bg-gray-800 transition flex items-center",
             rel: "nofollow",
-            data: { toggle: "tooltip", placement: "bottom" }, 
+            data: { toggle: "tooltip", placement: "bottom" },
             title: "Xでシェア" do %>
           <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
@@ -87,8 +87,8 @@
             class: "px-4 py-2 bg-red-500 text-white font-medium rounded-md hover:bg-red-600 transition flex items-center" do %>
           <span>🗑️ 削除</span>
         <% end %>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
 
     <!-- 🔙 戻るボタン -->
     <div class="text-center mt-6">
@@ -97,9 +97,9 @@
       <% elsif request.referer&.include?('mypage') %>
         <%= link_to "← マイページに戻る", mypage_path, class: "text-blue-500 hover:underline text-sm font-medium" %>
       <% elsif request.referer&.include?('other_user') %>
-        <%= link_to "← #{@user.name}さんのページに戻る", other_user_path(@user), class: "text-blue-500 hover:underline text-sm font-medium" %>
+        <%= link_to "← ユーザーページに戻る", other_user_path(@journal.user), class: "text-blue-500 hover:underline text-sm font-medium" %>
       <% else %>
-        <%= link_to "← 日記一覧に戻る", journals_path, class: "text-blue-500 hover:underline text-sm font-medium" %>
+        <%= link_to "← タイムラインに戻る", timeline_journals_path, class: "text-blue-500 hover:underline text-sm font-medium" %>
       <% end %>
     </div>
   </div>

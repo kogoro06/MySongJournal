@@ -1,17 +1,20 @@
 class ImagesController < ApplicationController
   skip_before_action :authenticate_user!, raise: false
+  skip_before_action :verify_authenticity_token, only: [ :ogp ]
+  before_action :set_cors_headers, only: [ :ogp ]
 
   def ogp
     text = params[:text]
     album_image_url = params[:album_image]
 
-    Rails.logger.info "=== OGP Controller Debug Info ==="
-    Rails.logger.info "Received text parameter: #{text.inspect}"
-    Rails.logger.info "Received album_image parameter: #{album_image_url.inspect}"
-    Rails.logger.info "Request URL: #{request.url}"
-    Rails.logger.info "Request parameters: #{params.inspect}"
-    Rails.logger.info "User Agent: #{request.user_agent}"
-    Rails.logger.info "Referer: #{request.referer}"
+    Rails.logger.warn "=== OGP Controller Debug Info ==="
+    Rails.logger.warn "Received text parameter: #{text.inspect}"
+    Rails.logger.warn "Received album_image parameter: #{album_image_url.inspect}"
+    Rails.logger.warn "Request URL: #{request.url}"
+    Rails.logger.warn "Request parameters: #{params.inspect}"
+    Rails.logger.warn "User Agent: #{request.user_agent}"
+    Rails.logger.warn "Referer: #{request.referer}"
+    Rails.logger.warn "Accept header: #{request.headers['Accept']}"
 
     begin
       # ベース画像の存在確認
@@ -26,9 +29,9 @@ class ImagesController < ApplicationController
       if album_image_url.present?
         begin
           uri = URI.parse(album_image_url)
-          Rails.logger.info "Parsed URI scheme: #{uri.scheme}"
-          Rails.logger.info "Parsed URI host: #{uri.host}"
-          Rails.logger.info "Parsed URI path: #{uri.path}"
+          Rails.logger.warn "Parsed URI scheme: #{uri.scheme}"
+          Rails.logger.warn "Parsed URI host: #{uri.host}"
+          Rails.logger.warn "Parsed URI path: #{uri.path}"
 
           unless uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
             Rails.logger.error "Invalid album image URL format: #{album_image_url}"
@@ -40,8 +43,8 @@ class ImagesController < ApplicationController
           response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") do |http|
             http.head(uri.path)
           end
-          Rails.logger.info "HEAD request response code: #{response.code}"
-          Rails.logger.info "HEAD request content type: #{response['content-type']}"
+          Rails.logger.warn "HEAD request response code: #{response.code}"
+          Rails.logger.warn "HEAD request content type: #{response['content-type']}"
 
         rescue URI::InvalidURIError => e
           Rails.logger.error "Failed to parse album image URL: #{e.message}"
@@ -62,7 +65,7 @@ class ImagesController < ApplicationController
         return
       end
 
-      Rails.logger.info "OGP image generated successfully"
+      Rails.logger.warn "OGP image generated successfully"
       send_data image_data, type: "image/png", disposition: "inline"
     rescue => e
       Rails.logger.error "Error in OGP generation: #{e.message}"
@@ -72,6 +75,18 @@ class ImagesController < ApplicationController
   end
 
   private
+
+  def set_cors_headers
+    allowed_origins = [ "https://ogp.buta3.net", "https://cards-dev.twitter.com", "https://www.facebook.com" ]
+    if allowed_origins.include?(request.headers["Origin"])
+      response.headers["Access-Control-Allow-Origin"] = request.headers["Origin"]
+    else
+      response.headers["Access-Control-Allow-Origin"] = "*"
+    end
+    response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept"
+    response.headers["Access-Control-Max-Age"] = "86400"  # 24時間
+  end
 
   def ogp_params
     params.permit(:text, :album_image)
