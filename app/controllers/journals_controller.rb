@@ -292,7 +292,7 @@ class JournalsController < ApplicationController
 
     # 更新日時をクエリパラメータとして追加
     cache_key = @journal.updated_at.to_i.to_s
-    
+
     @ogp_image = url_for(
       controller: :images,
       action: :ogp,
