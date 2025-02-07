@@ -15,7 +15,7 @@
     <% if @journal.present? %>
       <%
         # OGP用のテキストとパラメータを準備
-        ogp_text = "Today's song\n#{@journal.song_name}\n#{@journal.artist_name}"
+        ogp_text = "#{@journal.song_name} - #{@journal.artist_name}"
         ogp_params = {
           album_image: @journal.album_image,
           text: ogp_text,
