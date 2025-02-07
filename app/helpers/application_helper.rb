@@ -3,6 +3,8 @@ module ApplicationHelper
     {
       site: "MY SONG JOURNAL",
       title: "",
+      site: "MY SONG JOURNAL",
+      title: "",
       reverse: true,
       separator: "|",
       description: "音楽と一緒に日々の思い出を記録しよう",
@@ -15,6 +17,7 @@ module ApplicationHelper
         description: @journal&.artist_name.presence || "音楽と一緒に日々の思い出を記録しよう",
         type: "article",
         url: request.original_url,
+        image: image_url("ogp.png").to_s,
         image: image_url("ogp.png").to_s,
         locale: "ja_JP"
       },

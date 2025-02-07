@@ -1,16 +1,14 @@
 <div class="bg-gray-300 rounded-lg shadow p-6 text-gray-700">
   <!-- ヘッダー情報（タイトル、投稿者） -->
   <div class="flex flex-col mb-6">
-    <div class="flex justify-start gap-2 items-center">
-      <h3 class="font-bold text-xl">
-        <%= journal.title %>
-      </h3>
-      <div class="flex items-center gap-4">
-        <span class="text-base">by <%= journal.user.name %></span>
-        <% if user_signed_in? && journal.user != current_user %>
-          <%= render 'follows/button', user: journal.user %>
-        <% end %>
-      </div>
+    <h3 class="font-bold text-xl">
+      <%= journal.title %>
+    </h3>
+    <div class="flex items-center gap-4 mt-2">
+      <span class="text-base">by <%= journal.user.name %></span>
+      <% if user_signed_in? && journal.user != current_user %>
+        <%= render 'follows/button', user: journal.user %>
+      <% end %>
     </div>
   </div>
 
