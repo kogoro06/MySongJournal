@@ -36,8 +36,20 @@ Rails.application.configure do
   # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for Apache
   # config.action_dispatch.x_sendfile_header = "X-Accel-Redirect" # for NGINX
 
-  # Store uploaded files on the local file system (see config/storage.yml for options).
+  # アセットのホスト設定
+  config.action_controller.asset_host = 'https://mysongjournal.com'
+  
+  # デフォルトのURLオプション
+  routes.default_url_options = {
+    host: 'mysongjournal.com',
+    protocol: 'https'
+  }
+  
+  # Active Storageの設定
   config.active_storage.service = :amazon
+
+  # Store uploaded files on the local file system (see config/storage.yml for options).
+  # config.active_storage.service = :amazon
 
   # Mount Action Cable outside main process or domain.
   # config.action_cable.mount_path = nil
