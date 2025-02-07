@@ -328,8 +328,19 @@ end
       "Slackbot",
       "bot",
       "spider",
-      "crawler"
+      "crawler",
+      "OGP Checker"  # ogp.buta3.net用
     ]
+    
+    # リファラーによるチェックを追加
+    crawler_referrers = [
+      "ogp.buta3.net"
+    ]
+    
     user_agent = request.user_agent.to_s.downcase
-    crawler_user_agents.any? { |bot| user_agent.include?(bot.downcase) }
+    referer = request.referer.to_s.downcase
+    
+    # User-Agentまたはリファラーのどちらかがクローラーと判定された場合にtrueを返す
+    crawler_user_agents.any? { |bot| user_agent.include?(bot.downcase) } ||
+    crawler_referrers.any? { |ref| referer.include?(ref) }
   end
