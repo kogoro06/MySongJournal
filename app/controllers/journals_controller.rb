@@ -45,6 +45,11 @@ class JournalsController < ApplicationController
 
   # 詳細表示
   def show
+    if !user_signed_in? && !crawler?
+      authenticate_user!
+      return
+    end
+
     @journal = Journal.friendly.find(params[:id])
     @user = @journal.user
     @user_name = @user.name
@@ -282,6 +287,21 @@ class JournalsController < ApplicationController
     else
       journals_path
     end
+  end
+
+  def crawler?
+    crawler_user_agents = [
+      'Twitterbot',
+      'facebookexternalhit',
+      'LINE-Parts/',
+      'Discordbot',
+      'Slackbot',
+      'bot',
+      'spider',
+      'crawler'
+    ]
+    user_agent = request.user_agent.to_s.downcase
+    crawler_user_agents.any? { |crawler| user_agent.include?(crawler.downcase) }
   end
 
   def prepare_meta_tags
