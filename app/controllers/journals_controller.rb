@@ -1,11 +1,10 @@
 class JournalsController < ApplicationController
-  before_action :check_crawler_or_authenticate, except: [ :index, :timeline ]
-  before_action :set_journal, only: [ :edit, :update, :destroy ]
-  before_action :set_journal_for_show, only: [ :show ]
-  before_action :store_location, only: [ :index, :timeline ]
-  before_action :authorize_journal, only: [ :edit, :update, :destroy ]
-  before_action :store_edit_source, only: [ :edit ]
-  helper_method :prepare_meta_tags
+  before_action :set_journal, only: [:edit, :update, :destroy]
+  before_action :set_journal_for_show, only: [:show]
+  before_action :store_location, only: [:index, :timeline, :show]
+  before_action :authenticate_user!, except: [:show]  # showアクションを除外
+  before_action :authorize_journal, only: [:edit, :update, :destroy]
+  before_action :prepare_meta_tags, only: [:show]
 
   # 一覧表示
   def index
@@ -46,32 +45,9 @@ class JournalsController < ApplicationController
 
   # 詳細表示
   def show
-    @journal = Journal.friendly.find(params[:id])
+    @journal = Journal.find(params[:id])
     @user = @journal.user
     @user_name = @user.name
-
-    # OGP用の変数を設定
-    song_info = [@journal.song_name, @journal.artist_name].compact.join(" / ")
-    @ogp_title = song_info.present? ? song_info : "MY SONG JOURNAL"
-    
-    # 説明文を構築
-    description_parts = []
-    description_parts << "Today's song" if @journal.song_name.present?
-    description_parts << @journal.song_name if @journal.song_name.present?
-    description_parts << @journal.artist_name if @journal.artist_name.present?
-    description_parts << @journal.content.truncate(50) if @journal.content.present?
-    @ogp_description = description_parts.join("\n")
-
-    # OGP画像URL
-    @ogp_image = if @journal.album_image.present?
-      text_parts = ["Today's song"]
-      text_parts << @journal.song_name if @journal.song_name.present?
-      text_parts << @journal.artist_name if @journal.artist_name.present?
-      text = ERB::Util.url_encode(text_parts.join("\n"))
-      "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}&text=#{text}"
-    else
-      "#{request.base_url}/images/ogp.png"
-    end
 
     if !user_signed_in? && !crawler?
       store_location
@@ -207,7 +183,9 @@ class JournalsController < ApplicationController
   end
 
   def set_journal_for_show
-    @journal = Journal.friendly.find(params[:id])  # friendly_idを使用
+    @journal = Journal.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to journals_path, alert: '指定された日記は存在しません'
   end
 
   def store_location
@@ -275,44 +253,14 @@ class JournalsController < ApplicationController
   end
 
   def prepare_meta_tags
-    site_name   = "MY SONG JOURNAL"
+    return unless @journal
 
-    ogp_text = if journal.song_name.present? && journal.artist_name.present?
-      "MySongJournal / #{journal.song_name} / #{journal.artist_name} "
-    else
-      journal.title
-    end
-
-    # OGP画像のURLを生成（説明テキストなし）
-    ogp_image_url = if @journal.album_image.present?
-      "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}"
-    else
-      "#{request.base_url}/images/ogp.png"
-    end
-
-    meta_tags = {
-      site:        site_name,
-      title:       ogp_text,
-      description: "#MySongJournal #Today'sSong #{@journal.song_name}/#{@journal.artist_name}",
-      image:       ogp_image_url,
-      og: {
-        site_name: site_name,
-        title:     ogp_text,
-        description: "#MySongJournal #Today'sSong #{@journal.song_name}/#{@journal.artist_name}",
-        image: ogp_image_url,
-        type: "article"
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: ogp_text,
-        description: "#MySongJournal #Today'sSong #{@journal.song_name}/#{@journal.artist_name}",
-        image: ogp_image_url
-      }
-    }
-    set_meta_tags(meta_tags)
+    @ogp_title = @journal.song_name.presence || "MY SONG JOURNAL"
+    @ogp_description = @journal.artist_name.presence || "音楽と一緒に日々の思い出を記録しよう"
+    @ogp_image = url_for(controller: :images, action: :ogp, 
+                        text: "#{@journal.song_name} - #{@journal.artist_name}",
+                        album_image: @journal.album_image_url)
   end
-end
-
 
   def check_crawler_or_authenticate
     return if crawler?
@@ -344,3 +292,5 @@ end
     crawler_user_agents.any? { |bot| user_agent.include?(bot.downcase) } ||
     crawler_referrers.any? { |ref| referer.include?(ref) }
   end
+
+end
