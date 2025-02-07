@@ -289,9 +289,17 @@ class JournalsController < ApplicationController
 
     @ogp_title = @journal.song_name.presence || "MY SONG JOURNAL"
     @ogp_description = @journal.artist_name.presence || "音楽と一緒に日々の思い出を記録しよう"
-    @ogp_image = url_for(controller: :images, action: :ogp,
-                        text: "#{@journal.song_name} - #{@journal.artist_name}",
-                        album_image: @journal.album_image)
+
+    # 更新日時をクエリパラメータとして追加
+    cache_key = @journal.updated_at.to_i.to_s
+    
+    @ogp_image = url_for(
+      controller: :images,
+      action: :ogp,
+      text: "#{@journal.song_name} - #{@journal.artist_name}",
+      album_image: @journal.album_image,
+      v: cache_key  # versionパラメータとして更新日時を使用
+    )
   end
 
   def check_crawler_or_authenticate

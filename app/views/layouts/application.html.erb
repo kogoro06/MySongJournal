@@ -7,36 +7,30 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%# OGPメタタグ %>
+    <%# OGP %>
     <meta property="og:site_name" content="MY SONG JOURNAL">
+    <meta property="og:locale" content="ja_JP">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="<%= request.original_url %>">
     <% if @journal.present? %>
-      <meta property="og:title" content="<%='MY SONG JOURNAL' %>">
-      <meta property="og:description" content="#MySongJournal #Today'sSong <%= "#{@journal.song_name}/#{@journal.artist_name}" if @journal.song_name.present? && @journal.artist_name.present? %>">
-      <meta property="og:type" content="article">
-      <meta property="og:url" content="<%= request.original_url %>">
-      <% if @journal.album_image.present? %>
-        <meta property="og:image" content="<%= "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}&text=#{ERB::Util.url_encode("Today's song\n#{@journal.song_name}\n#{@journal.artist_name}")}" %>">
-      <% else %>
-        <meta property="og:image" content="<%= "#{request.base_url}/images/ogp.png?text=#{ERB::Util.url_encode("Today's song\n#{@journal.song_name}\n#{@journal.artist_name}")}" %>">
-      <% end %>
+      <% cache_key = "#{@journal.id}-#{@journal.updated_at.to_i}-#{@journal.song_name}-#{@journal.artist_name}" %>
+      <meta property="og:title" content="<%= @journal.song_name || 'MY SONG JOURNAL' %>">
+      <meta property="og:description" content="<%= @journal.artist_name || '音楽と一緒に日々の思い出を記録しよう' %>">
+      <meta property="og:image" content="<%= "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image || '')}&text=#{ERB::Util.url_encode("Today's song\n#{@journal.song_name}\n#{@journal.artist_name}")}&v=#{Digest::MD5.hexdigest(cache_key)}" %>">
     <% else %>
       <meta property="og:title" content="MY SONG JOURNAL">
       <meta property="og:description" content="音楽と一緒に日々の思い出を記録しよう">
-      <meta property="og:type" content="website">
       <meta property="og:image" content="<%= "#{request.base_url}/images/ogp.png" %>">
     <% end %>
-    <meta property="og:locale" content="ja_JP">
 
     <%# Twitterカード %>
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@MySongJournal">
     <% if @journal.present? %>
+      <% cache_key = "#{@journal.id}-#{@journal.updated_at.to_i}-#{@journal.song_name}-#{@journal.artist_name}" %>
       <meta name="twitter:title" content="<%= @journal.song_name || 'MY SONG JOURNAL' %>">
       <meta name="twitter:description" content="<%= @journal.artist_name || '音楽と一緒に日々の思い出を記録しよう' %>">
-      <% if @journal.album_image.present? %>
-        <meta name="twitter:image" content="<%= "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image)}&text=#{ERB::Util.url_encode("Today's song\n#{@journal.song_name}\n#{@journal.artist_name}")}" %>">
-      <% else %>
-        <meta name="twitter:image" content="<%= "#{request.base_url}/images/ogp.png?text=#{ERB::Util.url_encode("Today's song\n#{@journal.song_name}\n#{@journal.artist_name}")}" %>">
-      <% end %>
+      <meta name="twitter:image" content="<%= "#{request.base_url}/images/ogp.png?album_image=#{ERB::Util.url_encode(@journal.album_image || '')}&text=#{ERB::Util.url_encode("Today's song\n#{@journal.song_name}\n#{@journal.artist_name}")}&v=#{Digest::MD5.hexdigest(cache_key)}" %>">
     <% else %>
       <meta name="twitter:title" content="MY SONG JOURNAL">
       <meta name="twitter:description" content="音楽と一緒に日々の思い出を記録しよう">
