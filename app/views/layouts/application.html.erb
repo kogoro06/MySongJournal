@@ -10,8 +10,8 @@
     <%# OGPメタタグ %>
     <meta property="og:site_name" content="MY SONG JOURNAL">
     <% if @journal.present? %>
-      <meta property="og:title" content="<%= @journal.song_name || 'MY SONG JOURNAL' %>">
-      <meta property="og:description" content="<%= @journal.artist_name || '音楽と一緒に日々の思い出を記録しよう' %>">
+      <meta property="og:title" content="<%='MY SONG JOURNAL' %>">
+      <meta property="og:description" content="#MySongJournal #Today'sSong <%= "#{@journal.song_name}/#{@journal.artist_name}" if @journal.song_name.present? && @journal.artist_name.present? %>">
       <meta property="og:type" content="article">
       <meta property="og:url" content="<%= request.original_url %>">
       <% if @journal.album_image.present? %>
@@ -23,7 +23,6 @@
       <meta property="og:title" content="MY SONG JOURNAL">
       <meta property="og:description" content="音楽と一緒に日々の思い出を記録しよう">
       <meta property="og:type" content="website">
-      <meta property="og:url" content="<%= request.original_url %>">
       <meta property="og:image" content="<%= "#{request.base_url}/images/ogp.png" %>">
     <% end %>
     <meta property="og:locale" content="ja_JP">
