@@ -88,7 +88,9 @@ class JournalsController < ApplicationController
       form_data = session[:journal_form]
       @journal.assign_attributes(
         title: form_data["title"],
-        content: form_data["content"]
+        content: form_data["content"],
+        emotion: form_data["emotion"],
+        public: form_data["public"]
       )
       # emotionを数値から文字列キーに変換
       if form_data["emotion"].present?
@@ -130,7 +132,34 @@ class JournalsController < ApplicationController
   # 編集フォーム表示
   def edit
     @journal = current_user.journals.friendly.find(params[:id])
-    Rails.logger.info " Edit action called with referer: #{request.referer}"
+
+    # トップページからのアクセス時はセッションをクリア
+    if params[:from] == "top"
+      session.delete(:selected_track)
+      session.delete(:journal_form)
+    end
+
+    # セッションから曲の情報を復元
+    if session[:selected_track].present?
+      @journal.assign_attributes(
+        song_name: session[:selected_track]["song_name"],
+        artist_name: session[:selected_track]["artist_name"],
+        album_image: session[:selected_track]["album_image"],
+        preview_url: session[:selected_track]["preview_url"],
+        spotify_track_id: session[:selected_track]["spotify_track_id"]
+      )
+    end
+
+    # セッションからフォームの入力値を復元
+    if session[:journal_form].present?
+      form_data = session[:journal_form]
+      @journal.assign_attributes(
+        title: form_data["title"],
+        content: form_data["content"],
+        emotion: form_data["emotion"],
+        public: form_data["public"]
+      )
+    end
   end
 
   # 更新処理

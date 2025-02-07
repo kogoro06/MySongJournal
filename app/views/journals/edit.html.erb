@@ -56,12 +56,12 @@
           <!-- ジャンル選択 -->
           <div class="mb-4">
             <div class="form-group">
-              <%= form.label :genre, "ジャンル", class: "block text-md font-medium text-gray-700 mb-2" %>
+              <%= form.label :genre, "ジャンル", class: "block text-md font-medium mb-2 text-gray-700" %>
               <%= form.select :genre, 
                 Journal.genres.map { |k, v| [t("activerecord.attributes.journal.genre.#{k}"), k] },
                 { include_blank: '選択してください' },
                 { 
-                  class: "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  class: "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark-mode-text"
                 }
               %>
             </div>
@@ -92,16 +92,16 @@
 
       <!-- 😊 感情入力 -->
       <div>
-        <%= form.label :emotion, "感情", class: "block text-md font-medium text-gray-700 mb-2" %>
+        <%= form.label :emotion, "感情", class: "block dark-mode-text font-medium text-sm font-bold" %>
         <%= form.select :emotion, 
             Journal.emotions.map { |k, v| [k, k] }, 
             { prompt: "選択してください" }, 
-            class: "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400",id: "journal-emotion" %>
+            class: "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark-mode-text",id: "journal-emotion" %>
       </div>
 
       <!-- 📝 メモ入力 -->
       <div>
-        <%= form.label :content, "本文", class: "block text-md font-medium text-gray-700 mb-2" %>
+        <%= form.label :content, "本文", class: "block dark-mode-text font-medium text-sm font-bold" %>
         <%= form.text_area :content, required: true, placeholder: "今日の出来事や気持ちを記入", class: "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark-mode-text",id: "journal-content" %>
       </div>
 
