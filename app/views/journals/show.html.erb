@@ -68,9 +68,7 @@
         <%= link_to edit_journal_path(@journal), class: "px-4 py-2 bg-yellow-500 text-white font-medium rounded-md hover:bg-yellow-600 transition flex items-center" do %>
           <span>✏️ 編集</span>
         <% end %>
-      <% end %>
-      
-      <% if @journal.public? || @journal.user == current_user %>
+        
         <%= link_to "https://twitter.com/share?url=#{CGI.escape(journal_url(@journal))}", 
             target: '_blank', 
             class: "px-4 py-2 bg-black text-white font-medium rounded-md hover:bg-gray-800 transition flex items-center",
@@ -82,9 +80,7 @@
           </svg>
           <span>共有</span>
         <% end %>
-      <% end %>
 
-      <% if @journal.user == current_user %>
         <%= button_to journal_path(@journal), 
             method: :delete, 
             data: { confirm: "本当に削除しますか？" }, 
