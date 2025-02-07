@@ -63,7 +63,17 @@ class ImagesController < ApplicationController
       end
 
       Rails.logger.info "OGP image generated successfully"
-      send_data image_data, type: "image/png", disposition: "inline"
+      
+      # Accept-Headerに関係なく常にPNGとして返す
+      response.headers['Content-Type'] = 'image/png'
+      response.headers['Access-Control-Allow-Origin'] = '*'
+      response.headers['Cache-Control'] = 'public, max-age=31536000'
+      
+      # バイナリデータとして送信
+      send_data image_data,
+        type: 'image/png',
+        disposition: 'inline',
+        status: :ok
     rescue => e
       Rails.logger.error "Error in OGP generation: #{e.message}"
       Rails.logger.error e.backtrace.join("\n")
