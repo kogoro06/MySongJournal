@@ -5,6 +5,7 @@ class JournalsController < ApplicationController
   before_action :authenticate_user!, except: [ :show, :timeline ]
   before_action :authorize_journal, only: [ :edit, :update, :destroy ]
   before_action :prepare_meta_tags, only: [ :show ]
+  before_action :check_crawler_or_authenticate, only: [:show]
 
   # 一覧表示
   def index
@@ -290,18 +291,23 @@ class JournalsController < ApplicationController
   end
 
   def crawler?
-    crawler_user_agents = [
-      "Twitterbot",
-      "facebookexternalhit",
-      "LINE-Parts/",
-      "Discordbot",
-      "Slackbot",
-      "bot",
-      "spider",
-      "crawler"
-    ]
     user_agent = request.user_agent.to_s.downcase
-    crawler_user_agents.any? { |crawler| user_agent.include?(crawler.downcase) }
+    crawler_patterns = [
+      'twitterbot',
+      'facebookexternalhit',
+      'line-parts/',
+      'discordbot',
+      'slackbot',
+      'bot',
+      'spider',
+      'crawler'
+    ]
+    crawler_patterns.any? { |pattern| user_agent.include?(pattern) }
+  end
+
+  def check_crawler_or_authenticate
+    return if crawler?
+    authenticate_user!
   end
 
   def prepare_meta_tags
@@ -320,36 +326,5 @@ class JournalsController < ApplicationController
       album_image: @journal.album_image,
       v: cache_key  # versionパラメータとして更新日時を使用
     )
-  end
-
-  def check_crawler_or_authenticate
-    return if crawler?
-    authenticate_user!
-  end
-
-  def crawler?
-    crawler_user_agents = [
-      "Twitterbot",
-      "facebookexternalhit",
-      "LINE-Parts/",
-      "Discordbot",
-      "Slackbot",
-      "bot",
-      "spider",
-      "crawler",
-      "OGP Checker"
-    ]
-
-    # リファラーによるチェックを追加
-    crawler_referrers = [
-      "ogp.buta3.net"
-    ]
-
-    user_agent = request.user_agent.to_s.downcase
-    referer = request.referer.to_s.downcase
-
-    # User-Agentまたはリファラーのどちらかがクローラーと判定された場合にtrueを返す
-    crawler_user_agents.any? { |bot| user_agent.include?(bot.downcase) } ||
-    crawler_referrers.any? { |ref| referer.include?(ref) }
   end
 end
