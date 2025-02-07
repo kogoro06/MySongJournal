@@ -32,9 +32,9 @@ class OgpCreator
         album_image.resize "#{ALBUM_IMAGE_SIZE}x#{ALBUM_IMAGE_SIZE}"
 
         # 一時ファイルに保存
-        temp_album = Tempfile.new(['album', '.png'])
+        temp_album = Tempfile.new([ "album", ".png" ])
         album_image.write(temp_album.path)
-        
+
         # 画像を合成
         base_image = base_image.composite(MiniMagick::Image.open(temp_album.path)) do |c|
           c.compose "Over"
@@ -51,13 +51,13 @@ class OgpCreator
     end
 
     # 一時ファイルに保存
-    temp_base = Tempfile.new(['base', '.png'])
+    temp_base = Tempfile.new([ "base", ".png" ])
     base_image.write(temp_base.path)
 
     begin
       # テキストを追加
       result = MiniMagick::Image.open(temp_base.path)
-      
+
       # タイトルを追加
       result.combine_options do |c|
         c.gravity "south"

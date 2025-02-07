@@ -1,10 +1,10 @@
 class JournalsController < ApplicationController
-  before_action :set_journal, only: [:edit, :update, :destroy]
-  before_action :set_journal_for_show, only: [:show]
-  before_action :store_location, only: [:index]  
-  before_action :authenticate_user!, except: [:show, :timeline]  
-  before_action :authorize_journal, only: [:edit, :update, :destroy]
-  before_action :prepare_meta_tags, only: [:show]
+  before_action :set_journal, only: [ :edit, :update, :destroy ]
+  before_action :set_journal_for_show, only: [ :show ]
+  before_action :store_location, only: [ :index ]
+  before_action :authenticate_user!, except: [ :show, :timeline ]
+  before_action :authorize_journal, only: [ :edit, :update, :destroy ]
+  before_action :prepare_meta_tags, only: [ :show ]
 
   # 一覧表示
   def index
@@ -23,7 +23,7 @@ class JournalsController < ApplicationController
 
   # タイムライン表示
   def timeline
-    base_query = Journal.where(public: true)  
+    base_query = Journal.where(public: true)
 
     if user_signed_in?
       following_user_ids = current_user.following.pluck(:id)
@@ -70,7 +70,7 @@ class JournalsController < ApplicationController
     end
 
     @journal = Journal.new
-    @journal.emotion = nil  
+    @journal.emotion = nil
 
     # セッションから曲の情報を復元
     if session[:selected_track].present?
@@ -219,7 +219,7 @@ class JournalsController < ApplicationController
   def set_journal_for_show
     @journal = Journal.friendly.find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    redirect_to journals_path, alert: '指定された日記は存在しません'
+    redirect_to journals_path, alert: "指定された日記は存在しません"
   end
 
   def store_location
@@ -289,7 +289,7 @@ class JournalsController < ApplicationController
 
     @ogp_title = @journal.song_name.presence || "MY SONG JOURNAL"
     @ogp_description = @journal.artist_name.presence || "音楽と一緒に日々の思い出を記録しよう"
-    @ogp_image = url_for(controller: :images, action: :ogp, 
+    @ogp_image = url_for(controller: :images, action: :ogp,
                         text: "#{@journal.song_name} - #{@journal.artist_name}",
                         album_image: @journal.album_image)
   end
@@ -309,20 +309,19 @@ class JournalsController < ApplicationController
       "bot",
       "spider",
       "crawler",
-      "OGP Checker"  
+      "OGP Checker"
     ]
-    
+
     # リファラーによるチェックを追加
     crawler_referrers = [
       "ogp.buta3.net"
     ]
-    
+
     user_agent = request.user_agent.to_s.downcase
     referer = request.referer.to_s.downcase
-    
+
     # User-Agentまたはリファラーのどちらかがクローラーと判定された場合にtrueを返す
     crawler_user_agents.any? { |bot| user_agent.include?(bot.downcase) } ||
     crawler_referrers.any? { |ref| referer.include?(ref) }
   end
-
 end

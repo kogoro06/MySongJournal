@@ -1,7 +1,7 @@
 class ImagesController < ApplicationController
   skip_before_action :authenticate_user!, raise: false
-  skip_before_action :verify_authenticity_token, only: [:ogp]
-  before_action :set_cors_headers, only: [:ogp]
+  skip_before_action :verify_authenticity_token, only: [ :ogp ]
+  before_action :set_cors_headers, only: [ :ogp ]
 
   def ogp
     text = params[:text]
@@ -77,15 +77,15 @@ class ImagesController < ApplicationController
   private
 
   def set_cors_headers
-    allowed_origins = ['https://ogp.buta3.net', 'https://cards-dev.twitter.com', 'https://www.facebook.com']
-    if allowed_origins.include?(request.headers['Origin'])
-      response.headers['Access-Control-Allow-Origin'] = request.headers['Origin']
+    allowed_origins = [ "https://ogp.buta3.net", "https://cards-dev.twitter.com", "https://www.facebook.com" ]
+    if allowed_origins.include?(request.headers["Origin"])
+      response.headers["Access-Control-Allow-Origin"] = request.headers["Origin"]
     else
-      response.headers['Access-Control-Allow-Origin'] = '*'
+      response.headers["Access-Control-Allow-Origin"] = "*"
     end
-    response.headers['Access-Control-Allow-Methods'] = 'GET, HEAD, OPTIONS'
-    response.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept'
-    response.headers['Access-Control-Max-Age'] = '86400'  # 24時間
+    response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept"
+    response.headers["Access-Control-Max-Age"] = "86400"  # 24時間
   end
 
   def ogp_params
