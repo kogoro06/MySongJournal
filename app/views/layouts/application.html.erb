@@ -19,7 +19,8 @@
         ogp_params = {
           album_image: @journal.album_image,
           text: ogp_text,
-          timestamp: Time.current.to_i  # キャッシュ防止用
+          journal_id: @journal.id,
+          timestamp: @journal.updated_at.to_i  # 更新時のみ変更されるように
         }
         ogp_url = "#{request.base_url}/images/ogp.png?" + ogp_params.to_param
       %>

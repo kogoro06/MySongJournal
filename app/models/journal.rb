@@ -51,13 +51,13 @@ class Journal < ApplicationRecord
 
   def slug_candidates
     [
-      :title,
-      [ :title, :artist_name ],
-      [ :title, :artist_name, -> { (created_at || Time.current).strftime("%Y%m%d") } ]
+      :song_name,
+      [:song_name, :artist_name],
+      [:song_name, :artist_name, -> { created_at.strftime('%Y%m%d') }]
     ]
   end
 
   def should_generate_new_friendly_id?
-    title_changed? || artist_name_changed? || super
+    song_name_changed? || artist_name_changed? || slug.blank?
   end
 end
