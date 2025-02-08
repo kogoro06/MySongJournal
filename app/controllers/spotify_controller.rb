@@ -1,117 +1,240 @@
 class SpotifyController < ApplicationController
   before_action :authenticate_user!
+  # どのライブラリを使用するのか
+  #   * 速度を重視する時: rest-client
+  #   * Cookie等の自動追跡機能を使用する時: OpenURI
+  #   *  postメソッドを使用して通信を行いたい時: Net::HTTP
+  #   *　今回は速度を重視してrest-clientを使用しています
   require "rest-client"
-  require "json"
-  require "net/http"
+
 # 検索機能
 def search
+  # tracksに検索結果を格納
+  # query_partsに検索クエリを格納
   @tracks = []
   query_parts = []
 
   # ページネーションの設定
   @per_page = 6  # タイムラインと同じく6件に設定
-  page = params[:page] || 1
+  page = (params[:page] || 1).to_i # URLの?以降に指定されたページ番号　ex: search?page=2の場合、pageは2になり、パラメータが無い場合は1になる
+  # offsetの計算
+  # 例えば、page=2の時、offset=6になるため、7個目の要素から始まる
+  # 1ページ目は0から始まるため、 offset = (2-1) * 6 = 6
   offset = (page.to_i - 1) * @per_page
 
   # フォームの値をセッションに保存
-  if params[:journal].present?
-    session[:journal_form] = {
-      title: params[:journal][:title],
-      content: params[:journal][:content],
-      emotion: params[:journal][:emotion]
+  if params[:journal].present? #journalの値(タイトルと内容と感情と公開)が存在する場合
+    session[:journal_form] = { #セッションに値を保存
+      title: params[:journal][:title], #タイトル
+      content: params[:journal][:content], #内容
+      emotion: params[:journal][:emotion], #感情
     }
-    Rails.logger.info "✅ Form data saved in session: #{session[:journal_form]}"
   end
 
   # 初期検索条件の追加
-  if params[:search_conditions].present? && params[:search_values].present?
-    params[:search_conditions].zip(params[:search_values]).each do |condition, value|
+  if params[:search_conditions].present? && params[:search_values].present? #検索条件と検索値が存在する場合
+     # 検索条件と検索値を対応付けて配列にする
+    # 例: search_conditions = ["year", "artist"], search_values = ["2020", "椎名林檎"] の場合
+    # .zipで → [["year", "2020"], ["artist", "椎名林檎"]] という組み合わせの配列を作成
+    params[:search_conditions].zip(params[:search_values]).each do |condition, value| 
+      # 条件と値が存在する場合
+      # 例: condition = "year", value = "2020" の場合
       if condition.present? && value.present?
+        # 条件の種類によって処理を分岐
         case condition
+        # yearの場合
         when "year"
           # 年代をSpotify APIのクエリに変換（例：1990s → year:1990-1999）
+          # valueに「1990s」などの文字列が含まれる場合、\d{4}という正規表現にマッチングする
+          # マッチング結果の1つ目のグループ（()で囲まれた部分）を decade に代入
+          # .match ではマッチング結果を MatchData オブジェクトとして返す
+          # .[](1) というメソッドは MatchData オブジェクトの1つ目のグループを文字列として返す
+          # (1) という数字は、 () で囲まれたグループの番号を指定する
+          # 例えば、/(\d{4})(\w)/ という正規表現であれば、 .[](1) ではマッチング結果の1つ目(1990sであれば1990年)を指定する
+          # つまり、(\d{4}) という部分にマッチングした文字列を取得する
           decade = value.match(/(\d{4})s/)&.[](1)
+          # decade が存在する場合
           if decade
+            # decadeの1年目を start_year
             start_year = decade
+            # decadeの終了年を end_yearとする
             end_year = decade.to_i + 9
+            # year:#{start_year}-#{end_year} の形式のクエリ（例：year:1990-1999の１０年間）を query_parts という一つの配列に追加
             query_parts << "year:#{start_year}-#{end_year}"
           end
         else
+          # condition が keyword の場合
+          # value は keyword として扱う
           query_parts << (condition == "keyword" ? value : "#{condition}:#{value}")
         end
       end
     end
   else
+    # 検索条件が無効な場合、"検索条件を入力してください。" というアラートを表示
     flash.now[:alert] = "検索条件を入力してください。"
+    #spotify/_search.html.erbというパーシャルをレンダリング
     return render partial: "spotify/search"
   end
 
-  # 検索クエリの生成
+  #　query_stringという変数に、query_parts(query_partsは上で定義済み）をまとめた文字列を代入
   query_string = query_parts.join(" ")
-  Rails.logger.debug "🔍 Spotify API Query: #{query_string}"
 
+  # query_stringが空の場合
   if query_string.blank?
+    # "検索条件が無効です" というアラートを表示
     flash.now[:alert] = "検索条件が無効です。"
+    #spotify/_search.html.erbというパーシャルをレンダリング
     return render partial: "spotify/search"
   end
 
+  # 例外処理の開始
+  # beginからrescueまでの処理中にエラーが発生した場合、
+  # rescueで指定したエラー処理を実行する
+  # 例：
+  # - Spotify APIのアクセストークンの取得に失敗
+  # - APIからのレスポンスが不正
+  # - ネットワークエラー
   begin
+    # Spotify APIのアクセストークンの取得
     token = get_spotify_access_token
 
-    # Spotify APIで検索
+    # RestClientを使ってSpotify APIにGETリクエストを送る
+    # URLの"v1"はAPIのバージョンを示す
+    # - APIのバージョン管理により、新機能追加や仕様変更があっても古いバージョンは維持される
+    # - 例：将来v2が出ても、v1を使用しているアプリは影響を受けない
+    # - Spotifyの場合、v1は安定版のAPIバージョン
+    #
+    # APIエンドポイント（URL）について
+    # - https://api.spotify.com/v1/search は Spotify Web API のドキュメントで定義
+    # - 公式ドキュメント: https://developer.spotify.com/documentation/web-api/reference/search
+    # - このエンドポイントで曲、アーティスト、アルバムなどの検索が可能
     response = RestClient.get(
       "https://api.spotify.com/v1/search",
       {
+        # 認証情報の設定
+        # - Authorization: APIリクエストの認証に使用するHTTPヘッダー
+        # - "Bearer": トークンの種類を示す。OAuth2.0で使用される標準的な認証方式
+        #   - Bearer（持参人）という名前の通り、トークンを持っている人がAPIを使用できる
+        #   - 形式: "Bearer" + スペース + アクセストークン
+        # - #{token}: get_spotify_access_tokenで取得した一時的なアクセストークン
+        #   - トークンの有効期限は1時間
+        #   - 期限切れの場合は自動的に再取得される
         Authorization: "Bearer #{token}",
         "Accept-Language" => "ja",  # 日本語表記を優先
         params: {
-          q: query_string,
-          type: "track",
+          q: query_string, # 検索クエリ qは検索文字列　ex: "artist:椎名林檎" query_stringは上で定義済み
+          type: "track", # 検索対象を曲に限定
           market: "JP",  # 日本のマーケットに限定
-          limit: @per_page,
-          offset: offset
+          limit: @per_page, # 1ページの曲の数(@per_pageは上で定義しているように6に設定している)
+          offset: offset # 1ページ目は1から６まで、2ページ目は7から12までとなるように設定している
         }
       }
     )
 
+    # JSONをパースして、必要な情報を取得
+    # - parse: JSON形式の文字列をRubyのハッシュやオブジェクトに変換すること
+    # - response.body: APIから返ってきた生のJSONデータ（文字列）
+    # 例：
+    # JSON文字列: '{"name": "曲名", "artist": "アーティスト名"}'
+    # ↓ parse後
+    # Rubyハッシュ: {"name" => "曲名", "artist" => "アーティスト名"}
     results = JSON.parse(response.body)
-
+    
+    # APIレスポンスが正常で、曲データが存在する場合
+    # - .any?: 配列が空でないかをチェックするメソッド
+    #   - 配列に要素が1つでもあれば true
+    #   - 配列が空の場合は false
+    # 例：
+    # [1, 2, 3].any? => true
+    # [].any? => false
+    #今回の場合、　トラックがきちんと取得されていて、中に何かしらのデータがあることを確認
     if results["tracks"] && results["tracks"]["items"].any?
+      # APIレスポンスから曲データを取得
+      # - map: 配列の各要素に対してブロックを実行し、新しい配列を生成する
+      # 今回の場合、track: 1曲の情報を保持するハッシュとしてマップされる
       @tracks = results["tracks"]["items"].map do |track|
         {
-          spotify_track_id: track["id"],
-          song_name: track["name"],
-          artist_name: track["artists"].first["name"],
-          album_image: track["album"]["images"].first&.[]("url"),
-          preview_url: track["preview_url"],
-          spotify_url: track["external_urls"]["spotify"]
+          spotify_track_id: track["id"], # spotify_track_id: 曲のID
+          song_name: track["name"], #song_name: 曲の名前
+          artist_name: track["artists"].first["name"], #artist_name: アーティストの名前
+          album_image: track["album"]["images"].first["url"], #album_image: アルバム画像のURL
         }
       end
 
       # ページネーション情報の設定
+      # - total_count: 曲の総数
+      # - page: 現在のページ
+      # - per_page: 1ページの曲の数
+      #total_countは検索結果の総数で設定している
       @total_count = results["tracks"]["total"]
+
+      # @total_count個の配列を、@per_page個ずつのページに分割して、page番目のページを取得
       @tracks = Kaminari.paginate_array(@tracks, total_count: @total_count).page(page).per(@per_page)
     else
+      # トラックの中に何も取得できなかった場合
       @tracks = []
+      # 検索結果が見つかりませんでした。というアラートを表示
       flash.now[:alert] = "検索結果が見つかりませんでした。"
     end
 
+
+  # エラー処理を2つに分ける理由：
+  # 1. エラーの原因が異なる
+  #    - BadRequest（400）: APIの使用方法が間違っている（クエリの形式、認証など）
+  #    - StandardError: システムの問題（ネットワーク、サーバー、プログラムなど）
+  # 2. 対応方法が異なる
+  #    - BadRequest: APIの使用方法を修正する必要がある
+  #    - StandardError: システムの状態を確認する必要がある
+  # 3. デバッグ時の対応が異なる
+  #    - BadRequest: e.responseでAPIからのエラー詳細を確認
+  #    - StandardError: e.messageで一般的なエラーメッセージを確認
+  
+  # BadRequestエラー（400）の処理
+  # - 不正なリクエスト（クエリが長すぎる、不正な文字が含まれているなど）
+  # - アクセストークンの期限切れ
+  # - APIの利用制限超過
   rescue RestClient::BadRequest => e
-    Rails.logger.error "🚨 Spotify API Error: #{e.response}"
-    flash.now[:alert] = "Spotify検索中にエラーが発生しました。"
+    Rails.logger.error "🚨 Spotify API Usage Error: #{e.response}"
+    flash.now[:alert] = "検索条件が不正です。検索条件を見直してください。"
+  
+  # その他の予期しないエラーの処理
+  # - ネットワークエラー
+  # - タイムアウト
+  # - サーバーエラー（500系）
+  # - プログラムのバグ
   rescue StandardError => e
-    Rails.logger.error "🚨 Unexpected Error: #{e.message}"
-    flash.now[:alert] = "予期しないエラーが発生しました。"
+    Rails.logger.error "🚨 System Error: #{e.message}"
+    flash.now[:alert] = "システムエラーが発生しました。時間をおいて再度お試しください。"
   end
 
-  Rails.logger.debug "Response Data to Frontend: #{@tracks}"
+  # spotifyの検索結果をログに出力
+  Rails.logger.debug(
+    "Spotify Search Results:\n" \
+    "- Query: #{query_string}\n" \
+    "- Total Results: #{@total_count}\n" \
+    "- Current Page: #{page}\n" \
+    "- Results in Current Page: #{@tracks&.size || 0}"
+  )
 
   # 結果の表示
+  # tracksに何か入っている場合
   if @tracks.any?
-    render "spotify/results", locals: { tracks: @tracks }
+    # spotify/results.html.erbをレンダリングして、
+    # localsはrenderメソッドに渡すためのローカル変数を定義するためのオプション
+    # 検索クエリと検索結果をビューに渡す
+    render "spotify/results", locals: { 
+      tracks: @tracks,
+      query_string: format_query_for_display(query_string) 
+    }
   else
+    # 検索結果が見つからなかった場合  
+    # 検索結果がありませんでした。というアラートメッセージを表示
     flash.now[:alert] = "検索結果がありませんでした。"
-    redirect_to spotify_results_path
+    # renderとredirect_toの違い：
+    # - render: 同じリクエスト内でテンプレートを表示（現在の変数やflash.nowの内容が保持される）
+    # - redirect_to: 新しいリクエストを発生させる（現在の変数やflash.nowの内容が失われる）
+    # この場合、flash.nowを使用しているのでrenderを使う
+    render "spotify/search"
   end
 end
 
@@ -123,8 +246,10 @@ end
       session[:journal_form] = {
         title: params[:journal][:title],
         content: params[:journal][:content],
-        emotion: params[:journal][:emotion]
-      }
+        emotion: params[:journal][:emotion],
+        public: params[:journal][:public] == "1"
+      } if params[:journal].present?
+
       Rails.logger.info "✅ Form data saved in session from results: #{session[:journal_form]}"
     end
 
@@ -223,7 +348,8 @@ end
       session[:journal_form] = {
         title: params[:journal][:title],
         content: params[:journal][:content],
-        emotion: params[:journal][:emotion]
+        emotion: params[:journal][:emotion],
+        public: params[:journal][:public] == "1"
       } if params[:journal].present?
 
       Rails.logger.info "✅ Track and form data saved in session: #{session[:selected_track]}, #{session[:journal_form]}"
@@ -348,68 +474,53 @@ end
     JSON.parse(response.body)["access_token"]
   end
 
-  def determine_genre(spotify_genres)
-    return nil if spotify_genres.blank?
+  def determine_genre(genres)
+    return "others" if genres.blank?
 
-    spotify_genres = spotify_genres.map(&:downcase)
+    genre_patterns = {
+      "j-pop" => /j-pop|jpop|japanese/,
+      "k-pop" => /k-pop|kpop|korean/,
+      "idol" => /idol|boy band|girl group/,
+      "vocaloid" => /vocaloid|virtual singer/,
+      "game" => /game|gaming|chiptune/,
+      "classical" => /classical|orchestra/,
+      "jazz" => /jazz|bebop|swing/,
+      "western" => /pop|rock|hip hop|rap/
+    }
 
-    # ジャンルごとのスコアを計算
-    scores = Hash.new(0)
-
-    spotify_genres.each do |genre|
-      # J-POP関連
-      if genre =~ /j-pop|jpop|japanese|japan|shibuya-kei/
-        scores["j-pop"] += 1
+    genres.each do |genre|
+      genre_patterns.each do |key, pattern|
+        return key if genre.match?(pattern)
       end
-
-      # K-POP関連
-      if genre =~ /k-pop|kpop|korean|k-indie|k-rap/
-        scores["k-pop"] += 1
-      end
-
-      # アイドル関連
-      if genre =~ /idol|boy band|girl group/
-        scores["idol"] += 1
-      end
-
-      # ボーカロイド関連
-      if genre =~ /vocaloid|virtual singer|synthetic voice/
-        scores["vocaloid"] += 1
-      end
-
-      # ゲーム関連
-      if genre =~ /game|gaming|chiptune|8-bit|16-bit/
-        scores["game"] += 1
-      end
-
-      # クラシック関連
-      if genre =~ /classical|orchestra|symphony|chamber|baroque|opera|concerto/
-        scores["classical"] += 1
-      end
-
-      # ジャズ関連
-      if genre =~ /jazz|bebop|swing|fusion|big band/
-        scores["jazz"] += 1
-      end
-
-      # 洋楽関連
-      if genre =~ /pop|rock|hip hop|rap|r&b|dance|electronic|soul|blues|folk|country|indie|alternative|metal|punk|reggae|latin/
-        scores["western"] += 1
-      end
-    end
-
-    # スコアが最も高いジャンルを選択
-    return nil if scores.empty?
-
-    max_score = scores.values.max
-    candidates = scores.select { |k, v| v == max_score }.keys
-
-    # 優先順位: より具体的なジャンル > 一般的なジャンル
-    priority_order = [ "vocaloid", "game", "classical", "jazz", "idol", "k-pop", "j-pop", "western" ]
-    priority_order.each do |genre|
-      return genre if candidates.include?(genre)
     end
 
     "others"
+  end
+
+  def current_page
+    (params[:page] || 1).to_i
+  end
+
+  def render_error(message, status = :bad_request)
+    render json: { error: message }, status: status
+  end
+
+  # 検索条件を日本語表示に変換するメソッド
+  def format_query_for_display(query)
+    # 検索条件のマッピング
+    condition_mapping = {
+      'artist:' => 'アーティスト名:',
+      'track:' => '曲名:',
+      'album:' => 'アルバム名:',
+      'year:' => '年代:'
+    }
+  
+    # 各検索条件を日本語に変換
+    formatted_query = query.dup
+    condition_mapping.each do |eng, jpn|
+      formatted_query.gsub!(eng, jpn)
+    end
+  
+    formatted_query
   end
 end
