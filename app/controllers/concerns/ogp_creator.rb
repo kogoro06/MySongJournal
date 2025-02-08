@@ -17,6 +17,12 @@ class OgpCreator
     Rails.logger.info "Input text: #{text.inspect}"
     Rails.logger.info "Album URL: #{album_image_url.inspect}"
 
+    # 必須パラメータのチェック
+    if text.blank? || album_image_url.blank?
+      Rails.logger.error "Missing required parameters"
+      return nil
+    end
+
     title = "Today's song"
     subtitle = text.sub(/^Today's song\s*/, "").strip
 

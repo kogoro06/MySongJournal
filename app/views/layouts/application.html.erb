@@ -15,22 +15,23 @@
     <% if @journal.present? %>
       <%
         # OGP用のテキストとパラメータを準備
-        ogp_text = "Today's song\n#{@journal.song_name}\n#{@journal.artist_name}"
+        ogp_text = "#{@journal.song_name}\n#{@journal.artist_name}"
         ogp_params = {
           album_image: @journal.album_image,
           text: ogp_text,
-          journal_id: @journal.id,
-          updated_at: @journal.updated_at.to_i
+          timestamp: Time.current.to_i  # キャッシュ防止用
         }
         ogp_url = "#{request.base_url}/images/ogp.png?" + ogp_params.to_param
       %>
       <meta property="og:title" content="<%= @journal.song_name || 'MY SONG JOURNAL' %>">
       <meta property="og:description" content="<%= @journal.artist_name || '音楽と一緒に日々の思い出を記録しよう' %>">
       <meta property="og:image" content="<%= ogp_url %>">
+      <meta property="og:image:width" content="1200">
+      <meta property="og:image:height" content="630">
     <% else %>
       <meta property="og:title" content="MY SONG JOURNAL">
       <meta property="og:description" content="音楽と一緒に日々の思い出を記録しよう">
-      <meta property="og:image" content="<%= "#{request.base_url}/images/ogp.png" %>">
+      <meta property="og:image" content="<%= image_url('ogp.png') %>">
     <% end %>
 
     <%# Twitterカード %>
