@@ -6,18 +6,33 @@ module Spotify::SpotifySearchable
     @tracks = []
     unless valid_search_params?
       flash.now[:alert] = "検索条件を入力してください。"
-      render partial: "spotify/search"
-      return
+      return respond_to do |format|
+        format.html { render partial: "spotify/search" }
+        format.js { render partial: "spotify/search" }
+      end
     end
     
     @query_string = build_query_string
     if @query_string.blank?
       flash.now[:alert] = "検索条件が無効です。"
-      render partial: "spotify/search"
-      return
+      return respond_to do |format|
+        format.html { render partial: "spotify/search" }
+        format.js { render partial: "spotify/search" }
+      end
     end
-
+  
     perform_spotify_search
+  
+    respond_to do |format|
+      if @tracks.any?
+        format.html { render "spotify/results", locals: { query_string: format_query_for_display(@query_string) } }
+        format.js { render "spotify/results", locals: { query_string: format_query_for_display(@query_string) } }
+      else
+        flash.now[:alert] = "検索結果が見つかりませんでした。"
+        format.html { render partial: "spotify/search" }
+        format.js { render partial: "spotify/search" }
+      end
+    end
   end
 
   private
@@ -93,5 +108,17 @@ module Spotify::SpotifySearchable
     Rails.logger.error "🚨 Search Error: #{error.message}"
     flash.now[:alert] = "検索中にエラーが発生しました。"
     render partial: "spotify/search"
+  end
+
+  def format_query_for_display(query)
+    {
+      'artist:' => 'アーティスト名:',
+      'track:' => '曲名:',
+      'album:' => 'アルバム名:',
+      'year:' => '年代:'
+    }.each do |eng, jpn|
+      query = query.gsub(eng, jpn)
+    end
+    query
   end
 end
