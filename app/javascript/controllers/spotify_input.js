@@ -12,7 +12,7 @@ export function initializeSpotifyInput() {
 
   // 必要な要素が存在しない場合は初期化を中止
   if (!queryContainer || !searchTypeSelect) {
-    console.warn('⚠️ 必要な要素が見つかりません。');
+    console.warn('必要な要素が見つかりません。');
     return;
   }
 
@@ -40,7 +40,7 @@ export function initializeSpotifyInput() {
           return response.json();
         })
         .then((data) => renderSuggestions(data))
-        .catch((error) => console.error('❌ APIリクエストエラー:', error));
+        .catch((error) => console.error('APIリクエストエラー:', error));
     });
   }
 
@@ -76,8 +76,6 @@ export function initializeSpotifyInput() {
   const newQueryInput = document.getElementById('initial-query');
   autoCompleteList = document.getElementById('autoComplete_list');
 
-  console.log('🔍 新しい初期入力フィールド:', newQueryInput);
-  console.log('🔍 新しいオートコンプリートリスト:', autoCompleteList);
 
   // 新しい要素が存在する場合はイベントリスナーを設定
   if (newQueryInput && autoCompleteList) {
@@ -92,5 +90,4 @@ export function initializeSpotifyInput() {
 const initialQueryInput = document.getElementById('initial-query');
 if (initialQueryInput) {
   addInputEventListener(initialQueryInput);
-  console.log('✅ 初期入力フィールドにイベントリスナーが設定されました');
 }

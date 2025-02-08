@@ -13,6 +13,10 @@
       <% if @total_count&.positive? %>
         <div class="text-gray-600 text-sm mb-4">
           全<%= @total_count %>件中 <%= @tracks.offset_value + 1 %>-<%= @tracks.offset_value + @tracks.count %>件を表示
+          検索条件:
+          <span class="text-blue-500 font-bold">
+            <%= query_string.presence || '特になし' %>
+          </span>
         </div>
       <% end %>
 
@@ -55,7 +59,6 @@
                       album_image: track[:album_image],
                       preview_url: track[:preview_url],
                       spotify_track_id: track[:spotify_track_id],
-                      spotify_url: track[:spotify_url]
                     }.to_json
                   ), 
                   method: :post, 
