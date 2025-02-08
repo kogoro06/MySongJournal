@@ -64,7 +64,7 @@
          <!-- ジャンル選択 -->
           <div class="mb-4">
             <div class="form-group">
-              <%= form.label :genre, "ジャンル", class: "block text-md font-medium dark-mode-text mb-2" %>
+              <%= form.label :genre, "ジャンル", class: "block text-md font-medium text-black mb-2" %>
               <%= form.select :genre, 
                 Journal.genres.map { |k, v| [t("activerecord.attributes.journal.genre.#{k}"), k] },
                 { include_blank: '選択してください' },
@@ -94,7 +94,6 @@
       <%= form.hidden_field :song_name, value: @journal.song_name, name: "journal[song_name]" %>
       <%= form.hidden_field :artist_name, value: @journal.artist_name, name: "journal[artist_name]" %>
       <%= form.hidden_field :album_image, value: @journal.album_image, name: "journal[album_image]" %>
-      <%= form.hidden_field :preview_url, value: @journal.preview_url, name: "journal[preview_url]" %>
       <%= form.hidden_field :spotify_track_id, value: @journal.spotify_track_id, name: "journal[spotify_track_id]" %>
 
       <!-- 😊 感情入力 -->
