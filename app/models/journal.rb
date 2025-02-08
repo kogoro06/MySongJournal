@@ -53,7 +53,7 @@ class Journal < ApplicationRecord
     [
       :song_name,
       [:song_name, :artist_name],
-      [:song_name, :artist_name, -> { created_at.strftime('%Y%m%d') }]
+      [:song_name, :artist_name, -> { (created_at || Time.current).strftime('%Y%m%d') }]
     ]
   end
 
