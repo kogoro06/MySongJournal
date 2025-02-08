@@ -46,25 +46,13 @@ class JournalsController < ApplicationController
 
   # 詳細表示
   def show
-    if !user_signed_in? && !crawler?
-      authenticate_user!
-      return
-    end
-
-    @journal = Journal.friendly.find(params[:id])
-    @user = @journal.user
-    @user_name = @user.name
-
-    # 非公開記事の場合はログインチェック
-    unless @journal.public?
-      if !user_signed_in? && !crawler?
-        store_location
-        redirect_to new_user_session_path, notice: "ログインしてください"
-        return
-      end
-    end
-
-    prepare_meta_tags
+    @journal = if crawler?
+                Journal.find(params[:id])
+              else
+                current_user.journals.find(params[:id])
+              end
+  rescue ActiveRecord::RecordNotFound
+    redirect_to journals_path, alert: "指定された日記は存在しないか、アクセス権限がありません。"
   end
 
   # 新規作成フォーム表示
@@ -302,7 +290,10 @@ class JournalsController < ApplicationController
       'spider',
       'crawler'
     ]
-    crawler_patterns.any? { |pattern| user_agent.include?(pattern) }
+    Rails.logger.info "Checking crawler for User Agent: #{user_agent}"
+    is_crawler = crawler_patterns.any? { |pattern| user_agent.include?(pattern) }
+    Rails.logger.info "Is crawler? #{is_crawler}"
+    is_crawler
   end
 
   def check_crawler_or_authenticate
