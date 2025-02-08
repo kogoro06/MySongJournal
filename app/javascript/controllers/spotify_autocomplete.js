@@ -34,7 +34,6 @@ export function initializeSpotifyAutocomplete() {
       const controller = new AbortController();
       abortControllers.set(queryField, controller);
 
-      console.log(`🔍 オートコンプリートリクエスト: query="${query}", type="${type}"`);
 
       // Spotify APIに候補を問い合わせ
       fetch(`/spotify/autocomplete?query=${encodeURIComponent(query)}&type=${type}`, {

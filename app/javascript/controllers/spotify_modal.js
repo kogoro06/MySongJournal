@@ -5,8 +5,6 @@
  * モーダルの開閉とコンテンツのロードを管理する
  */
 export function initializeSpotifyModal() {
-  console.log('✅ Spotifyモーダルの初期化開始');
-
   // モーダル関連の要素を取得
   const openModalButton = document.getElementById('open-search-modal');
   const reopenModalButton = document.getElementById('reopen-search-modal');
@@ -25,7 +23,6 @@ export function initializeSpotifyModal() {
    * フォームの値を取得してモーダルコンテンツをロードする
    */
   async function openModal() {
-    console.log('🟢 モーダルを開きます');
     try {
       spotifyModal.showModal();
       
@@ -59,7 +56,6 @@ export function initializeSpotifyModal() {
    * モーダルを閉じてコンテンツをクリアする
    */
   function closeModal() {
-    console.log('🛑 モーダルを閉じます');
     spotifyModal.close();
     modalContent.innerHTML = '';
   }
@@ -84,19 +80,12 @@ export function initializeSpotifyModal() {
       const html = await response.text();
       modalContent.innerHTML = html;
 
-      console.log('🟢 モーダルコンテンツがロードされました');
-
-      // 関連モジュールを動的にインポートして初期化
-      import('./spotify_search.js')
-        .then((module) => module.initializeSearchConditions())
-        .catch((error) => console.error('❌ 検索条件モジュールの読み込みエラー:', error));
-
       import('./spotify_autocomplete.js')
         .then((module) => module.initializeSpotifyAutocomplete())
-        .catch((error) => console.error('❌ オートコンプリートモジュールの読み込みエラー:', error));
+        .catch((error) => console.error('オートコンプリートモジュールの読み込みエラー:', error));
     } catch (error) {
       modalContent.innerHTML = '<p class="text-red-500">検索フォームの読み込みに失敗しました。</p>';
-      console.error('❌ モーダルコンテンツのロードエラー:', error);
+      console.error('モーダルコンテンツのロードエラー:', error);
     }
   }
 

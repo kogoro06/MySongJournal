@@ -7,28 +7,19 @@ import "./controllers"
 // 🎵 Spotify関連機能のインポート
 // モーダルウィンドウの制御機能をインポート
 import { initializeSpotifyModal } from "./controllers/spotify_modal"
-// 楽曲検索の自動補完機能をインポート
-import { initializeSpotifyAutocomplete } from "./controllers/spotify_autocomplete"
-// 楽曲情報入力フィールドの制御機能をインポート
-import { initializeSpotifyInput } from "./controllers/spotify_input"
-
 /** 
  * ✨ Spotify関連機能の初期化
  * モーダル、オートコンプリート、入力フィールドの設定を行う
  * 各機能の初期化を順番に実行し、エラーハンドリングも行う
  */
 function initializeSpotifySearch() {
-  // 初期化開始のログを出力
-  console.log('🎯 Spotify関連機能の初期化開始');
 
   try {
     // モーダルウィンドウの初期化を実行
     initializeSpotifyModal();
-    console.log('✅ Spotifyモーダルが初期化されました');
 
     // 楽曲検索の自動補完機能を初期化
     initializeSpotifyAutocomplete();
-    console.log('✅ オートコンプリートが初期化されました');
 
     // 楽曲情報入力フィールドの初期化
     initializeSpotifyInput();
