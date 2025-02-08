@@ -46,11 +46,33 @@ class JournalsController < ApplicationController
 
   # 詳細表示
   def show
-    @journal = if crawler?
-                Journal.find(params[:id])
-              else
-                current_user.journals.find(params[:id])
-              end
+    # クローラーでもログインユーザーでもない場合は認証必要
+    if !user_signed_in? && !crawler?
+      authenticate_user!
+      return
+    end
+
+    @journal = Journal.friendly.find(params[:id])
+    @user = @journal.user
+    @user_name = @user.name
+
+    # 非公開記事の場合
+    if !@journal.public?
+      # クローラーでもなく未ログインの場合はログイン要求
+      if !user_signed_in? && !crawler?
+        store_location
+        redirect_to new_user_session_path, notice: "ログインしてください"
+        return
+      end
+      
+      # ログイン済みで自分の記事でない場合はアクセス拒否
+      if user_signed_in? && @journal.user != current_user
+        redirect_to journals_path, alert: "アクセス権限がありません"
+        return
+      end
+    end
+
+    prepare_meta_tags
   rescue ActiveRecord::RecordNotFound
     redirect_to journals_path, alert: "指定された日記は存在しないか、アクセス権限がありません。"
   end
