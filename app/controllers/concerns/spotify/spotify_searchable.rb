@@ -11,7 +11,7 @@ module Spotify::SpotifySearchable
         format.js { render partial: "spotify/search" }
       end
     end
-    
+
     @query_string = build_query_string
     if @query_string.blank?
       flash.now[:alert] = "検索条件が無効です。"
@@ -20,9 +20,9 @@ module Spotify::SpotifySearchable
         format.js { render partial: "spotify/search" }
       end
     end
-  
+
     perform_spotify_search
-  
+
     respond_to do |format|
       if @tracks.any?
         format.html { render "spotify/results", locals: { query_string: format_query_for_display(@query_string) } }
@@ -112,10 +112,10 @@ module Spotify::SpotifySearchable
 
   def format_query_for_display(query)
     {
-      'artist:' => 'アーティスト名:',
-      'track:' => '曲名:',
-      'album:' => 'アルバム名:',
-      'year:' => '年代:'
+      "artist:" => "アーティスト名:",
+      "track:" => "曲名:",
+      "album:" => "アルバム名:",
+      "year:" => "年代:"
     }.each do |eng, jpn|
       query = query.gsub(eng, jpn)
     end

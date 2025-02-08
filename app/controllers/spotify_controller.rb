@@ -13,7 +13,7 @@ class SpotifyController < ApplicationController
   include Spotify::SpotifyTrackSelectable
 
   before_action :authenticate_user!
-  before_action :set_per_page, only: [:search]
+  before_action :set_per_page, only: [ :search ]
 
   private
 
