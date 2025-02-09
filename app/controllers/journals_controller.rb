@@ -51,39 +51,21 @@ class JournalsController < ApplicationController
   # 日記の詳細を表示
   def show
     @journal = Journal.friendly.find(params[:id])
+    @user = @journal.user
+    @user_name = @user.name
+
     prepare_meta_tags if @journal.present?
 
     # クローラー以外はログインが必要
     if !user_signed_in? && !crawler?
-      authenticate_user!
-      nil
-    end
-  end
-
-    # 日記を取得
-    # friendly_findとは、friendly_idを使用しているモデルのfindメソッドで、
-    # モデルのslugを使用して日記を取得するメソッド
-    # slugは、日記のタイトルをURLに変換したもの
-    # 例えば、日記のタイトルが「My Song Journal」の場合、
-    # 日記のslugは「my-song-journal」になります。
-    # このslugを使用して日記を取得するメソッドがfriendly_findです。
-    @journal = Journal.friendly.find(params[:id])
-    # 日記の作成者を取得
-    @user = @journal.user
-    # 日記の作成者の名前を取得
-    @user_name = @user.name
-
-    # 非公開記事はログインが必要
-    unless @journal.public?
-      if !user_signed_in? && !crawler?
-        # 現在のURLをセッションに保存
+      # 非公開記事の場合
+      unless @journal.public?
         store_location
-        # ログイン画面にリダイレクト
         redirect_to new_user_session_path, notice: "ログインしてください"
         nil
       end
     end
-end
+  end
 
   # 新規作成フォームを表示
   def new
@@ -96,7 +78,6 @@ end
     @journal = Journal.new
     @journal.emotion = nil
 
-    # セッションから選択された曲の情報を復元
     if session[:selected_track].present?
       # 選択された曲の情報を日記に設定
       @journal.assign_attributes(
@@ -107,7 +88,6 @@ end
       )
     end
 
-    # セッションから保存されていたフォームの入力値を復元
     if session[:journal_form].present?
       # セッションから保存されていたフォームの入力値を復元
       form_data = session[:journal_form]
@@ -381,3 +361,4 @@ end
       journals_path
     end
   end
+end

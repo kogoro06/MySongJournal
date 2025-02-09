@@ -3,6 +3,18 @@ module Spotify::SpotifySearchable
   include Spotify::SpotifyApiRequestable
 
   def search
+    p "========== Spotify Search Debug =========="
+    p "Params: #{params}"
+    p "Journal Params: #{params[:journal]}"
+    p "Current Session: #{session[:journal_form]}"
+    p "========================================"
+
+    save_journal_form
+
+    p "========== After Save Debug =========="
+    p "Updated Session: #{session[:journal_form]}"
+    p "===================================="
+
     @tracks = []
     unless valid_search_params?
       flash.now[:alert] = "検索条件を入力してください。"
@@ -31,6 +43,27 @@ module Spotify::SpotifySearchable
         flash.now[:alert] = "検索結果が見つかりませんでした。"
         format.html { render partial: "spotify/search" }
         format.js { render partial: "spotify/search" }
+      end
+    end
+  end
+
+  def search_spotify
+    Rails.logger.debug "🔍 Search params: #{params.inspect}"
+
+    save_journal_form if params[:journal].present?
+
+    @query = params[:query]
+    if @query.present?
+      # ... 既存の検索処理 ...
+      respond_to do |format|
+        format.html
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "search_results",
+            partial: "spotify/search_results",
+            locals: { tracks: @tracks }
+          )
+        end
       end
     end
   end
@@ -120,5 +153,19 @@ module Spotify::SpotifySearchable
       query = query.gsub(eng, jpn)
     end
     query
+  end
+
+  def save_journal_form
+    return unless params[:journal].present?
+
+    session[:journal_form] = {
+      title: params[:journal][:title],
+      content: params[:journal][:content],
+      emotion: params[:journal][:emotion],
+      public: params[:journal][:public]
+    }
+    Rails.logger.info "✅ Form data saved in session: #{session[:journal_form]}"
+  rescue => e
+    Rails.logger.error "⚠️ Error saving form data: #{e.message}"
   end
 end
