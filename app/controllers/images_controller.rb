@@ -14,9 +14,9 @@ class ImagesController < ApplicationController
 
       # OGP画像生成処理
       image = generate_ogp_image(
-        album_image: params[:album_image],
-        title: params[:text],  # 完全なテキストをタイトルとして使用
-        emotion: "♪",         # デフォルト値として音符を使用
+        album_image: params[:album_image],  # 正しいパラメータ名に修正
+        title: params[:text],
+        emotion: "♪",
         song_name: song_name,
         artist_name: artist_name
       )
@@ -76,6 +76,36 @@ class ImagesController < ApplicationController
   end
 
   def generate_ogp_image(title:, emotion:, song_name:, artist_name:, album_image:)
-    # 既存の画像生成ロジック
+    # 画像の基本設定
+    image = MiniMagick::Image.new(1200, 630, "white")
+
+    # アルバムアート画像を読み込んで配置
+    album_art = MiniMagick::Image.open(album_image)
+    album_art.resize("400x400")
+    image.composite(album_art) do |c|
+      c.compose "Over"
+      c.geometry "+50+115"  # 左側に配置
+    end
+
+    # テキストを描画
+    draw = MiniMagick::Draw.new
+    draw.font("Arial")
+
+    # タイトル
+    draw.pointsize(48)
+    draw.text(480, 200, title)
+
+    # 感情
+    draw.pointsize(36)
+    draw.text(480, 300, "Emotion: #{emotion}")
+
+    # 曲名とアーティスト
+    draw.pointsize(32)
+    draw.text(480, 400, "#{song_name} by #{artist_name}")
+
+    # 描画を実行
+    draw.draw(image)
+
+    image
   end
 end
