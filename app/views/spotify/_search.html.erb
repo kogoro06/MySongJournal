@@ -8,40 +8,34 @@
 
   <!-- 🔍 検索条件 -->
   <div data-controller="spotify-search">
-    <%= form_tag spotify_search_path, method: :get, id: "spotify-search-form", class: "space-y-4" do %>
-      <div id="search-conditions">
-        <!-- 初期検索条件 -->
-        <div class="search-condition mt-4" data-condition-id="0">
-          <div class="mb-4">
-            <%= label_tag "search-type-0", "🔍 検索タイプ", class: "block text-md font-medium mb-2" %>
-            <%= select_tag "search_conditions[]", 
-                options_for_select([
-                  ["検索タイプを選択", ""],
-                  ["曲名", "track"],
-                  ["アーティスト名", "artist"],
-                  ["年代", "year"],
-                  ["キーワード", "keyword"]
-                ]), 
-                class: "select select-bordered w-full px-4 py-2 rounded-md bg-gray-700 text-white search-type-select",
-                data: { action: "spotify-search#toggleSearchInput" } %>
-          </div>
-
-          <!-- 動的に切り替わるコンテナ -->
-          <div class="mb-4" id="query-container-0">
-            <!-- テキスト入力フィールド -->
-            <div class="text-input-container">
-              <%= label_tag "text-input-0", "📝 検索キーワード", class: "block text-md font-medium mb-2" %>
-              <%= text_field_tag "search_values[]", nil, 
-                  placeholder: "キーワードを入力",
-                  class: "input input-bordered w-full px-4 py-2 rounded-md bg-gray-700 text-white" %>
+    <div data-spotify-search-target="conditionContainer">
+      <%= form_tag spotify_search_path, method: :get, id: "spotify-search-form", class: "space-y-4" do %>
+        <div id="search-conditions">
+          <!-- 検索条件 -->
+          <div class="search-condition mt-4" data-condition-id="0">
+            <div class="mb-4">
+              <%= label_tag "search-type-0", "🔍 検索タイプ", class: "block text-md font-medium mb-2" %>
+              <%= select_tag "search_conditions[]", 
+                  options_for_select([
+                    ["検索タイプを選択", ""],
+                    ["曲名", "track"],
+                    ["アーティスト名", "artist"],
+                    ["年代", "year"],
+                    ["キーワード", "keyword"]
+                  ]), 
+                  class: "select select-bordered w-full px-4 py-2 rounded-md bg-gray-700 text-white search-type-select",
+                  data: { action: "change->spotify-search#toggleSearchInput" } %>
             </div>
 
-            <!-- 年代選択プルダウン（初期状態では非表示） -->
-            <div class="year-select-container hidden">
-              <%= label_tag "year-select-0", "📅 年代選択", class: "block text-md font-medium mb-2" %>
+            <div class="mb-4">
+              <%= label_tag "search-keyword-0", "🔎 検索キーワード", class: "block text-md font-medium mb-2" %>
+              <!-- テキスト入力フィールド -->
+              <%= text_field_tag "search_values[]", nil, 
+                  class: "w-full px-4 py-2 rounded-md bg-gray-700 text-white search-keyword-input",
+                  placeholder: "キーワードを入力" %>
+              <!-- 年代選択プルダウン（初期状態では非表示） -->
               <%= select_tag "search_values[]",
                   options_for_select([
-                    ["年代を選択", ""],
                     ["1960年代", "1960s"],
                     ["1970年代", "1970s"],
                     ["1980年代", "1980s"],
@@ -50,32 +44,30 @@
                     ["2010年代", "2010s"],
                     ["2020年代", "2020s"]
                   ]),
-                  class: "select select-bordered w-full px-4 py-2 rounded-md bg-gray-700 text-white",
-                  disabled: true %>
+                  class: "w-full px-4 py-2 rounded-md bg-gray-700 text-white search-decade-select hidden",
+                  style: "display: none;" %>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- ➕ 検索条件の追加・削除ボタン -->
-      <div class="flex gap-4 mt-4">
-        <%= button_tag "➕ 検索条件を追加", 
-            type: "button",
-            id: "add-condition-btn",
-            class: "flex-1 px-4 py-2 bg-green-500 text-white font-medium rounded-md hover:bg-green-600",
-            data: { action: "spotify-search#addCondition" } %>
-        <%= button_tag "➖ 検索条件を削除",
-            type: "button", 
-            id: "remove-condition-btn",
-            class: "flex-1 px-4 py-2 bg-red-500 text-white font-medium rounded-md hover:bg-red-600",
-            data: { action: "spotify-search#removeCondition" } %>
-      </div>
+        <div class="flex gap-4 mt-4">
+          <%= button_tag "➕ 検索条件を追加", 
+              type: "button",
+              id: "add-condition-btn",
+              class: "flex-1 px-4 py-2 bg-green-500 text-white font-medium rounded-md hover:bg-green-600",
+              data: { action: "click->spotify-search#addCondition" } %>
+          <%= button_tag "➖ 検索条件を削除",
+              type: "button", 
+              id: "remove-condition-btn",
+              class: "flex-1 px-4 py-2 bg-red-500 text-white font-medium rounded-md hover:bg-red-600",
+              data: { action: "click->spotify-search#removeCondition" } %>
+        </div>
 
-      <!-- 🔎 検索ボタン -->
-      <div class="text-center mt-4">
-        <%= submit_tag "🔎 検索",
-            class: "w-full px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600" %>
-      </div>
-    <% end %>
+        <!-- 検索ボタン -->
+        <%= button_tag type: "submit", class: "w-full px-4 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 mt-4" do %>
+          🔍 検索
+        <% end %>
+      <% end %>
+    </div>
   </div>
 </div>

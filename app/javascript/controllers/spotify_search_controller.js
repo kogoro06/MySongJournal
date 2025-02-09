@@ -5,11 +5,13 @@ import { Controller } from "@hotwired/stimulus"
  * 検索条件の追加/削除や入力フィールドの切り替えを管理
  */
 export default class extends Controller {
+  static targets = ["conditionContainer"]
+
   /**
    * コントローラーが接続された時に呼ばれる
    */
   connect() {
-    console.log("Spotify Search controller connected")
+    console.log("Spotify Search Controller Connected")
   }
 
   /**
@@ -17,27 +19,41 @@ export default class extends Controller {
    * @param {Event} event - 変更イベント
    */
   toggleSearchInput(event) {
-    console.log("toggleSearchInput called")
-    const select = event.currentTarget
-    const conditionId = select.closest('.search-condition').dataset.conditionId
-    const queryContainer = document.getElementById(`query-container-${conditionId}`)
-    const textInputContainer = queryContainer.querySelector('.text-input-container')
-    const yearSelectContainer = queryContainer.querySelector('.year-select-container')
-
-    // 年選択の場合はyearSelectを表示、それ以外はテキスト入力を表示
+    const select = event.target
+    const container = select.closest('.search-condition')
+    const textInput = container.querySelector('.search-keyword-input')
+    const decadeSelect = container.querySelector('.search-decade-select')
+    
     if (select.value === 'year') {
-      console.log("Switching to year select")
-      textInputContainer.classList.add('hidden')
-      yearSelectContainer.classList.remove('hidden')
-      textInputContainer.querySelector('input').disabled = true
-      yearSelectContainer.querySelector('select').disabled = false
+      textInput.style.display = 'none'
+      textInput.disabled = true
+      decadeSelect.style.display = 'block'
+      decadeSelect.disabled = false
     } else {
-      console.log("Switching to text input")
-      textInputContainer.classList.remove('hidden')
-      yearSelectContainer.classList.add('hidden')
-      textInputContainer.querySelector('input').disabled = false
-      yearSelectContainer.querySelector('select').disabled = true
+      textInput.style.display = 'block'
+      textInput.disabled = false
+      decadeSelect.style.display = 'none'
+      decadeSelect.disabled = true
     }
+
+    // 他の検索条件の選択肢を更新
+    this.updateAvailableOptions()
+  }
+
+  updateAvailableOptions() {
+    const conditions = document.querySelectorAll('.search-condition')
+    const selectedValues = Array.from(conditions).map(condition => 
+      condition.querySelector('.search-type-select').value
+    )
+
+    conditions.forEach((condition, index) => {
+      const select = condition.querySelector('.search-type-select')
+      Array.from(select.options).forEach(option => {
+        if (option.value && option.value !== select.value) {
+          option.disabled = selectedValues.includes(option.value)
+        }
+      })
+    })
   }
 
   /**
@@ -47,37 +63,44 @@ export default class extends Controller {
    */
   addCondition(event) {
     event.preventDefault()
-    console.log("addCondition called")
     const conditions = document.querySelectorAll('.search-condition')
     const newId = conditions.length
     
     if (newId < 2) {  // 最大2つまで
-      // 既存の検索条件をクローン
       const template = document.querySelector('.search-condition').cloneNode(true)
       template.dataset.conditionId = newId
       
-      // 新しい要素のIDを更新
       template.querySelectorAll('[id]').forEach(el => {
         el.id = el.id.replace(/\d+/, newId)
       })
-
-      // イベントリスナーを設定
-      const newSelect = template.querySelector('.search-type-select');
-      newSelect.setAttribute('data-action', 'change->spotify-search#toggleSearchInput');
-
-      // フォーム要素をリセット
-      template.querySelector('select').value = ''
-      template.querySelector('input[type="text"]').value = ''
-      template.querySelector('select[id^="year-select"]').value = ''
-
-      // 表示状態を初期化
-      const textInputContainer = template.querySelector('.text-input-container')
-      const yearSelectContainer = template.querySelector('.year-select-container')
-      textInputContainer.classList.remove('hidden')
-      yearSelectContainer.classList.add('hidden')
-      textInputContainer.querySelector('input').disabled = false
-      yearSelectContainer.querySelector('select').disabled = true
-
+      
+      template.querySelectorAll('label').forEach(el => {
+        const forAttr = el.getAttribute('for')
+        if (forAttr) {
+          el.setAttribute('for', forAttr.replace(/\d+/, newId))
+        }
+      })
+      
+      // 入力値をリセット
+      template.querySelectorAll('input, select').forEach(el => {
+        if (el.classList.contains('search-decade-select')) {
+          el.style.display = 'none'
+          el.disabled = true
+          el.value = '1960s'  // デフォルト値を設定
+        } else if (el.classList.contains('search-keyword-input')) {
+          el.style.display = 'block'
+          el.disabled = false
+          el.value = ''
+        } else if (el.classList.contains('search-type-select')) {
+          el.value = ''
+          // 既に選択されている検索タイプを無効化
+          const selectedType = document.querySelector('.search-condition').querySelector('.search-type-select').value
+          if (selectedType) {
+            Array.from(el.options).find(opt => opt.value === selectedType).disabled = true
+          }
+        }
+      })
+      
       document.getElementById('search-conditions').appendChild(template)
     }
   }
@@ -89,10 +112,10 @@ export default class extends Controller {
    */
   removeCondition(event) {
     event.preventDefault()
-    console.log("removeCondition called")
     const conditions = document.querySelectorAll('.search-condition')
     if (conditions.length > 1) {
       conditions[conditions.length - 1].remove()
+      this.updateAvailableOptions()
     }
   }
 
@@ -151,5 +174,32 @@ export default class extends Controller {
     return animePatterns.some(pattern => 
       pattern.test(artistName) || pattern.test(songName)
     );
+  }
+
+  toggleDecade(event) {
+    const radio = event.target
+    const span = radio.nextElementSibling.nextElementSibling
+    const hiddenInput = radio.nextElementSibling
+    
+    // 他の全てのラジオボタンのスタイルをリセット
+    document.querySelectorAll('.decade-radio').forEach(r => {
+      const otherSpan = r.nextElementSibling.nextElementSibling
+      const otherHidden = r.nextElementSibling
+      if (r !== radio) {
+        otherSpan.classList.remove('bg-white', 'text-customblue')
+        otherSpan.classList.add('text-white')
+        otherHidden.disabled = true
+      }
+    })
+    
+    // 選択されたラジオボタンのスタイルを更新
+    if (radio.checked) {
+      span.classList.add('bg-white', 'text-customblue')
+      span.classList.remove('text-white')
+      hiddenInput.disabled = false
+    }
+    
+    // フォームを自動送信
+    radio.closest('form').requestSubmit()
   }
 }
