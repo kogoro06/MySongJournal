@@ -15,15 +15,12 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get ogp" do
-    # テスト用の日記データを作成
-    journal = journals(:one)  # fixtureを使用する場合
-
-    # OGP画像生成のパラメータを設定
+    # テストパラメータを直接指定
     get ogp_images_url(format: :png), params: {
-      title: journal.title,
-      emotion: journal.emotion,
-      song_name: journal.song_name,
-      artist_name: journal.artist_name
+      title: "テスト日記",
+      emotion: "喜",
+      song_name: "テスト曲",
+      artist_name: "テストアーティスト"
     }
 
     assert_response :success
