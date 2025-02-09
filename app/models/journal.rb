@@ -51,9 +51,9 @@ class Journal < ApplicationRecord
 
   def slug_candidates
     [
-      :title,
-      [ :title, :artist_name ],
-      [ :title, :artist_name, -> { (created_at || Time.current).strftime("%Y%m%d") } ]
+      [ :title, :artist_name ],  # まず曲名とアーティスト名の組み合わせを試す
+      [ :title, :artist_name, -> { (created_at || Time.current).strftime("%Y%m%d") } ],  # 日付も加える
+      [ :title, :artist_name, -> { (created_at || Time.current).strftime("%Y%m%d%H%M") } ]  # 分単位まで加える
     ]
   end
 
