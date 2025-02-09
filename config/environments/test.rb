@@ -66,4 +66,8 @@ Rails.application.configure do
       RSpotify.singleton_class.prepend(SpotifyMock)
     end
   end
+
+  # 一時ファイルの保存先を設定
+  config.active_storage.service = :test
+  config.tmp_path = Rails.root.join("tmp")
 end

@@ -15,25 +15,18 @@ class ImagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get ogp" do
-    Rails.logger.info "=== Starting OGP Test ==="
+    # テスト用の日記データを作成
+    journal = journals(:one)  # fixtureを使用する場合
 
-    # テスト用のダミー画像データを作成
-    dummy_image = "dummy_image_data"
+    # OGP画像生成のパラメータを設定
+    get ogp_images_url(format: :png), params: {
+      title: journal.title,
+      emotion: journal.emotion,
+      song_name: journal.song_name,
+      artist_name: journal.artist_name
+    }
 
-    # OgpCreator.buildメソッドをスタブ化
-    OgpCreator.stub(:build, dummy_image) do
-      text = "Today's song 🎵 Test Song by Test Artist 🎤"
-      album_image = "https://example.com/image.jpg"
-
-      get "/images/ogp.png", params: { text: text, album_image: album_image }
-
-      if response.status == 500
-        Rails.logger.error "Response body: #{response.body}"
-        Rails.logger.error "Response headers: #{response.headers}"
-      end
-
-      assert_response :success
-      assert_equal "image/png", response.content_type
-    end
+    assert_response :success
+    assert_equal "image/png", response.content_type
   end
 end

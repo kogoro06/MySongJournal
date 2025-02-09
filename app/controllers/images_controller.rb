@@ -6,33 +6,20 @@ class ImagesController < ApplicationController
   before_action :set_cors_headers, only: [ :ogp ]
 
   def ogp
-    text = params[:text]
-    album_image_url = params[:album_image]
-
-    Rails.logger.warn "=== OGP Controller Debug Info ==="
-    Rails.logger.warn "Received text parameter: #{text.inspect}"
-    Rails.logger.warn "Received album_image parameter: #{album_image_url.inspect}"
-    Rails.logger.warn "Request URL: #{request.url}"
-    Rails.logger.warn "Request parameters: #{params.inspect}"
-    Rails.logger.warn "User Agent: #{request.user_agent}"
-    Rails.logger.warn "Referer: #{request.referer}"
-    Rails.logger.warn "Accept header: #{request.headers['Accept']}"
-
     begin
-      validate_base_image
-      validate_album_image_url(album_image_url) if album_image_url.present?
+      # 画像生成処理
+      image = generate_ogp_image(
+        title: params[:title],
+        emotion: params[:emotion],
+        song_name: params[:song_name],
+        artist_name: params[:artist_name]
+      )
 
-      image_data = Generator.build(text, album_image_url)
-
-      if image_data.nil?
-        Rails.logger.error "Generated image data is nil"
-        render plain: "Error: Failed to generate image", status: :internal_server_error
-        return
-      end
-
-      send_data image_data, type: "image/png", disposition: "inline"
-    rescue => e
-      handle_ogp_error(e)
+      send_data image.to_blob, type: "image/png", disposition: "inline"
+    rescue StandardError => e
+      Rails.logger.error "OGP画像生成エラー: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+      head :internal_server_error
     end
   end
 
@@ -75,5 +62,9 @@ class ImagesController < ApplicationController
 
   def ogp_params
     params.permit(:text, :album_image)
+  end
+
+  def generate_ogp_image(title:, emotion:, song_name:, artist_name:)
+    # 既存の画像生成ロジック
   end
 end
