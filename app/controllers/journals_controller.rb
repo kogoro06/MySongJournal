@@ -62,7 +62,6 @@ class JournalsController < ApplicationController
         return
       end
     end
-
     prepare_meta_tags
   end
 
@@ -73,10 +72,10 @@ class JournalsController < ApplicationController
       session.delete(:selected_track)
       session.delete(:journal_form)
     end
-  
+
     @journal = Journal.new
     @journal.emotion = nil
-  
+
     # セッションから曲の情報を復元
     if session[:selected_track].present?
       @journal.assign_attributes(
@@ -86,7 +85,7 @@ class JournalsController < ApplicationController
         spotify_track_id: session[:selected_track]["spotify_track_id"]
       )
     end
-  
+
     # セッションからフォームの入力値を復元
     if session[:journal_form].present?
       form_data = session[:journal_form]
@@ -101,7 +100,7 @@ class JournalsController < ApplicationController
         emotion_key = Journal.emotions.key(form_data["emotion"])
         @journal.emotion = emotion_key if emotion_key.present?
       end
-  
+
       Rails.logger.info "✅ Form data restored from session: #{@journal.attributes}"
     else
       Rails.logger.warn "⚠️ No form data found in session"
