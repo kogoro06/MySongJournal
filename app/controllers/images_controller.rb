@@ -7,15 +7,21 @@ class ImagesController < ApplicationController
 
   def ogp
     begin
-      # Content-Typeヘッダーを明示的に設定
-      response.headers["Content-Type"] = "image/png"
+      # textパラメータからsong_nameとartist_nameを抽出
+      text_parts = params[:text].split(" - ")
+      song_name = text_parts[0]
+      artist_name = text_parts[1]
 
       # OGP画像生成処理
       image = generate_ogp_image(
         album_image: params[:album_image],
-        text: params[:text]
+        title: params[:text],  # 完全なテキストをタイトルとして使用
+        emotion: "♪",         # デフォルト値として音符を使用
+        song_name: song_name,
+        artist_name: artist_name
       )
 
+      response.headers["Content-Type"] = "image/png"
       send_data image.to_blob, type: "image/png", disposition: "inline"
     rescue StandardError => e
       Rails.logger.error "OGP画像生成エラー: #{e.message}"
