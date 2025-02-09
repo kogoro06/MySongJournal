@@ -79,7 +79,7 @@ class JournalsController < ApplicationController
         nil
       end
     end
-  end
+    prepare_meta_tags
 
   # 新規作成フォームを表示
   def new
@@ -92,7 +92,6 @@ class JournalsController < ApplicationController
     @journal = Journal.new
     @journal.emotion = nil
 
-    # セッションから選択された曲の情報を復元
     if session[:selected_track].present?
       # 選択された曲の情報を日記に設定
       @journal.assign_attributes(
@@ -103,7 +102,6 @@ class JournalsController < ApplicationController
       )
     end
 
-    # セッションから保存されていたフォームの入力値を復元
     if session[:journal_form].present?
       # セッションから保存されていたフォームの入力値を復元
       form_data = session[:journal_form]
