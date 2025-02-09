@@ -11,7 +11,7 @@
     <meta property="og:site_name" content="MY SONG JOURNAL">
     <meta property="og:locale" content="ja_JP">
     <meta property="og:type" content="article">
-    <meta property="og:url" content="<%= request.original_url %>">
+    <meta property="og:url" content="<%= @ogp_url || request.original_url %>">
     <% if @journal.present? %>
       <%
         # OGP用のテキストとパラメータを準備
