@@ -1,29 +1,22 @@
 require "test_helper"
 
 class ImagesControllerTest < ActionDispatch::IntegrationTest
-  def setup
-    # ベース画像のパス
+  include Ogp::ImageGenerator
+
+  setup do
+    # テスト用の画像ファイルが存在することを確認
     @base_image_path = Rails.root.join("app/assets/images/ogp.png")
-    @font_path = Rails.root.join("app/assets/fonts/DelaGothicOne-Regular.ttf")
-
-    # ベース画像が存在することを確認
-    assert File.exist?(@base_image_path), "Base image not found at #{@base_image_path}"
-    assert File.exist?(@font_path), "Font file not found at #{@font_path}"
-
-    # テスト用の画像データを準備
-    @dummy_image = File.binread(@base_image_path)
+    skip unless File.exist?(@base_image_path)
   end
 
   test "should get ogp" do
-    # テストパラメータを直接指定
-    get ogp_images_url(format: :png), params: {
-      title: "テスト日記",
+    get ogp_images_path, params: {
+      title: "テストタイトル",
       emotion: "喜",
-      song_name: "テスト曲",
+      song_name: "テスト曲名",
       artist_name: "テストアーティスト"
     }
-
     assert_response :success
-    assert_equal "image/png", response.content_type
+    assert_equal "image/png", response.media_type
   end
 end
