@@ -50,11 +50,15 @@ class JournalsController < ApplicationController
 
   # 日記の詳細を表示
   def show
+    @journal = Journal.friendly.find(params[:id])
+    prepare_meta_tags if @journal.present?
+
     # クローラー以外はログインが必要
     if !user_signed_in? && !crawler?
       authenticate_user!
-      return
+      nil
     end
+  end
 
     # 日記を取得
     # friendly_findとは、friendly_idを使用しているモデルのfindメソッドで、
@@ -79,7 +83,7 @@ class JournalsController < ApplicationController
         nil
       end
     end
-  end
+end
 
   # 新規作成フォームを表示
   def new
@@ -377,4 +381,3 @@ class JournalsController < ApplicationController
       journals_path
     end
   end
-end
