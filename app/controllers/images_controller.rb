@@ -75,7 +75,7 @@ class ImagesController < ApplicationController
     params.permit(:text, :album_image)
   end
 
-  def generate_ogp_image(title:, emotion:, song_name:, artist_name:)
+  def generate_ogp_image(title:, emotion:, song_name:, artist_name:, album_image:)
     # 既存の画像生成ロジック
   end
 end
