@@ -3,9 +3,11 @@ one:
   email: "test1@example.com"
   name: "テストユーザー1"
   encrypted_password: <%= Devise::Encryptor.digest(User, 'password') %>
+  confirmed_at: <%= Time.current %>
 
 two:
   id: 2
   email: "test2@example.com"
   name: "テストユーザー2"
   encrypted_password: <%= Devise::Encryptor.digest(User, 'password') %>
+  confirmed_at: <%= Time.current %>

@@ -1,7 +1,7 @@
 one:
   title: "テスト日記"
   content: "これはテスト用の日記です"
-  emotion: 0  # 喜 (enumの数値を指定)
+  emotion: 0  # 喜
   genre: "j_pop"
   song_name: "テスト曲"
   artist_name: "テストアーティスト"
@@ -9,7 +9,7 @@ one:
   preview_url: "https://example.com/preview1.mp3"
   spotify_track_id: "test123"
   public: true
-  user: one  # users.ymlのoneを参照
+  user_id: 1  # usersのoneのidを直接指定
   slug: "test-diary-1"
   created_at: <%= Time.current %>
   updated_at: <%= Time.current %>
@@ -17,7 +17,7 @@ one:
 two:
   title: "テスト日記2"
   content: "これは2つ目のテスト用日記です"
-  emotion: 3  # 楽 (enumの数値を指定)
+  emotion: 3  # 楽
   genre: "anime"
   song_name: "テスト曲2"
   artist_name: "テストアーティスト2"
@@ -25,7 +25,7 @@ two:
   preview_url: "https://example.com/preview2.mp3"
   spotify_track_id: "test456"
   public: false
-  user: two  # users.ymlのtwoを参照
+  user_id: 2  # usersのtwoのidを直接指定
   slug: "test-diary-2"
   created_at: <%= Time.current %>
   updated_at: <%= Time.current %>
