@@ -17,10 +17,9 @@
         # OGP用のテキストとパラメータを準備
         ogp_text = "#{@journal.song_name} - #{@journal.artist_name}"
         ogp_params = {
-          album_image: @journal.album_image,
           text: ogp_text,
-          journal_id: @journal.id,
-          updated_at: @journal.updated_at.to_i
+          album_image: @journal.album_image,
+          v: @journal.updated_at.to_i  # キャッシュバスティング用
         }
         ogp_url = "#{request.base_url}/images/ogp.png?" + ogp_params.to_param
       %>
