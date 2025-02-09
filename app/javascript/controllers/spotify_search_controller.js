@@ -12,6 +12,14 @@ export default class extends Controller {
    */
   connect() {
     console.log("Spotify Search Controller Connected")
+    // 既存の検索フィールドにオートコンプリートを設定
+    import('../controllers/spotify_autocomplete.js')
+      .then(module => {
+        module.initializeSpotifyAutocomplete();
+      })
+      .catch(error => {
+        console.error('オートコンプリートの初期化エラー:', error);
+      });
   }
 
   /**

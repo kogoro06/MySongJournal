@@ -7,7 +7,7 @@
   <p class="text-md text-center">2つの条件を組み合わせて検索できます</p>
 
   <!-- 🔍 検索条件 -->
-  <div data-controller="spotify-search">
+  <div data-controller="spotify-search autocomplete">
     <div data-spotify-search-target="conditionContainer">
       <%= form_tag spotify_search_path, method: :get, id: "spotify-search-form", class: "space-y-4" do %>
         <div id="search-conditions">
@@ -27,13 +27,21 @@
                   data: { action: "change->spotify-search#toggleSearchInput" } %>
             </div>
 
-            <div class="mb-4">
+            <div class="mb-4 relative">
               <%= label_tag "search-keyword-0", "🔎 検索キーワード", class: "block text-md font-medium mb-2" %>
               <!-- テキスト入力フィールド -->
               <%= text_field_tag "search_values[]", nil, 
                   class: "w-full px-4 py-2 rounded-md bg-gray-700 text-white search-keyword-input",
-                  placeholder: "キーワードを入力" %>
-              <!-- 年代選択プルダウン（初期状態では非表示） -->
+                  placeholder: "キーワードを入力",
+                  data: {
+                    autocomplete_target: "input",
+                    action: "input->autocomplete#search"
+                  } %>
+              <!-- オートコンプリート結果表示エリア -->
+              <div class="absolute w-full bg-gray-700 rounded-md mt-1 z-50 hidden"
+                   data-autocomplete-target="results">
+              </div>
+              <!-- 年代選択プルダウン -->
               <%= select_tag "search_values[]",
                   options_for_select([
                     ["1960年代", "1960s"],

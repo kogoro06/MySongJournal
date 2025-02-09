@@ -37,6 +37,12 @@ function initializeSpotifySearch() {
  * - turbo:render: Turboによるページレンダリング完了時
  * - DOMContentLoaded: 通常のページ読み込み完了時
  */
-document.addEventListener('turbo:load', initializeSpotifySearch);
-document.addEventListener('turbo:render', initializeSpotifySearch);
+document.addEventListener("turbo:load", () => {
+  initializeSpotifySearch();
+});
+
+document.addEventListener("turbo:render", () => {
+  initializeSpotifySearch();
+});
+
 document.addEventListener('DOMContentLoaded', initializeSpotifySearch);
