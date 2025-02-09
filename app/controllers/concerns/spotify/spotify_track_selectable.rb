@@ -18,11 +18,19 @@ module Spotify::SpotifyTrackSelectable
   end
 
   def save_journal_form
+    return unless params[:journal].present?
+    flash.now[:alert] = "フォームデータが存在しません"
+    # digメソッドは、ネストされたハッシュから安全に値を取得するメソッドです
+    # 例: params = { journal: { title: "タイトル" } } の場合
+    # params[:journal][:title] と書くと、params[:journal]がnilの時にエラーになります
+    # params.dig(:journal, :title) と書くと、途中がnilでもnilを返すだけで安全です
+    # 下記の場合、params[:journal]がnilの時もエラーにならずnilを返します
     session[:journal_form] = {
-      title: params[:journal][:title],
-      content: params[:journal][:content],
-      emotion: params[:journal][:emotion]
-    }
+      title: params.dig(:journal, :title),
+      content: params.dig(:journal, :content),
+      emotion: params.dig(:journal, :emotion),
+      public: params.dig(:journal, :public)
+    }.compact
   end
 
   def handle_selection_error(error)

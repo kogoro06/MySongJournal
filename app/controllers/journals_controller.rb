@@ -62,7 +62,6 @@ class JournalsController < ApplicationController
         return
       end
     end
-
     prepare_meta_tags
   end
 
