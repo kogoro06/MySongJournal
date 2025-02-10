@@ -22,14 +22,14 @@ class OgpCreator
       subtitle = text.sub(/^Today's song\s*/, "").strip
 
       # ベース画像を読み込む
-      base_image = MiniMagick::Image.open(BASE_IMAGE_PATH)
+      base_image = MiniMagick::Image.new(BASE_IMAGE_PATH)
       base_image.resize "#{IMAGE_WIDTH}x#{IMAGE_HEIGHT}"
 
       # アルバム画像の追加（存在する場合）
       if album_image_url.present?
         begin
           Rails.logger.info "Downloading album image..."
-          album_image = MiniMagick::Image.open(album_image_url)
+          album_image = MiniMagick::Image.new(album_image_url)
           album_image.resize "#{ALBUM_IMAGE_SIZE}x#{ALBUM_IMAGE_SIZE}"
 
           # 一時ファイルに保存
@@ -37,7 +37,7 @@ class OgpCreator
           album_image.write(temp_album.path)
 
           # 画像を合成
-          base_image = base_image.composite(MiniMagick::Image.open(temp_album.path)) do |c|
+          base_image = base_image.composite(MiniMagick::Image.new(temp_album.path)) do |c|
             c.compose "Over"
             c.geometry "+#{(IMAGE_WIDTH - ALBUM_IMAGE_SIZE) / 2}+#{ALBUM_Y_OFFSET}"
           end
@@ -57,7 +57,7 @@ class OgpCreator
 
       begin
         # テキストを追加
-        result = MiniMagick::Image.open(temp_base.path)
+        result = MiniMagick::Image.new(temp_base.path)
 
         # タイトルを追加
         result.combine_options do |c|
@@ -69,24 +69,23 @@ class OgpCreator
         end
 
         # サブタイトルを追加
-        result.combine_options do |c|
-          c.gravity "south"
-          c.font FONT_PATH
-          c.pointsize SUBTITLE_FONT_SIZE
-          c.fill "black"
-          c.annotate "+0+#{SUBTITLE_Y_OFFSET}", subtitle
+        if subtitle.present?
+          result.combine_options do |c|
+            c.gravity "south"
+            c.font FONT_PATH
+            c.pointsize SUBTITLE_FONT_SIZE
+            c.fill "black"
+            c.annotate "+0+#{SUBTITLE_Y_OFFSET}", subtitle
+          end
         end
 
-        # 最終画像をバイナリで返す
+        # 最終的な画像をバイナリで返す
+        result.format "png"
         result.to_blob
       ensure
         temp_base.close
         temp_base.unlink
       end
-    rescue => e
-      Rails.logger.error "Error in OgpCreator.build: #{e.message}"
-      Rails.logger.error e.backtrace.join("\n")
-      raise
     end
   end
 end
