@@ -2,8 +2,8 @@ class ImagesController < ApplicationController
   include Ogp::ImageGenerator
 
   skip_before_action :authenticate_user!, raise: false
-  skip_before_action :verify_authenticity_token, only: [:ogp]
-  before_action :set_cors_headers, only: [:ogp]
+  skip_before_action :verify_authenticity_token, only: [ :ogp ]
+  before_action :set_cors_headers, only: [ :ogp ]
 
   def ogp
     begin
@@ -44,11 +44,11 @@ class ImagesController < ApplicationController
       c.font font_path
       c.fill "#333333"
       c.gravity "North"  # 上端を基準に
-      
+
       # 曲名（上部）
       c.pointsize 48
       c.draw "text 0,40 '#{song_name}'"  # 上部の余白を増やす
-      
+
       # アーティスト名
       c.pointsize 36
       c.draw "text 0,110 '#{artist_name}'"  # 曲名との間隔を広げる
@@ -59,7 +59,7 @@ class ImagesController < ApplicationController
       begin
         album_art = MiniMagick::Image.open(album_image)
         album_art.resize "350x350"  # サイズを少し小さく
-        
+
         image = image.composite(album_art) do |c|
           c.compose "Over"
           c.gravity "Center"
