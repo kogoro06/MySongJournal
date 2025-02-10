@@ -59,6 +59,7 @@ gem "image_processing", "~> 1.2"
 gem "meta-tags", require: "meta_tags"
 gem "aws-sdk-s3"
 
+
 # Security
 gem "rack-attack"
 
@@ -86,4 +87,7 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
   gem "mocha"
+  gem "webmock"
+  gem "rspec-rails"
+  gem "factory_bot_rails"
 end
