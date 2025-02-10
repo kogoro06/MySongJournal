@@ -1,19 +1,31 @@
-journal_one:
-  title: "Test Journal 1"
-  content: "This is the content of test journal 1."
-  emotion: 0
-  artist_name: "Test Artist 1"
-  song_name: "Test Song 1"
-  preview_url: "http://example.com/preview1"
-  album_image: "http://example.com/album1.jpg"
-  user_id: 1 # 正しいカラム名を使用
+one:
+  title: "テスト日記"
+  content: "これはテスト用の日記です"
+  emotion: 0  # 喜
+  genre: "j_pop"
+  song_name: "テスト曲"
+  artist_name: "テストアーティスト"
+  album_image: "https://example.com/test.jpg"
+  preview_url: "https://example.com/preview1.mp3"
+  spotify_track_id: "test123"
+  public: true
+  user_id: 980190962  # users.ymlで設定したIDと一致させる
+  slug: "test-diary-1"
+  created_at: <%= Time.current %>
+  updated_at: <%= Time.current %>
 
-journal_two:
-  title: "Test Journal 2"
-  content: "This is the content of test journal 2."
-  emotion: 1
-  artist_name: "Test Artist 2"
-  song_name: "Test Song 2"
-  preview_url: "http://example.com/preview2"
-  album_image: "http://example.com/album2.jpg"
-  user_id: 2 # 正しいカラム名を使用
+two:
+  title: "テスト日記2"
+  content: "これは2つ目のテスト用日記です"
+  emotion: 3  # 楽
+  genre: "anime"
+  song_name: "テスト曲2"
+  artist_name: "テストアーティスト2"
+  album_image: "https://example.com/test2.jpg"
+  preview_url: "https://example.com/preview2.mp3"
+  spotify_track_id: "test456"
+  public: false
+  user_id: 980190963  # users.ymlで設定したIDと一致させる
+  slug: "test-diary-2"
+  created_at: <%= Time.current %>
+  updated_at: <%= Time.current %>

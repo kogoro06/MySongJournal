@@ -8,3 +8,6 @@ import { application } from "./application"
 // 🔐 パスワードの表示/非表示を切り替えるコントローラー
 import PasswordVisibilityController from "./password_visibility_controller"
 application.register("password-visibility", PasswordVisibilityController)
+
+import SpotifySearchController from "./spotify_search_controller"
+application.register("spotify-search", SpotifySearchController)

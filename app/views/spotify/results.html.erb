@@ -8,6 +8,9 @@
       </h1>
     </div>
 
+    <!-- 検索フォームのパーシャルを追加 -->
+    <%= render 'spotify/search' %>
+
     <% if @tracks.present? %>
       <!-- 検索結果数の表示 -->
       <% if @total_count&.positive? %>
@@ -83,33 +86,6 @@
         <p class="text-gray-600 text-lg">検索結果が見つかりませんでした。</p>
       </div>
     <% end %>
-
-    <!-- 再検索フォーム -->
-    <div class="mt-6">
-      <div class="bg-gray-300 rounded-lg shadow p-4">
-        <%= render partial: 'spotify/search' %>
-      </div>
-    </div>
   </div>
 </div>
 
-<style>
-  .pagination {
-    @apply flex justify-center gap-2;
-  }
-  .pagination span {
-    @apply inline-block;
-  }
-  .pagination .page {
-    @apply px-4 py-2 bg-gray-500 text-white font-medium rounded shadow-md hover:bg-gray-600 text-center text-sm;
-  }
-  .pagination .page.current {
-    @apply bg-customred;
-  }
-  .pagination .prev, .pagination .next {
-    @apply px-4 py-2 bg-gray-500 text-white font-medium rounded shadow-md hover:bg-gray-600 text-center text-sm;
-  }
-  .pagination .gap {
-    @apply px-2 text-gray-600;
-  }
-</style>

@@ -226,6 +226,8 @@ GEM
     mini_magick (4.13.2)
     mini_mime (1.1.5)
     minitest (5.25.4)
+    mocha (2.7.1)
+      ruby2_keywords (>= 0.0.5)
     msgpack (1.7.5)
     multi_xml (0.7.1)
       bigdecimal (~> 3.1)
@@ -387,6 +389,7 @@ GEM
     ruby-vips (2.2.2)
       ffi (~> 1.12)
       logger
+    ruby2_keywords (0.0.5)
     rubyzip (2.3.2)
     securerandom (0.4.0)
     selenium-webdriver (4.27.0)
@@ -475,6 +478,7 @@ DEPENDENCIES
   letter_opener_web
   meta-tags
   mini_magick
+  mocha
   omniauth-google-oauth2
   omniauth-rails_csrf_protection
   pg (~> 1.1)
