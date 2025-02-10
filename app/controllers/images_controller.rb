@@ -2,25 +2,24 @@ class ImagesController < ApplicationController
   include Ogp::ImageGenerator
 
   skip_before_action :authenticate_user!, raise: false
-  skip_before_action :verify_authenticity_token, only: [ :ogp ]
-  before_action :set_cors_headers, only: [ :ogp ]
+  skip_before_action :verify_authenticity_token, only: [:ogp]
+  before_action :set_cors_headers, only: [:ogp]
 
   def ogp
     begin
-      # textパラメータからsong_nameとartist_nameを抽出
-      text_parts = params[:text].split(" - ")
+      # パラメータの取得と整形
+      text_parts = params[:text].to_s.split(" - ")
       song_name = text_parts[0]
       artist_name = text_parts[1]
 
-      # OGP画像生成処理
+      # OGP画像生成
       image = generate_ogp_image(
-        album_image: params[:album_image],  # 正しいパラメータ名に修正
-        title: params[:text],
-        emotion: "♪",
+        album_image: params[:album_image],
         song_name: song_name,
         artist_name: artist_name
       )
 
+      # レスポンスの設定
       response.headers["Content-Type"] = "image/png"
       send_data image.to_blob, type: "image/png", disposition: "inline"
     rescue StandardError => e
@@ -32,25 +31,66 @@ class ImagesController < ApplicationController
 
   private
 
-  def validate_base_image
+  def generate_ogp_image(album_image:, song_name:, artist_name:)
+    # ベース画像の読み込み
     base_image_path = Rails.root.join("app/assets/images/ogp.png")
-    unless File.exist?(base_image_path)
-      Rails.logger.error "Base image not found at: #{base_image_path}"
-      raise "Base image not found"
-    end
-  end
+    image = MiniMagick::Image.open(base_image_path)
 
-  def validate_album_image_url(url)
-    uri = URI.parse(url)
-    unless uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
-      raise "Invalid album image URL format"
-    end
-  end
+    # フォントの設定
+    font_path = Rails.root.join("app/assets/fonts/DelaGothicOne-Regular.ttf").to_s
 
-  def handle_ogp_error(error)
-    Rails.logger.error "Error in OGP generation: #{error.message}"
-    Rails.logger.error error.backtrace.join("\n")
-    render plain: "Error: #{error.message}", status: :internal_server_error
+    # テキストとアルバムアートを中央揃えで配置
+    image.combine_options do |c|
+      c.font font_path
+      c.fill "#333333"
+      c.gravity "North"  # 上端を基準に
+      
+      # 曲名（上部）
+      c.pointsize 48
+      c.draw "text 0,40 '#{song_name}'"  # 上部の余白を増やす
+      
+      # アーティスト名
+      c.pointsize 36
+      c.draw "text 0,110 '#{artist_name}'"  # 曲名との間隔を広げる
+    end
+
+    # アルバムアート
+    if album_image.present?
+      begin
+        album_art = MiniMagick::Image.open(album_image)
+        album_art.resize "350x350"  # サイズを少し小さく
+        
+        image = image.composite(album_art) do |c|
+          c.compose "Over"
+          c.gravity "Center"
+          c.geometry "+0+30"  # 中央よりやや下に
+        end
+      rescue => e
+        Rails.logger.error "アルバム画像の処理に失敗: #{e.message}"
+      end
+    end
+
+    # MY-SONG-JOURNALとURL
+    image.combine_options do |c|
+      c.font font_path
+      c.fill "#333333"
+      c.gravity "South"  # 下端を基準に
+
+      # MY-SONG-JOURNAL
+      c.pointsize 36
+      c.draw "text 0,-100 'MY-SONG-JOURNAL'"  # 下部の余白を増やす
+
+      # URL
+      c.pointsize 24
+      c.draw "text 0,-50 'og.nullnull.dev'"  # MY-SONG-JOURNALとの間隔を広げる
+    end
+
+    # デバッグ用：生成された画像を一時ファイルに保存
+    temp_path = "/tmp/debug_ogp_#{Time.now.to_i}.png"
+    image.write(temp_path)
+    Rails.logger.info "Debug: OGP image saved to #{temp_path}"
+
+    image
   end
 
   def set_cors_headers
@@ -69,43 +109,5 @@ class ImagesController < ApplicationController
     response.headers["Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept"
     response.headers["Cache-Control"] = "public, max-age=31536000"
     response.headers["Expires"] = 1.year.from_now.httpdate
-  end
-
-  def ogp_params
-    params.permit(:text, :album_image)
-  end
-
-  def generate_ogp_image(title:, emotion:, song_name:, artist_name:, album_image:)
-    # 画像の基本設定
-    image = MiniMagick::Image.new(1200, 630, "white")
-
-    # アルバムアート画像を読み込んで配置
-    album_art = MiniMagick::Image.open(album_image)
-    album_art.resize("400x400")
-    image.composite(album_art) do |c|
-      c.compose "Over"
-      c.geometry "+50+115"  # 左側に配置
-    end
-
-    # テキストを描画
-    draw = MiniMagick::Draw.new
-    draw.font("Arial")
-
-    # タイトル
-    draw.pointsize(48)
-    draw.text(480, 200, title)
-
-    # 感情
-    draw.pointsize(36)
-    draw.text(480, 300, "Emotion: #{emotion}")
-
-    # 曲名とアーティスト
-    draw.pointsize(32)
-    draw.text(480, 400, "#{song_name} by #{artist_name}")
-
-    # 描画を実行
-    draw.draw(image)
-
-    image
   end
 end
