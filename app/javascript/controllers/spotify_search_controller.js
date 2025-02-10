@@ -32,6 +32,20 @@ export default class extends Controller {
     const textInput = container.querySelector('.search-keyword-input')
     const decadeSelect = container.querySelector('.search-decade-select')
     
+    // 入力値をクリア
+    textInput.value = ''
+    decadeSelect.value = ''
+    
+    // 検索タイプに応じてプレースホルダーを設定
+    const placeholders = {
+      'track': '曲名を入力',
+      'artist': 'アーティスト名を入力',
+      'keyword': 'キーワードを入力',
+      'year': '年代を選択',
+      '': '検索タイプを選択してください'
+    }
+    textInput.placeholder = placeholders[select.value] || placeholders['']
+    
     if (select.value === 'year') {
       textInput.style.display = 'none'
       textInput.disabled = true
