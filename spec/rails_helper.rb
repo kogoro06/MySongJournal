@@ -7,8 +7,21 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 # Uncomment the line below in case you have `--require rails_helper` in the `.rspec` file
 # that will avoid rails generators crashing because migrations haven't been run yet
 # return unless Rails.env.test?
-require 'rspec/rails'
-require 'webmock/rspec'
+require 'rspec/rails' # RSpecの設定を読み込む
+require 'capybara/rspec' # Capybaraの設定を読み込む
+require 'webmock/rspec' # WebMockの設定を読み込む
+require 'mocha/minitest' # Mochaの設定を読み込む
+
+# 外部へのHTTPリクエストを禁止
+WebMock.disable_net_connect!(allow_localhost: true) # ローカル環境では許可
+# Capybaraのデフォルトドライバを設定
+Capybara.default_driver = :selenium_chrome # Chromeを使用
+Capybara.javascript_driver = :selenium_chrome_headless # ヘッドレスモード
+
+RSpec.configure do |config|
+  config.include FactoryBot::Syntax::Methods # FactoryBotのメソッドを使用可能にする
+end
+
 # Add additional requires below this line. Rails is not loaded until this point!
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
