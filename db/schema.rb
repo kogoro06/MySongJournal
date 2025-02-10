@@ -131,8 +131,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_09_190930) do
     t.datetime "updated_at", null: false
     t.text "bio"
     t.string "x_link"
+    t.string "provider", default: "", null: false
     t.string "uid"
-    t.string "provider"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
