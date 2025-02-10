@@ -45,6 +45,12 @@ export default class extends Controller {
       }
     }
     
+    // ul要素の候補リストもクリア
+    const suggestionList = textInput.nextElementSibling
+    if (suggestionList && suggestionList.tagName === 'UL') {
+      suggestionList.remove()
+    }
+    
     // 検索タイプに応じてプレースホルダーを設定
     const placeholders = {
       'track': '曲名を入力',
