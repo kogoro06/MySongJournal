@@ -89,5 +89,5 @@ group :test do
   gem "mocha"
   gem "webmock"
   gem "rspec-rails"
-  gem "factory_bot_rails" 
+  gem "factory_bot_rails"
 end
