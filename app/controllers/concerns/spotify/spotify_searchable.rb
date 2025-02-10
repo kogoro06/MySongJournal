@@ -16,20 +16,31 @@ module Spotify::SpotifySearchable
     p "===================================="
 
     @tracks = []
+    # モーダルからのリクエストかどうかを判定
+    is_modal = request.xhr? || params[:modal].present?
+
     unless valid_search_params?
-      flash.now[:alert] = "検索条件を入力してください。"
+      flash[:alert] = "検索条件を入力してください。"
       return respond_to do |format|
-        format.html { render partial: "spotify/search" }
-        format.js { render partial: "spotify/search" }
+        if is_modal
+          format.html { render partial: "spotify/search", layout: false }
+          format.js { render partial: "spotify/search", layout: false }
+        else
+          format.html { redirect_to(request.referer || root_path) }
+        end
       end
     end
 
     @query_string = build_query_string
     if @query_string.blank?
-      flash.now[:alert] = "検索条件が無効です。"
+      flash[:alert] = "検索条件が無効です。"
       return respond_to do |format|
-        format.html { render partial: "spotify/search" }
-        format.js { render partial: "spotify/search" }
+        if is_modal
+          format.html { render partial: "spotify/search", layout: false }
+          format.js { render partial: "spotify/search", layout: false }
+        else
+          format.html { redirect_to(request.referer || root_path) }
+        end
       end
     end
 
@@ -40,9 +51,13 @@ module Spotify::SpotifySearchable
         format.html { render "spotify/results", locals: { query_string: format_query_for_display(@query_string) } }
         format.js { render "spotify/results", locals: { query_string: format_query_for_display(@query_string) } }
       else
-        flash.now[:alert] = "検索結果が見つかりませんでした。"
-        format.html { render partial: "spotify/search" }
-        format.js { render partial: "spotify/search" }
+        flash[:alert] = "検索結果が見つかりませんでした。"
+        if is_modal
+          format.html { render partial: "spotify/search", layout: false }
+          format.js { render partial: "spotify/search", layout: false }
+        else
+          format.html { redirect_to(request.referer || root_path) }
+        end
       end
     end
   end
