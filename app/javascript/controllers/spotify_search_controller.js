@@ -36,6 +36,21 @@ export default class extends Controller {
     textInput.value = ''
     decadeSelect.value = ''
     
+    // オートコンプリートの候補をクリア
+    const datalist = textInput.getAttribute('list')
+    if (datalist) {
+      const datalistElement = document.getElementById(datalist)
+      if (datalistElement) {
+        datalistElement.innerHTML = ''
+      }
+    }
+    
+    // ul要素の候補リストもクリア
+    const suggestionList = textInput.nextElementSibling
+    if (suggestionList && suggestionList.tagName === 'UL') {
+      suggestionList.remove()
+    }
+    
     // 検索タイプに応じてプレースホルダーを設定
     const placeholders = {
       'track': '曲名を入力',
@@ -57,7 +72,7 @@ export default class extends Controller {
       decadeSelect.style.display = 'none'
       decadeSelect.disabled = true
     }
-
+    
     // 他の検索条件の選択肢を更新
     this.updateAvailableOptions()
   }
