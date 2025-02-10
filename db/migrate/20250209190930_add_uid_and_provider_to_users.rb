@@ -11,15 +11,15 @@ class AddUidAndProviderToUsers < ActiveRecord::Migration[7.0]
     end
 
     # インデックスが存在しない場合のみ追加
-    unless index_exists?(:users, [:uid, :provider])
-      add_index :users, [:uid, :provider], unique: true
+    unless index_exists?(:users, [ :uid, :provider ])
+      add_index :users, [ :uid, :provider ], unique: true
     end
   end
 
   def down
     # インデックスが存在する場合のみ削除
-    if index_exists?(:users, [:uid, :provider])
-      remove_index :users, [:uid, :provider]
+    if index_exists?(:users, [ :uid, :provider ])
+      remove_index :users, [ :uid, :provider ]
     end
 
     # uidカラムが存在する場合のみ削除
