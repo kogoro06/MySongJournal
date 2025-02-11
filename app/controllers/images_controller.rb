@@ -8,7 +8,6 @@ class ImagesController < ApplicationController
   def ogp
     Rails.logger.info "OGP Request Parameters: #{params.inspect}"
     Rails.logger.info "User Agent: #{request.user_agent}"
-    Rails.logger.info "Request Headers: #{request.headers.to_h.select { |k, _| k.start_with?('HTTP_') }}"
 
     begin
       # パラメータの取得と整形
@@ -16,19 +15,40 @@ class ImagesController < ApplicationController
       song_name = text_parts[0]
       artist_name = text_parts[1]
 
-      Rails.logger.info "Generating OGP image for song: #{song_name}, artist: #{artist_name}"
+      cache_key = "ogp/#{Digest::MD5.hexdigest([song_name, artist_name, params[:album_image]].join('_'))}"
+      Rails.logger.info "Cache key: #{cache_key}"
+      
+      image_data = Rails.cache.fetch(cache_key, expires_in: 1.week) do
+        Rails.logger.info "Cache miss - Generating new OGP image"
+        Rails.logger.info "Generating OGP image for song: #{song_name}, artist: #{artist_name}"
 
-      # OGP画像生成
-      image = generate_ogp_image(
-        album_image: params[:album_image],
-        song_name: song_name,
-        artist_name: artist_name
-      )
+        # 画像生成とバイナリデータへの変換を一度に行う
+        image = generate_ogp_image(
+          album_image: params[:album_image],
+          song_name: song_name,
+          artist_name: artist_name
+        )
+        
+        Rails.logger.info "Image generated successfully, converting to blob"
+        blob = image.to_blob
+        image.destroy!
+        blob
+      end
 
-      # レスポンスの設定
+      Rails.logger.info "Image data size: #{image_data.bytesize} bytes"
+
+      # レスポンスヘッダーの設定
       response.headers["Content-Type"] = "image/png"
       response.headers["Cache-Control"] = "public, max-age=31536000"
-      send_data image.to_blob, type: "image/png", disposition: "inline"
+      response.headers["ETag"] = %("#{Digest::MD5.hexdigest(image_data)}")
+
+      # 条件付きGETのチェック
+      if stale?(etag: response.headers["ETag"])
+        Rails.logger.info "Sending image data..."
+        send_data image_data, type: "image/png", disposition: "inline"
+      else
+        Rails.logger.info "304 Not Modified response sent"
+      end
     rescue StandardError => e
       Rails.logger.error "OGP画像生成エラー: #{e.message}"
       Rails.logger.error "Backtrace: #{e.backtrace.join("\n")}"
@@ -36,6 +56,7 @@ class ImagesController < ApplicationController
       
       # デフォルトのOGP画像を返す
       default_ogp_path = Rails.root.join("app/assets/images/ogp.png")
+      Rails.logger.info "Sending default OGP image: #{default_ogp_path}"
       send_file default_ogp_path, type: "image/png", disposition: "inline"
     end
   end
@@ -43,64 +64,51 @@ class ImagesController < ApplicationController
   private
 
   def generate_ogp_image(album_image:, song_name:, artist_name:)
-    # ベース画像の読み込み
+    Rails.logger.info "Starting OGP image generation"
+    start_time = Time.current
+
     base_image_path = Rails.root.join("app/assets/images/ogp.png")
     image = MiniMagick::Image.open(base_image_path)
-
-    # フォントの設定
     font_path = Rails.root.join("app/assets/fonts/DelaGothicOne-Regular.ttf").to_s
 
-    # テキストとアルバムアートを中央揃えで配置
+    # テキストを追加
     image.combine_options do |c|
       c.font font_path
       c.fill "#333333"
-      c.gravity "North"  # 上端を基準に
-
-      # 曲名（上部）
+      c.gravity "North"
       c.pointsize 48
-      c.draw "text 0,40 '#{song_name}'"  # 上部の余白を増やす
-
-      # アーティスト名
+      c.draw "text 0,40 '#{song_name}'"
       c.pointsize 36
-      c.draw "text 0,110 '#{artist_name}'"  # 曲名との間隔を広げる
+      c.draw "text 0,110 '#{artist_name}'"
     end
 
     # アルバムアート
     if album_image.present?
       begin
         album_art = MiniMagick::Image.open(album_image)
-        album_art.resize "350x350"  # サイズを少し小さく
-
+        album_art.resize "350x350"
         image = image.composite(album_art) do |c|
           c.compose "Over"
           c.gravity "Center"
-          c.geometry "+0+30"  # 中央よりやや下に
+          c.geometry "+0+30"
         end
       rescue => e
         Rails.logger.error "アルバム画像の処理に失敗: #{e.message}"
       end
     end
 
-    # MY-SONG-JOURNALとURL
+    # フッター
     image.combine_options do |c|
       c.font font_path
       c.fill "#333333"
-      c.gravity "South"  # 下端を基準に
-
-      # MY-SONG-JOURNAL
+      c.gravity "South"
       c.pointsize 36
-      c.draw "text 0,-100 'MY-SONG-JOURNAL'"  # 下部の余白を増やす
-
-      # URL
+      c.draw "text 0,-100 'MY-SONG-JOURNAL'"
       c.pointsize 24
-      c.draw "text 0,-50 'og.nullnull.dev'"  # MY-SONG-JOURNALとの間隔を広げる
+      c.draw "text 0,-50 'og.nullnull.dev'"
     end
 
-    # デバッグ用：生成された画像を一時ファイルに保存
-    temp_path = "/tmp/debug_ogp_#{Time.now.to_i}.png"
-    image.write(temp_path)
-    Rails.logger.info "Debug: OGP image saved to #{temp_path}"
-
+    Rails.logger.info "OGP image generation completed in #{Time.current - start_time} seconds"
     image
   end
 
@@ -109,7 +117,9 @@ class ImagesController < ApplicationController
       "https://ogp.buta3.net",
       "https://cards-dev.twitter.com",
       "https://twitter.com",
-      "https://x.com"
+      "https://x.com",
+      "https://www.facebook.com",
+      "https://l.facebook.com"
     ]
 
     if allowed_origins.include?(request.headers["Origin"])
