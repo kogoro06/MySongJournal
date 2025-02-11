@@ -23,7 +23,7 @@ module Spotify::SpotifyApiRequestable
     }
   end
 
-  def handle_unauthorized_access
+  def handle_unauthorized_access(endpoint, params)
     @attempts ||= 0
     @attempts += 1
     if @attempts < MAX_ATTEMPTS
