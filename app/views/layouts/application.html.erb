@@ -12,38 +12,16 @@
     <meta property="og:locale" content="ja_JP">
     <meta property="og:type" content="article">
     <meta property="og:url" content="<%= @ogp_url || request.original_url %>">
-    <% if @journal.present? %>
-      <%
-        # OGP用のテキストとパラメータを準備
-        ogp_text = "#{@journal.song_name} - #{@journal.artist_name}"
-        ogp_params = {
-          text: ogp_text,
-          album_image: @journal.album_image,
-          v: @journal.updated_at.to_i  # キャッシュバスティング用
-        }
-        ogp_url = "#{request.base_url}/images/ogp.png?" + ogp_params.to_param
-      %>
-      <meta property="og:title" content="<%= @journal.song_name || 'MY SONG JOURNAL' %>">
-      <meta property="og:description" content="<%= @journal.artist_name || '音楽と一緒に日々の思い出を記録しよう' %>">
-      <meta property="og:image" content="<%= ogp_url %>">
-    <% else %>
-      <meta property="og:title" content="MY SONG JOURNAL">
-      <meta property="og:description" content="音楽と一緒に日々の思い出を記録しよう">
-      <meta property="og:image" content="<%= "#{request.base_url}/images/ogp.png" %>">
-    <% end %>
+    <meta property="og:title" content="<%= @ogp_title || 'MY SONG JOURNAL' %>">
+    <meta property="og:description" content="<%= @ogp_description || '音楽と一緒に日々の思い出を記録しよう' %>">
+    <meta property="og:image" content="<%= @ogp_image || "#{request.base_url}/images/ogp.png" %>">
 
     <%# Twitterカード %>
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@MySongJournal">
-    <% if @journal.present? %>
-      <meta name="twitter:title" content="<%= @journal.song_name || 'MY SONG JOURNAL' %>">
-      <meta name="twitter:description" content="<%= @journal.artist_name || '音楽と一緒に日々の思い出を記録しよう' %>">
-      <meta name="twitter:image" content="<%= ogp_url %>">
-    <% else %>
-      <meta name="twitter:title" content="MY SONG JOURNAL">
-      <meta name="twitter:description" content="音楽と一緒に日々の思い出を記録しよう">
-      <meta name="twitter:image" content="<%= "#{request.base_url}/images/ogp.png" %>">
-    <% end %>
+    <meta name="twitter:title" content="<%= @ogp_title || 'MY SONG JOURNAL' %>">
+    <meta name="twitter:description" content="<%= @ogp_description || '音楽と一緒に日々の思い出を記録しよう' %>">
+    <meta name="twitter:image" content="<%= @ogp_image || "#{request.base_url}/images/ogp.png" %>">
 
     <%= yield :head %>
 

@@ -1,51 +1,48 @@
 module Spotify::SpotifySearchable
   extend ActiveSupport::Concern
   include Spotify::SpotifyApiRequestable
+  include Spotify::SpotifySearchResultsHandler
 
   def search
-    p "========== Spotify Search Debug =========="
-    p "Params: #{params}"
-    p "Journal Params: #{params[:journal]}"
-    p "Current Session: #{session[:journal_form]}"
-    p "========================================"
+    log_search_debug_info
 
     save_journal_form
 
-    p "========== After Save Debug =========="
-    p "Updated Session: #{session[:journal_form]}"
-    p "===================================="
-
-    @tracks = []
-    # モーダルからのリクエストかどうかを判定
-    is_modal = request.xhr? || params[:modal].present?
-
-    unless valid_search_params?
-      flash[:alert] = "検索条件を入力してください。"
-      return respond_to do |format|
-        if is_modal
-          format.html { render partial: "spotify/search", layout: false }
-          format.js { render partial: "spotify/search", layout: false }
-        else
-          format.html { redirect_to(request.referer || root_path) }
-        end
-      end
-    end
+    return handle_invalid_search_params if invalid_search_params?
 
     @query_string = build_query_string
-    if @query_string.blank?
-      flash[:alert] = "検索条件が無効です。"
-      return respond_to do |format|
-        if is_modal
-          format.html { render partial: "spotify/search", layout: false }
-          format.js { render partial: "spotify/search", layout: false }
-        else
-          format.html { redirect_to(request.referer || root_path) }
-        end
-      end
-    end
+    return handle_invalid_query_string if @query_string.blank?
 
     perform_spotify_search
 
+    respond_to_search_results
+  end
+
+  private
+
+  def log_search_debug_info
+    Rails.logger.debug "========== Spotify Search Debug =========="
+    Rails.logger.debug "Params: #{params}"
+    Rails.logger.debug "Journal Params: #{params[:journal]}"
+    Rails.logger.debug "Current Session: #{session[:journal_form]}"
+    Rails.logger.debug "========================================"
+  end
+
+  def invalid_search_params?
+    !params[:search_conditions].present? || !params[:search_values].present?
+  end
+
+  def handle_invalid_search_params
+    flash[:alert] = "検索条件を入力してください。"
+    respond_to_search_format
+  end
+
+  def handle_invalid_query_string
+    flash[:alert] = "検索条件が無効です。"
+    respond_to_search_format
+  end
+
+  def respond_to_search_format
     respond_to do |format|
       if @tracks.any?
         format.html { render "spotify/results", locals: { query_string: format_query_for_display(@query_string) } }
@@ -100,13 +97,17 @@ module Spotify::SpotifySearchable
 
     case condition
     when "year"
-      if (decade = value.match(/(\d{4})s/))
-        start_year = decade[1]
-        end_year = start_year.to_i + 9
-        "year:#{start_year}-#{end_year}"
-      end
+      build_year_query(value)
     else
       condition == "keyword" ? value : "#{condition}:#{value}"
+    end
+  end
+
+  def build_year_query(value)
+    if (decade = value.match(/(\d{4})s/))
+      start_year = decade[1]
+      end_year = start_year.to_i + 9
+      "year:#{start_year}-#{end_year}"
     end
   end
 
@@ -116,8 +117,6 @@ module Spotify::SpotifySearchable
 
     results = spotify_get("search", search_params(offset))
     process_search_results(results, page)
-  rescue StandardError => e
-    handle_search_error(e)
   end
 
   def search_params(offset)
