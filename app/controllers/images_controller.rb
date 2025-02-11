@@ -25,7 +25,10 @@ class ImagesController < ApplicationController
     rescue StandardError => e
       Rails.logger.error "OGP画像生成エラー: #{e.message}"
       Rails.logger.error e.backtrace.join("\n")
-      head :internal_server_error
+      
+      # デフォルトのOGP画像を返す
+      default_ogp_path = Rails.root.join("app/assets/images/ogp.png")
+      send_file default_ogp_path, type: "image/png", disposition: "inline"
     end
   end
 
