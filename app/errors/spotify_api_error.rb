@@ -3,5 +3,4 @@ class SpotifyApiError < StandardError
     def initialize(message = "Spotify API Error")
       super(message)
     end
-  end
-  
+end

@@ -29,12 +29,12 @@ RSpec.describe Spotify::SpotifyAutocompletable do
           {
             "id" => "track1",
             "name" => "Track 1",
-            "artists" => [{ "name" => "Artist 1" }]
+            "artists" => [ { "name" => "Artist 1" } ]
           },
           {
             "id" => "track2",
             "name" => "Track 2",
-            "artists" => [{ "name" => "Artist 2" }]
+            "artists" => [ { "name" => "Artist 2" } ]
           }
         ]
       },

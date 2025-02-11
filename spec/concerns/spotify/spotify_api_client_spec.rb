@@ -1,6 +1,6 @@
 require 'rails_helper'
 require 'rest-client'
-require 'json' 
+require 'json'
 require_relative '../../../app/controllers/concerns/spotify/spotify_api_client'
 
 RSpec.describe Spotify::SpotifyApiClient do

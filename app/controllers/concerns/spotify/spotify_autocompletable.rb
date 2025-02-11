@@ -1,7 +1,7 @@
 module Spotify::SpotifyAutocompletable
   extend ActiveSupport::Concern
   include Spotify::SpotifyApiRequestable # Spotify APIリクエスト用のモジュールをインクルード
-  require_relative '../../../errors/spotify_api_error'
+  require_relative "../../../errors/spotify_api_error"
 
 
   # Spotifyの検索APIを使ってオートコンプリート機能を実行するメソッド
@@ -35,7 +35,7 @@ module Spotify::SpotifyAutocompletable
   # Spotify APIの検索結果をフォーマットするメソッド
   # 曲とアーティストの情報をそれぞれフォーマットし、1つのリストにまとめます。
   def format_results(results)
-    format_items(results, "tracks", "track") + format_items(results, "artists", "artist") #必要な情報のみ取得
+    format_items(results, "tracks", "track") + format_items(results, "artists", "artist") # 必要な情報のみ取得
   end
 
   # Spotify APIの検索結果をフォーマットするメソッド
@@ -76,5 +76,5 @@ module Spotify::SpotifyAutocompletable
       Rails.logger.error "Autocomplete Error: #{error.message}. Params: #{params&.to_unsafe_h || {}}"
       render json: { error: "検索中にエラーが発生しました" }, status: :bad_request
     end
-  end  
+  end
 end
