@@ -5,16 +5,22 @@ module Spotify::SpotifyApiClient
 
   # Spotify APIのアクセストークンを取得するメインメソッド
   def get_spotify_access_token
+    if @spotify_access_token && Time.now < @spotify_access_token_expiry
+      return @spotify_access_token
+    end
+  
     response = spotify_auth_request
-    token = JSON.parse(response.body)["access_token"]
-
-    raise "Failed to get Spotify access token: #{response.body}" unless token
-
-    token
+    token_data = JSON.parse(response.body)
+    @spotify_access_token = token_data["access_token"]
+    @spotify_access_token_expiry = Time.now + token_data["expires_in"].to_i
+  
+    raise "Failed to get Spotify access token: #{response.body}" unless @spotify_access_token
+  
+    @spotify_access_token
   rescue RestClient::ExceptionWithResponse => e
     raise "Failed to get Spotify access token: #{e.response}"
   end
-
+  
   # Spotifyの認証リクエストを送信するメソッド
   def spotify_auth_request
     RestClient.post(
