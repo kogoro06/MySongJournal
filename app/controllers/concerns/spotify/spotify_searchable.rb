@@ -69,7 +69,6 @@ module Spotify::SpotifySearchable
 
     @query = params[:query]
     if @query.present?
-      # ... 既存の検索処理 ...
       respond_to do |format|
         format.html
         format.turbo_stream do
@@ -145,7 +144,7 @@ module Spotify::SpotifySearchable
 
       @total_count = results["tracks"]["total"]
       @tracks = Kaminari.paginate_array(@tracks, total_count: @total_count)
-                       .page(page).per(@per_page)
+                      .page(page).per(@per_page)
     else
       @tracks = []
       flash.now[:alert] = "検索結果が見つかりませんでした。"
