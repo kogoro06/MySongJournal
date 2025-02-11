@@ -6,11 +6,17 @@ class ImagesController < ApplicationController
   before_action :set_cors_headers, only: [ :ogp ]
 
   def ogp
+    Rails.logger.info "OGP Request Parameters: #{params.inspect}"
+    Rails.logger.info "User Agent: #{request.user_agent}"
+    Rails.logger.info "Request Headers: #{request.headers.to_h.select { |k, _| k.start_with?('HTTP_') }}"
+
     begin
       # パラメータの取得と整形
       text_parts = params[:text].to_s.split(" - ")
       song_name = text_parts[0]
       artist_name = text_parts[1]
+
+      Rails.logger.info "Generating OGP image for song: #{song_name}, artist: #{artist_name}"
 
       # OGP画像生成
       image = generate_ogp_image(
@@ -21,10 +27,12 @@ class ImagesController < ApplicationController
 
       # レスポンスの設定
       response.headers["Content-Type"] = "image/png"
+      response.headers["Cache-Control"] = "public, max-age=31536000"
       send_data image.to_blob, type: "image/png", disposition: "inline"
     rescue StandardError => e
       Rails.logger.error "OGP画像生成エラー: #{e.message}"
-      Rails.logger.error e.backtrace.join("\n")
+      Rails.logger.error "Backtrace: #{e.backtrace.join("\n")}"
+      Rails.logger.error "Parameters: #{params.inspect}"
       
       # デフォルトのOGP画像を返す
       default_ogp_path = Rails.root.join("app/assets/images/ogp.png")

@@ -116,8 +116,19 @@ Rails.application.configure do
   # Enable DNS rebinding protection and other `Host` header attacks.
   config.hosts << "mysongjournal.com"
   config.hosts << "mysongjournal.onrender.com" # Renderのホストも許可する
-  # Skip DNS rebinding protection for the default health check endpoint.
-  # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  config.hosts << "og.nullnull.dev"  # OGP用のドメイン
+
+  # OGPクローラーからのアクセスを許可
+  config.host_authorization = {
+    exclude: ->(request) {
+      request.path.start_with?("/images/ogp") ||
+      request.user_agent&.include?("Twitterbot") ||
+      request.user_agent&.include?("facebookexternalhit") ||
+      request.user_agent&.include?("LinkedInBot") ||
+      request.user_agent&.include?("LINE-Parts")
+    }
+  }
+
   config.time_zone = "UTC"
   config.active_record.default_timezone = :utc
 end
