@@ -69,11 +69,11 @@ RSpec.describe Spotify::SpotifyApiRequestable do
       it 'clears the cached access token and retries' do
         expect(dummy_instance).to receive(:get_spotify_access_token).exactly(Spotify::SpotifyApiRequestable::MAX_ATTEMPTS).times.and_return("new_mock_access_token")
         expect(RestClient).to receive(:get).exactly(Spotify::SpotifyApiRequestable::MAX_ATTEMPTS).times.and_raise(unauthorized_exception)
-      
+
         expect {
           dummy_instance.send(:spotify_get, endpoint, params)
         }.to raise_error(RuntimeError, /Unauthorized access after #{Spotify::SpotifyApiRequestable::MAX_ATTEMPTS} attempts/)
-      end      
+      end
     end
 
     context 'when the request fails with another error' do
@@ -89,12 +89,12 @@ RSpec.describe Spotify::SpotifyApiRequestable do
         logger_double = instance_double("Logger")
         allow(Rails).to receive(:logger).and_return(logger_double)
         expect(logger_double).to receive(:error).with(/Spotify API request failed: Internal Server Error. Endpoint: #{endpoint}, Params: #{params}/)
-      
+
         # 例外が発生することを確認
         expect {
           dummy_instance.send(:spotify_get, endpoint, params)
         }.to raise_error(RuntimeError, /Spotify API request failed: Internal Server Error/)
-      end      
+      end
     end
   end
 end
