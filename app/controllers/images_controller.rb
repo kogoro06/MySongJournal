@@ -11,9 +11,21 @@ class ImagesController < ApplicationController
 
     begin
       # パラメータの取得と整形
-      text_parts = params[:text].to_s.split(" - ")
-      song_name = text_parts[0]
-      artist_name = text_parts[1]
+      text = params[:text].to_s
+      parts = text.split(" - ").map(&:strip)
+      
+      # 曲名とアーティスト名を正しく抽出
+      song_name = parts[0]
+      artist_name = if parts.size > 2
+        # "曲名 - From xxx - アーティスト名" のパターン
+        parts.last
+      else
+        # "曲名 - アーティスト名" のパターン
+        parts[1]
+      end
+
+      Rails.logger.info "Parsed song name: #{song_name.inspect}"
+      Rails.logger.info "Parsed artist name: #{artist_name.inspect}"
 
       cache_key = "ogp/#{Digest::MD5.hexdigest([song_name, artist_name, params[:album_image]].join('_'))}"
       Rails.logger.info "Cache key: #{cache_key}"
