@@ -2,8 +2,8 @@ class ImagesController < ApplicationController
   include Ogp::ImageGenerator
 
   skip_before_action :authenticate_user!, raise: false
-  skip_before_action :verify_authenticity_token, only: [:ogp]
-  before_action :set_cors_headers, only: [:ogp]
+  skip_before_action :verify_authenticity_token, only: [ :ogp ]
+  before_action :set_cors_headers, only: [ :ogp ]
 
   def ogp
     Rails.logger.info "OGP Request Parameters: #{params.inspect}"
@@ -50,18 +50,18 @@ class ImagesController < ApplicationController
     artist_name = parts.size > 2 ? parts.last : parts[1]
     Rails.logger.info "Parsed song name: #{song_name.inspect}"
     Rails.logger.info "Parsed artist name: #{artist_name.inspect}"
-    [song_name.to_s.strip.downcase, artist_name.to_s.strip.downcase]
+    [ song_name.to_s.strip.downcase, artist_name.to_s.strip.downcase ]
   end
 
   # アルバム画像URLを正規化
   def normalize_album_image(album_image)
-    normalized_url = album_image.to_s.split('?').first
+    normalized_url = album_image.to_s.split("?").first
     valid_url?(normalized_url) ? normalized_url : nil
   end
 
   # キャッシュキーを生成
   def generate_cache_key(song_name, artist_name, album_image)
-    Digest::MD5.hexdigest([song_name, artist_name, album_image].join('_'))
+    Digest::MD5.hexdigest([ song_name, artist_name, album_image ].join("_"))
   end
 
   # OGP画像を生成し、バイナリデータを返す
