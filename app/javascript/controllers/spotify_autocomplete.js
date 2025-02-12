@@ -7,6 +7,8 @@ export function initializeSpotifyAutocomplete() {
   const searchConditionsContainer = document.getElementById('search-conditions');
   // 各検索フィールドのリクエストを管理するMap
   const abortControllers = new Map();
+  const cache = new Map(); // キャッシュ用のMapを作成
+  let debounceTimeout; // デバウンス用のタイマー
 
   /**
    * 検索フィールドごとにオートコンプリートを初期化する
@@ -24,44 +26,55 @@ export function initializeSpotifyAutocomplete() {
         return;
       }
 
-      // 進行中のリクエストがあればキャンセル
-      if (abortControllers.has(queryField)) {
-        const controller = abortControllers.get(queryField);
-        controller.abort();
-      }
+      // デバウンス処理
+      clearTimeout(debounceTimeout);
+      debounceTimeout = setTimeout(() => {
+        // キャッシュを確認
+        if (cache.has(query)) {
+          console.log('ℹ️ キャッシュから候補を取得します。');
+          renderSuggestions(cache.get(query), queryField);
+          return;
+        }
 
-      // 新しいリクエストのためのAbortControllerを作成
-      const controller = new AbortController();
-      abortControllers.set(queryField, controller);
+        // 進行中のリクエストがあればキャンセル
+        if (abortControllers.has(queryField)) {
+          const controller = abortControllers.get(queryField);
+          controller.abort();
+        }
 
+        // 新しいリクエストのためのAbortControllerを作成
+        const controller = new AbortController();
+        abortControllers.set(queryField, controller);
 
-      // Spotify APIに候補を問い合わせ
-      fetch(`/spotify/autocomplete?query=${encodeURIComponent(query)}&type=${type}`, {
-        signal: controller.signal,
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTPエラー: ${response.status}`);
-          }
-          return response.json();
+        // Spotify APIに候補を問い合わせ
+        fetch(`/spotify/autocomplete?query=${encodeURIComponent(query)}&type=${type}`, {
+          signal: controller.signal,
         })
-        .then(data => {
-          if (data.length === 0) {
-            console.log('ℹ️ 検索結果なし。候補をクリアします。');
-            clearSuggestions(queryField);
-            return;
-          }
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTPエラー: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            if (data.length === 0) {
+              console.log('ℹ️ 検索結果なし。候補をクリアします。');
+              clearSuggestions(queryField);
+              return;
+            }
 
-          const uniqueSuggestions = filterUniqueSuggestions(data);
-          renderSuggestions(uniqueSuggestions, queryField);
-        })
-        .catch(error => {
-          if (error.name === 'AbortError') {
-            console.log('🔄 リクエストがキャンセルされました:', queryField);
-          } else {
-            console.error('❌ APIリクエストエラー:', error);
-          }
-        });
+            const uniqueSuggestions = filterUniqueSuggestions(data);
+            cache.set(query, uniqueSuggestions); // キャッシュに結果を保存
+            renderSuggestions(uniqueSuggestions, queryField);
+          })
+          .catch((error) => {
+            if (error.name === 'AbortError') {
+              console.log('🔄 リクエストがキャンセルされました:', queryField);
+            } else {
+              console.error('❌ APIリクエストエラー:', error);
+            }
+          });
+      }, 300); // デバウンスの遅延時間を設定
     });
   }
 
@@ -72,7 +85,7 @@ export function initializeSpotifyAutocomplete() {
    */
   function filterUniqueSuggestions(suggestions) {
     const seen = new Set();
-    return suggestions.filter(suggestion => {
+    return suggestions.filter((suggestion) => {
       if (seen.has(suggestion.name)) {
         return false;
       }
@@ -104,7 +117,7 @@ export function initializeSpotifyAutocomplete() {
     }
 
     suggestionList.innerHTML = '';
-    suggestions.forEach(suggestion => {
+    suggestions.forEach((suggestion) => {
       const li = document.createElement('li');
       li.textContent = suggestion.name;
       li.classList.add('p-2', 'hover:bg-gray-100', 'cursor-pointer');
