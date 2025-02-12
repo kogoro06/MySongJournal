@@ -14,15 +14,14 @@ module Ogp
     end
 
     def generate_ogp_image_url(journal)
-      cache_key = "#{journal.id}-#{journal.updated_at.to_i}"
+      cache_key = journal.updated_at.to_i.to_s
 
       url_for(
         controller: :images,
         action: :ogp,
         text: "#{journal.song_name} - #{journal.artist_name}",
         album_image: journal.album_image,
-        v: cache_key,
-        journal_id: journal.id
+        v: cache_key
       )
     end
   end
