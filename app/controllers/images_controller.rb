@@ -27,7 +27,16 @@ class ImagesController < ApplicationController
       Rails.logger.info "Parsed song name: #{song_name.inspect}"
       Rails.logger.info "Parsed artist name: #{artist_name.inspect}"
 
-      cache_key = "ogp/#{Digest::MD5.hexdigest([song_name, artist_name, params[:album_image]].join('_'))}"
+      # 曲名とアーティスト名を正規化
+      normalized_song_name = song_name.to_s.strip.downcase
+      normalized_artist_name = artist_name.to_s.strip.downcase
+
+      # アルバム画像のURLを正規化
+      normalized_album_image = params[:album_image].to_s.split('?').first
+
+      # キャッシュキーを生成
+      cache_key = "ogp/#{Digest::MD5.hexdigest([normalized_song_name, normalized_artist_name, normalized_album_image].join('_'))}"
+
       Rails.logger.info "Cache key: #{cache_key}"
       
       image_data = Rails.cache.fetch(cache_key, expires_in: 1.week) do
