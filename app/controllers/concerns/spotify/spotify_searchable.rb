@@ -20,7 +20,6 @@ module Spotify::SpotifySearchable
     is_modal = request.xhr? || params[:modal].present?
 
     unless valid_search_params?
-      flash[:alert] = "検索条件を入力してください。"
       return respond_to do |format|
         if is_modal
           format.html { render partial: "spotify/search", layout: false }
