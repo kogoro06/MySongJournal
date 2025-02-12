@@ -19,14 +19,14 @@
 
         <% if @journal.song_name.present? %>
           <p class="text-lg font-medium text-gray-800">
-            🎼 曲名: <%= @journal.song_name %>
+            🎼 曲名: <%= truncate(@journal.song_name, length: 25) %>
           </p>
       <% end %>
       
         
         <% if @journal.artist_name.present? %>
           <p class="text-lg font-medium text-gray-800">
-            🎤 アーティスト: <%= @journal.artist_name %>
+            🎤 アーティスト: <%= truncate(@journal.artist_name, length: 20) %>
           </p>
         <% end %>
       
