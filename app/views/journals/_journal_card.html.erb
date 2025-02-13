@@ -5,7 +5,10 @@
       <%= journal.title %>
     </h3>
     <div class="flex items-center gap-4 mt-2">
-      <span class="text-base">by <%= journal.user.name %></span>
+      <span class="text-base">by <%= link_to journal.user.name, other_user_path(journal.user) %></span>
+      <%= image_tag journal.user.avatar.presence || 'profile_sample.png',
+          class: "h-12 w-12 rounded-full object-cover mr-4",
+          alt: "プロフィール画像" %>
       <% if user_signed_in? && journal.user != current_user %>
         <%= render 'follows/button', user: journal.user %>
       <% end %>

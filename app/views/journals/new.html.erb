@@ -13,7 +13,7 @@
 
       <!-- 📝 タイトル入力 -->
       <div>
-        <%= form.label :title, "日記タイトル", class: "block text-xl font-medium text-black mb-2" %>
+        <%= form.label :title, "日記タイトル", class: "block text-gray-700 text-xl font-bold" %>
         <%= form.text_field :title, required: true, placeholder: "タイトルを入力", name: "journal[title]", class: "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark-mode-text",id: "journal-title" %>
       </div>
 
@@ -64,7 +64,7 @@
          <!-- ジャンル選択 -->
           <div class="mb-4">
             <div class="form-group">
-              <%= form.label :genre, "ジャンル", class: "block text-md font-medium text-black mb-2" %>
+              <%= form.label :genre, "ジャンル", class: "block text-gray-700 text-xl font-bold" %>
               <%= form.select :genre, 
                 Journal.genres.map { |k, v| [t("activerecord.attributes.journal.genre.#{k}"), k] },
                 { include_blank: '選択してください' },
@@ -98,30 +98,33 @@
 
       <!-- 😊 感情入力 -->
       <div>
-        <%= form.label :emotion, "感情", class: "block text-md font-medium text-black mb-2" %>
+        <%= form.label :emotion, "感情", class: "block text-gray-700 text-xl font-bold" %>
         <%= form.select :emotion, 
             Journal.emotions.map { |k, v| [k, k] }, 
             { prompt: "選択してください" }, 
-            name: "journal[emotion]", 
-            class: "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark-mode-text",
-            id: "journal-emotion" %>
+            class: "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark-mode-text",id: "journal-emotion" %>
       </div>
 
       <!-- 📝 メモ入力 -->
       <div>
-        <%= form.label :content, "本文", class: "block text-md font-medium text-black mb-2" %>
+        <%= form.label :content, "本文", class: "block text-gray-700 text-xl font-bold" %>
         <%= form.text_area :content, required: true, placeholder: "今日の出来事や気持ちを記入", name: "journal[content]", class: "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark-mode-text",id: "journal-content" %>
       </div>
 
       <!-- 公開設定 -->
       <div class="mb-4">
         <div class="flex items-center">
-          <%= form.check_box :public, checked: true, class: "h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500", style: "transform: scale(1.5);" %>
-          <%= form.label :public, "タイムラインに投稿する", class: "ml-3 block text-gray-700 text-sm font-bold" %>
+          <%= form.check_box :public, class: "h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500", style: "transform: scale(1.5);" %>
+          <%= form.label :public, "タイムラインに投稿する", class: "ml-3 block text-gray-700 text-xl font-bold" %>
         </div>
-        <p class="text-sm text-gray-600 mt-1">※チェックを外すと、タイムラインには表示されません</p>
+        <p class="text-md text-gray-700 mt-1 font-bold">※チェックを外すと、タイムラインには表示されません</p>
       </div>
 
+      <% if @journal.spotify_track_id.present? %>
+      <div class="text-center text-red-600 font-bold text-lg mb-4">
+        ⚠️ジャンルの選択も忘れずに！
+      </div>
+    <% end %>
 
       <!-- 💾 保存ボタン -->
       <div class="text-center mt-6">
