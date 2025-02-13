@@ -20,8 +20,9 @@ module Spotify::SpotifySearchable
     p "Updated Session: #{session[:journal_form]}"
     p "===================================="
 
-    # 元のページ情報をセッションに保存
-    if request.referer&.include?('/edit')
+    # 検索時のみsessionを設定
+    if params[:search_conditions].present? || params[:search_values].present?
+      if request.referer&.include?('/edit')
       session[:return_to] = request.referer
       Rails.logger.info "💾 Saved return path: #{session[:return_to]}"
     else

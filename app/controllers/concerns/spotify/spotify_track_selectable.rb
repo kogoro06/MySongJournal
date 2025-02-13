@@ -38,12 +38,7 @@ module Spotify::SpotifyTrackSelectable
   def save_journal_form
     return unless params[:journal].present?
     Rails.logger.info "💾 Saving journal form data"
-    session[:journal_form] = {
-      title: params.dig(:journal, :title),
-      content: params.dig(:journal, :content),
-      emotion: params.dig(:journal, :emotion),
-      public: params.dig(:journal, :public)
-    }.compact
+    session[:journal_form] = params[:journal].to_h
     Rails.logger.info "✅ Form data saved: #{session[:journal_form].inspect}"
   end
 
