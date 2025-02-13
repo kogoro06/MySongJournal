@@ -3,6 +3,11 @@ module Spotify::SpotifySearchable
   include Spotify::SpotifyApiRequestable
 
   def search
+    Rails.logger.info "🔍 Search called"
+    Rails.logger.info "🎯 Current URL: #{request.url}"
+    Rails.logger.info "🔙 Referer: #{request.referer}"
+    Rails.logger.info "📝 Search params: #{params.inspect}"
+
     p "========== Spotify Search Debug =========="
     p "Params: #{params}"
     p "Journal Params: #{params[:journal]}"
@@ -14,6 +19,17 @@ module Spotify::SpotifySearchable
     p "========== After Save Debug =========="
     p "Updated Session: #{session[:journal_form]}"
     p "===================================="
+
+    # 検索時のみsessionを設定
+    if params[:search_conditions].present? || params[:search_values].present?
+      if request.referer&.include?("/edit")
+        session[:return_to] = request.referer
+        Rails.logger.info "💾 Saved return path: #{session[:return_to]}"
+      else
+        session[:return_to] = new_journal_path
+        Rails.logger.info "💾 Saved return path: #{session[:return_to]}"
+      end
+    end
 
     @tracks = []
     # モーダルからのリクエストかどうかを判定
@@ -43,7 +59,12 @@ module Spotify::SpotifySearchable
       end
     end
 
+    # 検索条件をログに出力
+    Rails.logger.info "🎵 Search conditions: #{params[:search_conditions]}"
+    Rails.logger.info "🎯 Search values: #{params[:search_values]}"
+
     perform_spotify_search
+    Rails.logger.info "✅ Search completed with #{@tracks&.size || 0} results"
 
     respond_to do |format|
       if @tracks.any?
@@ -59,6 +80,10 @@ module Spotify::SpotifySearchable
         end
       end
     end
+  rescue StandardError => e
+    Rails.logger.error "🚨 Search Error: #{e.message}"
+    flash.now[:alert] = "検索中にエラーが発生しました。"
+    render partial: "spotify/search"
   end
 
   def search_spotify
@@ -171,14 +196,14 @@ module Spotify::SpotifySearchable
   def save_journal_form
     return unless params[:journal].present?
 
-    session[:journal_form] = {
-      title: params[:journal][:title],
-      content: params[:journal][:content],
-      emotion: params[:journal][:emotion],
-      public: params[:journal][:public]
-    }
+    journal_params = params.require(:journal).permit(
+      :title, :content, :emotion, :genre, :song_name, :artist_name, :album_name, :album_image, :spotify_track_id, :public
+    ).to_h
+
+    session[:journal_form] = journal_params
     Rails.logger.info "✅ Form data saved in session: #{session[:journal_form]}"
   rescue => e
     Rails.logger.error "⚠️ Error saving form data: #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
   end
 end
