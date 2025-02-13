@@ -196,14 +196,14 @@ module Spotify::SpotifySearchable
   def save_journal_form
     return unless params[:journal].present?
 
-    journal_params = params.require(:journal).permit(
-      :title, :content, :emotion, :genre, :song_name, :artist_name, :album_name, :album_image, :spotify_track_id, :public
-    ).to_h
-
-    session[:journal_form] = journal_params
+    session[:journal_form] = {
+      title: params[:journal][:title],
+      content: params[:journal][:content],
+      emotion: params[:journal][:emotion],
+      public: params[:journal][:public]
+    }
     Rails.logger.info "✅ Form data saved in session: #{session[:journal_form]}"
   rescue => e
     Rails.logger.error "⚠️ Error saving form data: #{e.message}"
-    Rails.logger.error e.backtrace.join("\n")
   end
 end
