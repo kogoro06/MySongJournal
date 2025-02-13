@@ -22,12 +22,13 @@ module Spotify::SpotifySearchable
 
     # 検索時のみsessionを設定
     if params[:search_conditions].present? || params[:search_values].present?
-      if request.referer&.include?('/edit')
-      session[:return_to] = request.referer
-      Rails.logger.info "💾 Saved return path: #{session[:return_to]}"
-    else
-      session[:return_to] = new_journal_path
-      Rails.logger.info "💾 Saved return path: #{session[:return_to]}"
+      if request.referer&.include?("/edit")
+        session[:return_to] = request.referer
+        Rails.logger.info "💾 Saved return path: #{session[:return_to]}"
+      else
+        session[:return_to] = new_journal_path
+        Rails.logger.info "💾 Saved return path: #{session[:return_to]}"
+      end
     end
 
     @tracks = []
