@@ -24,6 +24,9 @@ module Spotify::SpotifySearchable
     if request.referer&.include?('/edit')
       session[:return_to] = request.referer
       Rails.logger.info "💾 Saved return path: #{session[:return_to]}"
+    else
+      session[:return_to] = new_journal_path
+      Rails.logger.info "💾 Saved return path: #{session[:return_to]}"
     end
 
     @tracks = []
