@@ -3,11 +3,6 @@ module Spotify::SpotifySearchable
   include Spotify::SpotifyApiRequestable
 
   def search
-    Rails.logger.info "🔍 Search called"
-    Rails.logger.info "🎯 Current URL: #{request.url}"
-    Rails.logger.info "🔙 Referer: #{request.referer}"
-    Rails.logger.info "📝 Search params: #{params.inspect}"
-
     p "========== Spotify Search Debug =========="
     p "Params: #{params}"
     p "Journal Params: #{params[:journal]}"
@@ -19,17 +14,6 @@ module Spotify::SpotifySearchable
     p "========== After Save Debug =========="
     p "Updated Session: #{session[:journal_form]}"
     p "===================================="
-
-    # 検索時のみsessionを設定
-    if params[:search_conditions].present? || params[:search_values].present?
-      if request.referer&.include?("/edit")
-        session[:return_to] = request.referer
-        Rails.logger.info "💾 Saved return path: #{session[:return_to]}"
-      else
-        session[:return_to] = new_journal_path
-        Rails.logger.info "💾 Saved return path: #{session[:return_to]}"
-      end
-    end
 
     @tracks = []
     # モーダルからのリクエストかどうかを判定
@@ -59,12 +43,7 @@ module Spotify::SpotifySearchable
       end
     end
 
-    # 検索条件をログに出力
-    Rails.logger.info "🎵 Search conditions: #{params[:search_conditions]}"
-    Rails.logger.info "🎯 Search values: #{params[:search_values]}"
-
     perform_spotify_search
-    Rails.logger.info "✅ Search completed with #{@tracks&.size || 0} results"
 
     respond_to do |format|
       if @tracks.any?
@@ -80,10 +59,6 @@ module Spotify::SpotifySearchable
         end
       end
     end
-  rescue StandardError => e
-    Rails.logger.error "🚨 Search Error: #{e.message}"
-    flash.now[:alert] = "検索中にエラーが発生しました。"
-    render partial: "spotify/search"
   end
 
   def search_spotify
