@@ -13,7 +13,7 @@
 
       <!-- 📝 タイトル入力 -->
       <div>
-        <%= form.label :title, "日記タイトル", class: "block text-xl font-medium text-black mb-2" %>
+        <%= form.label :title, "日記タイトル", class: "block text-gray-700 text-xl font-bold" %>
         <%= form.text_field :title, required: true, placeholder: "タイトルを入力", name: "journal[title]", class: "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark-mode-text",id: "journal-title" %>
       </div>
 
@@ -64,7 +64,7 @@
          <!-- ジャンル選択 -->
           <div class="mb-4">
             <div class="form-group">
-              <%= form.label :genre, "ジャンル", class: "block text-md font-medium text-black mb-2" %>
+              <%= form.label :genre, "ジャンル", class: "block text-gray-700 text-xl font-bold" %>
               <%= form.select :genre, 
                 Journal.genres.map { |k, v| [t("activerecord.attributes.journal.genre.#{k}"), k] },
                 { include_blank: '選択してください' },
@@ -98,18 +98,16 @@
 
       <!-- 😊 感情入力 -->
       <div>
-        <%= form.label :emotion, "感情", class: "block text-md font-medium text-black mb-2" %>
+        <%= form.label :emotion, "感情", class: "block text-gray-700 text-xl font-bold" %>
         <%= form.select :emotion, 
             Journal.emotions.map { |k, v| [k, k] }, 
             { prompt: "選択してください" }, 
-            name: "journal[emotion]", 
-            class: "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark-mode-text",
-            id: "journal-emotion" %>
+            class: "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark-mode-text",id: "journal-emotion" %>
       </div>
 
       <!-- 📝 メモ入力 -->
       <div>
-        <%= form.label :content, "本文", class: "block text-md font-medium text-black mb-2" %>
+        <%= form.label :content, "本文", class: "block text-gray-700 text-xl font-bold" %>
         <%= form.text_area :content, required: true, placeholder: "今日の出来事や気持ちを記入", name: "journal[content]", class: "w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 dark-mode-text",id: "journal-content" %>
       </div>
 
