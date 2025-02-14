@@ -59,10 +59,6 @@ gem "image_processing", "~> 1.2"
 gem "meta-tags", require: "meta_tags"
 gem "aws-sdk-s3"
 
-# browser detection
-gem 'browser', '~> 2.2.0'
-
-
 # Security
 gem "rack-attack"
 

@@ -100,7 +100,6 @@ GEM
       msgpack (~> 1.2)
     brakeman (7.0.0)
       racc
-    browser (2.2.0)
     builder (3.3.0)
     capybara (3.40.0)
       addressable
@@ -494,7 +493,6 @@ DEPENDENCIES
   aws-sdk-s3
   bootsnap
   brakeman
-  browser (~> 2.2.0)
   capybara
   cssbundling-rails
   debug
