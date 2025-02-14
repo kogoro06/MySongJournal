@@ -1,5 +1,30 @@
-<% if user_signed_in? %>
-    <%= render "main_content" %> <!-- 新しく作成したメインコンテンツ部分 -->
-        <% else %>
-    <%= render "introduce" %>
-<%end%>
+<div class="relative">
+  <!-- モバイル向け画像 -->
+  <%= image_tag 'Smartphone_Responsive.Top.png', alt: 'モバイル画像', class: 'block md:hidden w-full h-auto' %>
+
+  <!-- デスクトップ向け画像 -->
+  <%= image_tag 'Desktop_Responsive.Top.png', alt: 'デスクトップ画像', class: 'hidden md:block w-full h-auto' %>
+
+  <% if user_signed_in? %>
+    <div class="absolute top-[50%] left-1/2 transform -translate-x-1/2 sm:top-[25%] sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:-translate-y-1/2 lg:top-[75%] lg:left-[15rem]">
+      <div class="bg-customblue text-customred font-bold py-8 px-4 rounded-full w-96 text-center text-4xl mt-4">
+        <%= link_to "日記を書く".html_safe, new_journal_path(from: 'top') %>
+      </div>
+      <div class="bg-customblue text-customred font-bold py-8 px-4 rounded-full w-96 text-center text-4xl mt-4">
+        <%= link_to "過去の日記一覧".html_safe, journals_path %>
+      </div>
+      <div class="bg-customblue text-customred font-bold py-8 px-4 rounded-full w-96 text-center text-4xl mt-4">
+        <%= link_to "タイムライン".html_safe, timeline_journals_path %>
+      </div>
+    </div>
+  <% else %>
+     <div class="absolute top-[50%] left-1/2 transform -translate-x-1/2 sm:top-[25%] sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:-translate-y-1/2 lg:top-[80%] lg:left-[15rem]">
+      <div class="bg-customblue text-customred font-bold py-8 px-4 rounded-full w-96 text-center text-4xl mt-4">
+        <%= link_to "アプリの使い方".html_safe, app_explanation_path %>
+      </div>
+      <div class="bg-customblue text-customred font-bold py-8 px-4 rounded-full w-96 text-center text-4xl mt-4">
+        <%= link_to "タイムライン".html_safe, timeline_journals_path %>
+      </div>
+    </div>
+  <% end %>
+</div>
