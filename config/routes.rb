@@ -40,7 +40,7 @@ Rails.application.routes.draw do
   # 静的ページのルート
   get "/privacy_policy", to: "pages#privacy_policy"
   get "/terms", to: "pages#terms"
-  get 'static_pages/app_explanation', to: 'static_pages#app_explanation', as: 'app_explanation'
+  get "static_pages/app_explanation", to: "static_pages#app_explanation", as: "app_explanation"
 
   # Defines the root path route ("/")
   root "static_pages#top"
