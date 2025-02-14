@@ -1,25 +1,56 @@
 <nav class="flex justify-around items-center space-x-8 text-lg">
   <% if user_signed_in? %>
-    <div class="flex items-center space-x-8">
-        <%= link_to mypage_path do %>
-           <%= link_to '日記を書く', new_journal_path, class: 'text-center text-gray-600 font-bold' %>
-           <%= link_to '過去の日記一覧', journals_path, class: 'text-center text-gray-600 font-bold' %>
-           <%= link_to 'タイムライン', timeline_journals_path, class: 'text-center text-gray-600 font-bold' %>
-          <div class="text-center flex flex-col items-center">
-            <% if current_user.profile.present? && current_user.avatar.attached? %>
-              <%= image_tag current_user.avatar, class: 'w-10 h-10 rounded-full object-cover border border-primary border-300' %>
-            <% else %>
-              <%= image_tag 'profile_sample.png', class: 'w-10 h-10 rounded-full object-cover border border-primary border-300' %>
-            <% end %>
-            <p class="text-sm text-gray-600 font-bold mt-1">マイページ</p>
-          </div>
-        <% end %>
-        <%= button_to 'ログアウト', destroy_user_session_path, method: :delete, data: { turbo_method: :delete }, class: 'text-gray-600 font-bold hover:text-red-500' %>
+    <!-- PC View -->
+    <div class="hidden sm:flex items-center space-x-8">
+      <%= link_to '日記を書く', new_journal_path, class: 'text-center text-gray-600 font-bold' %>
+      <%= link_to '過去の日記一覧', journals_path, class: 'text-center text-gray-600 font-bold' %>
+      <%= link_to 'タイムライン', timeline_journals_path, class: 'text-center text-gray-600 font-bold' %>
+      <%= link_to mypage_path do %>
+        <div class="text-center flex flex-col items-center">
+          <% if current_user.profile.present? && current_user.avatar.attached? %>
+            <%= image_tag current_user.avatar, class: 'w-10 h-10 rounded-full object-cover border border-primary border-300' %>
+          <% else %>
+            <%= image_tag 'profile_sample.png', class: 'w-10 h-10 rounded-full object-cover border border-primary border-300' %>
+          <% end %>
+          <p class="text-sm text-gray-600 font-bold mt-1">マイページ</p>
+        </div>
+      <% end %>
+      <%= button_to 'ログアウト', destroy_user_session_path, method: :delete, data: { turbo_method: :delete }, class: 'text-gray-600 font-bold hover:text-red-500' %>
+    </div>
+
+    <!-- Mobile View -->
+    <div class="sm:hidden">
+      <details class="dropdown relative">
+        <summary class="btn m-1 bg-customred text-white whitespace-nowrap">コンテンツ</summary>
+        <ul class="menu dropdown-content bg-customred text-white rounded-box z-10 w-52 p-2 shadow absolute" style="left: -20px;">
+          <li><%= link_to '日記を書く', new_journal_path %></li>
+          <li><%= link_to 'タイムライン', timeline_journals_path %></li>
+          <li><%= link_to '過去の日記一覧', journals_path %></li>
+          <li><%= link_to 'マイページ', mypage_path %></li>
+          <li><%= button_to 'ログアウト', destroy_user_session_path, method: :delete, data: { turbo_method: :delete } %></li>
+        </ul>
+      </details>
     </div>
   <% else %>
-    <%= link_to 'タイムライン', timeline_journals_path, class: 'text-center text-gray-600 font-bold' %>
-    <%= link_to 'ログイン', new_user_session_path, class: 'text-center text-gray-600 font-bold' %>
-    <%= link_to 'サインアップ', new_user_registration_path, class: 'text-center text-gray-600 font-bold' %>
-    <%= link_to 'パスワード再発行', new_user_password_path, class: 'text-center text-gray-600 font-bold' %>
+    <!-- PC View -->
+    <div class="hidden sm:flex items-center space-x-8">
+      <%= link_to 'タイムライン', timeline_journals_path, class: 'text-center text-gray-600 font-bold' %>
+      <%= link_to 'ログイン', new_user_session_path, class: 'text-center text-gray-600 font-bold' %>
+      <%= link_to 'サインアップ', new_user_registration_path, class: 'text-center text-gray-600 font-bold' %>
+      <%= link_to 'パスワード再発行', new_user_password_path, class: 'text-center text-gray-600 font-bold' %>
+    </div>
+
+    <!-- Mobile View -->
+    <div class="sm:hidden">
+      <details class="dropdown relative">
+        <summary class="btn m-1 bg-customred text-white whitespace-nowrap">コンテンツ</summary>
+        <ul class="menu dropdown-content bg-customred text-white rounded-box z-10 w-52 p-2 shadow absolute" style="left: -20px;">
+          <li><%= link_to 'タイムライン', timeline_journals_path %></li>
+          <li><%= link_to 'ログイン', new_user_session_path %></li>
+          <li><%= link_to 'サインアップ', new_user_registration_path %></li>
+          <li><%= link_to 'パスワード再発行', new_user_password_path %></li>
+        </ul>
+      </details>
+    </div>
   <% end %>
 </nav>
