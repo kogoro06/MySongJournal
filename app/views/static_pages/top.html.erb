@@ -1,5 +1,17 @@
-<% if user_signed_in? %>
-    <%= render "main_content" %> <!-- 新しく作成したメインコンテンツ部分 -->
-        <% else %>
-    <%= render "introduce" %>
-<%end%>
+<div>
+    <%= image_tag 'top.png',class: "relative"  %>
+    <% if user_signed_in? %>
+        <div class="bg-customblue text-customred font-bold py-8 px-4 rounded-full w-96 text-center text-4xl absolute top-[65%] left-[5rem] left-2">
+            <%= link_to "日記を書く".html_safe, new_journal_path(from: 'top') %>
+        </div>
+        <div class="bg-customblue text-customred font-bold py-8 px-4 rounded-full w-96 text-center text-4xl absolute top-[80%] left-[5rem] left-2">
+            <%= link_to "過去の日記一覧".html_safe, journals_path %>
+        </div>
+    <% else %>
+        <div>
+            <div class="bg-customblue text-customred font-bold py-7 px-4 rounded-full w-96 text-center text-4xl absolute top-[65%] left-[5rem] left-2">
+                <p>日々の感情や思い出を音楽と一緒に<br>記録しませんか？</p>
+            </div>
+        </div>
+    <% end %>
+</div>  
