@@ -7,10 +7,6 @@
         検索結果
       </h1>
     </div>
-
-    <!-- 検索フォームのパーシャルを追加 -->
-    <%= render 'spotify/search' %>
-
     <% if @tracks.present? %>
       <!-- 検索結果数の表示 -->
       <% if @total_count&.positive? %>
@@ -74,6 +70,18 @@
           </div>
         <% end %>
       </div>
+
+    <div tabindex="0" class="collapse collapse-plus bg-customblue hover:bg-customblue/90 rounded-lg justify-center items-center">
+      <input type="checkbox" class="peer" /> 
+      <div class="collapse-title text-xl font-medium text-white">
+        再検索はこちらからどうぞ🎧
+      </div>
+      <div class="collapse-content bg-customblue text-white"> 
+        <!-- 検索フォームのパーシャルを追加 -->
+        <%= render 'spotify/search' %>
+      </div>
+    </div>
+
 
       <!-- ページネーション -->
       <% if @tracks.total_pages > 1 %>
