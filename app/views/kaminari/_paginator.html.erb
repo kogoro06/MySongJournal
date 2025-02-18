@@ -10,7 +10,9 @@
   <nav class="flex justify-center items-center space-x-2 mt-8">
     <% unless current_page.first? %>
       <%= first_page_tag %>
-      <%= prev_page_tag %>
+      <span class="hidden sm:inline">
+        <%= prev_page_tag %>
+      </span>
     <% end %>
 
     <% each_page do |page| -%>
@@ -22,7 +24,9 @@
     <% end -%>
 
     <% unless current_page.last? %>
-      <%= next_page_tag %>
+      <span class="hidden sm:inline">
+        <%= next_page_tag %>
+      </span>
       <%= last_page_tag %>
     <% end %>
   </nav>

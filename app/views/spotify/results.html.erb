@@ -12,15 +12,16 @@
       <% if @total_count&.positive? %>
         <div class="text-gray-600 text-sm mb-4">
           全<%= @total_count %>件中 <%= @tracks.offset_value + 1 %>-<%= @tracks.offset_value + @tracks.count %>件を表示
+          <br>
           検索条件:
           <span class="text-blue-500 font-bold">
-            <%= query_string.presence || '特になし' %>
+            <%= query_string.presence.truncate(20) || '特になし' %>
           </span>
         </div>
       <% end %>
 
       <!-- 検索結果一覧 -->
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <% @tracks.each do |track| %>
           <div class="bg-gray-300 rounded-lg shadow h-full flex flex-col p-4">
             <!-- Spotify Player -->
@@ -71,7 +72,7 @@
         <% end %>
       </div>
 
-    <div tabindex="0" class="collapse collapse-plus bg-customblue hover:bg-customblue/90 rounded-lg justify-center items-center">
+    <div tabindex="0" class="collapse collapse-plus bg-customblue hover:bg-customblue/90 rounded-lg justify-center items-center mt-4 mb-4">
       <input type="checkbox" class="peer" /> 
       <div class="collapse-title text-xl font-medium text-white">
         再検索はこちらからどうぞ🎧
@@ -86,7 +87,12 @@
       <!-- ページネーション -->
       <% if @tracks.total_pages > 1 %>
         <div class="mt-6">
-          <%= paginate @tracks %>
+          <div class="hidden sm:block">
+            <%= paginate @tracks %>
+          </div>
+          <div class="sm:hidden">
+            <%= paginate @tracks, window: 1, outer_window: 0 %>
+          </div>
         </div>
       <% end %>
     <% else %>
