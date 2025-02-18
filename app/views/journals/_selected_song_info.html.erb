@@ -20,7 +20,7 @@
 
   <% if journal.album_image.present? %>
     <div class="mb-4 text-center">
-      <a href="https://open.spotify.com/track/<%= journal.spotify_track_id %>" target="_blank">
+      <a href="https://open.spotify.com/track/<%= journal.spotify_track_id %>" target="_blank" rel="noopener noreferrer">
         <img id="selected-album-image" src="<%= journal.album_image %>" 
              alt="アルバム画像" 
              class="w-64 h-64 object-cover mx-auto rounded-lg shadow-md">
