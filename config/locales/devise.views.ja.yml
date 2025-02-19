@@ -53,6 +53,12 @@ ja:
       locked: アカウントはロックされています。
       timeout: セッションがタイムアウトしました。もう一度ログインしてください。
       unauthenticated: ログインもしくはアカウント登録してください。
+    omniauth_callbacks:
+      google_oauth2:
+        success: "Googleログインに成功しました"
+        failure: "Googleログインに失敗しました"
+      failure: "%{kind}認証に失敗しました。理由：%{reason}"
+      success: "%{kind}認証に成功しました。"
     mailer:
       confirmation_instructions:
         subject: メールアドレス確認メール
