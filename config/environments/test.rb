@@ -62,8 +62,6 @@ Rails.application.configure do
           puts "Spotify authentication skipped in test environment"
         end
       end
-
-      RSpotify.singleton_class.prepend(SpotifyMock)
     end
   end
 
