@@ -33,15 +33,15 @@
         <% if @journal.spotify_track_id.present? %>
           <div class="mb-4">
             <iframe style="border-radius:12px" 
-                    src="https://open.spotify.com/embed/track/<%= @journal.spotify_track_id %>" 
+                    src="https://open.spotify.com/embed/track/<%= @journal.spotify_track_id %>?utm_source=generator" 
                     width="100%"
                     height="352"
                     frameBorder="0" 
                     allowfullscreen="" 
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                    loading="lazy"
-                    class="w-full rounded-lg">
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy">
             </iframe>
+            <%= render 'shared/spotify_fallback', track_id: @journal.spotify_track_id %>
           </div>
         <% end %>
       </div>

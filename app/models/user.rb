@@ -5,7 +5,9 @@ class User < ApplicationRecord
   has_one :profile
   # Deviseのモジュール
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable, :omniauthable, omniauth_providers: [ :google_oauth2 ]
+         :recoverable, :rememberable, :validatable, :omniauthable, omniauth_providers: [ :google_oauth2
+           # :spotify  # 将来的な機能拡張時に使用
+         ]
   # バリデーション
   validates :name, presence: true, length: { maximum: 50 }
   validates :email, presence: true, uniqueness: true

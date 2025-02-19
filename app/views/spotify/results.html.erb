@@ -36,7 +36,8 @@
                       loading="lazy"
                       class="w-full rounded-lg">
               </iframe>
-            </div>
+
+            <%= render 'shared/spotify_fallback', track_id: track[:spotify_track_id] %>
 
             <!-- 曲情報 -->
             <div class="space-y-3">

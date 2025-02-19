@@ -24,10 +24,10 @@
         height="352"
         frameBorder="0" 
         allowfullscreen="" 
-        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-        loading="lazy"
-        class="w-full">
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture; encrypted-media"
+        loading="lazy">
       </iframe>
+      <%= render 'shared/spotify_fallback', track_id: journal.spotify_track_id %>
     </div>
   <% else %>
     <!-- ジャケット画像（Spotifyプレーヤーがない場合のフォールバック） -->

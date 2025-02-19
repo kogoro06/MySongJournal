@@ -280,6 +280,18 @@ Devise.setup do |config|
                     scope: "email,profile",
                     redirect_uri: ENV["GOOGLE_REDIRECT_URI_PRODUCTION"] || "http://localhost:3000/users/auth/google_oauth2/callback"
                   }
+  # config.omniauth :spotify, 　将来的に必要になればコメントを解除
+  #                 ENV['SPOTIFY_CLIENT_ID'],
+  #                 ENV['SPOTIFY_CLIENT_SECRET'],
+  #                 scope: %w(
+  #                   user-read-email
+  #                   playlist-read-private
+  #                   user-read-private
+  #                   streaming
+  #                   user-read-playback-state
+  #                   user-modify-playback-state
+  #                   app-remote-control
+  #                 ).join(' ')
 
   # 本番環境でもGETリクエストを許可
   OmniAuth.config.allowed_request_methods = [ :post, :get ]

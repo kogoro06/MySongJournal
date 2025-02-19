@@ -5,6 +5,8 @@ class ApplicationController < ActionController::Base
   # allow_browser versions: :modern
   before_action :configure_permitted_parameters, if: :devise_controller?
 
+  helper_method :browser
+
   protected
 
   def configure_permitted_parameters
@@ -27,5 +29,9 @@ class ApplicationController < ActionController::Base
 
   def after_sign_out_path_for(resource)
     root_path
+  end
+
+  def browser
+    @browser ||= Browser.new(request.user_agent)
   end
 end
