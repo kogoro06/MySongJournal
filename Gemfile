@@ -46,9 +46,8 @@ gem "rest-client"
 
 # Google OAuth2認証用のGem
 gem "omniauth-google-oauth2"
+gem "omniauth-spotify"
 gem "omniauth-rails_csrf_protection"
-
-gem "rspotify"
 gem "dotenv-rails"
 gem "redis"
 gem "sidekiq"
@@ -58,6 +57,9 @@ gem "mini_magick"
 gem "image_processing", "~> 1.2"
 gem "meta-tags", require: "meta_tags"
 gem "aws-sdk-s3"
+
+# ブラウザとデバイスの検出
+gem 'browser'
 
 # Security
 gem "rack-attack"

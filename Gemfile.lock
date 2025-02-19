@@ -100,6 +100,7 @@ GEM
       msgpack (~> 1.2)
     brakeman (7.0.0)
       racc
+    browser (6.2.0)
     builder (3.3.0)
     capybara (3.40.0)
       addressable
@@ -288,6 +289,8 @@ GEM
     omniauth-rails_csrf_protection (1.0.2)
       actionpack (>= 4.2)
       omniauth (~> 2.0)
+    omniauth-spotify (0.0.13)
+      omniauth-oauth2 (~> 1.1)
     orm_adapter (0.5.0)
     parallel (1.26.3)
     parser (3.3.6.0)
@@ -380,10 +383,6 @@ GEM
       rspec-mocks (~> 3.13)
       rspec-support (~> 3.13)
     rspec-support (3.13.2)
-    rspotify (2.12.4)
-      addressable (~> 2.8.0)
-      omniauth-oauth2 (>= 1.6)
-      rest-client (~> 2.0.2)
     rubocop (1.69.1)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
@@ -493,6 +492,7 @@ DEPENDENCIES
   aws-sdk-s3
   bootsnap
   brakeman
+  browser
   capybara
   cssbundling-rails
   debug
@@ -513,6 +513,7 @@ DEPENDENCIES
   mocha
   omniauth-google-oauth2
   omniauth-rails_csrf_protection
+  omniauth-spotify
   pg (~> 1.1)
   puma (>= 5.0)
   rack-attack
@@ -520,7 +521,6 @@ DEPENDENCIES
   redis
   rest-client
   rspec-rails
-  rspotify
   rubocop-rails-omakase
   selenium-webdriver
   sidekiq
