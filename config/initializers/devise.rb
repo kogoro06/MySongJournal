@@ -281,7 +281,7 @@ Devise.setup do |config|
                     redirect_uri: ENV["GOOGLE_REDIRECT_URI_PRODUCTION"] || "http://localhost:3000/users/auth/google_oauth2/callback"
                   }
   # config.omniauth :spotify, 　将来的に必要になればコメントを解除
-  #                 ENV['SPOTIFY_CLIENT_ID'], 
+  #                 ENV['SPOTIFY_CLIENT_ID'],
   #                 ENV['SPOTIFY_CLIENT_SECRET'],
   #                 scope: %w(
   #                   user-read-email

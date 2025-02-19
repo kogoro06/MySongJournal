@@ -59,7 +59,7 @@ gem "meta-tags", require: "meta_tags"
 gem "aws-sdk-s3"
 
 # ブラウザとデバイスの検出
-gem 'browser'
+gem "browser"
 
 # Security
 gem "rack-attack"

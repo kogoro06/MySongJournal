@@ -1,6 +1,6 @@
 # app/controllers/users/omniauth_callbacks_controller.rb
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
-  skip_before_action :verify_authenticity_token, only: [:google_oauth2, :spotify]
+  skip_before_action :verify_authenticity_token, only: [ :google_oauth2, :spotify ]
 
   def google_oauth2
     callback_for(:google_oauth2)
