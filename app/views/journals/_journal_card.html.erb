@@ -86,7 +86,7 @@
     </div>
 
     <!-- Mobile View -->
-    <div class="flex sm:hidden gap-2 h-12">
+    <div class="flex sm:hidden gap-2 h-12 items-center justify-center">
       <%= link_to '詳細', journal_path(journal), data: { turbo: false },
           class: "w-20 h-12 flex items-center justify-center bg-gray-500 text-white text-sm rounded hover:bg-gray-600" %>
       <%= link_to "編集", edit_journal_path(journal), data: { turbo: false },
