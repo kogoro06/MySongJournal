@@ -2,13 +2,13 @@
   <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl space-y-8">
     
     <!-- 📅 日付表示 -->
-      <div class="text-xl font-semibold text-gray-700 text-end">
+      <div class="text-2xl font-semibold text-gray-700 text-center">
         <%= @journal.created_at.strftime('%Y年%m月%d日') %>
       </div>
 
     <!-- 📝 タイトル表示 -->
     <div class="text-center">
-      <h2 class="text-md font-medium text-gray-700 mb-2">日記タイトル</h2>
+      <h2 class="text-xl font-bold text-gray-700 mb-2">日記タイトル</h2>
       <p class="text-xl font-bold text-gray-900"><%= @journal.title %></p>
     </div>
 
@@ -49,16 +49,16 @@
 
     <!-- 📝 本文表示 -->
     <div class="bg-gray-50 p-6 rounded-lg shadow-md text-center">
-      <h2 class="text-md font-medium text-gray-700 mb-2">📖 本文</h2>
-      <p class="text-md text-gray-800 font-bold p-4 rounded-md">
+      <h2 class="text-xl font-bold text-gray-700 mb-2">📖 本文</h2>
+      <p class="text-xl text-gray-800 font-bold p-4 rounded-md">
         <%= @journal.content %>
       </p>
     </div>
 
     <!-- 😊 感情表示 -->
     <div class="bg-gray-50 p-6 rounded-lg shadow-md text-center">
-      <h2 class="text-md font-medium text-gray-700 mb-2">😊 感情</h2>
-      <p class="text-md text-gray-800 font-bold p-4 rounded-md">
+      <h2 class="text-xl font-bold text-gray-700 mb-2">😊 感情</h2>
+      <p class="text-xl text-gray-800 font-bold p-4 rounded-md">
         <%= @journal.emotion %>
       </p>
     </div>
