@@ -67,10 +67,13 @@
   </head>
 
   <body class="flex flex-col min-h-screen">
-    <%= render "shared/header" %>
-    <%= render "devise/shared/flash_messages" %> 
-    <%= yield %>
-    <%= yield(:js) %>
-    <%= render "shared/footer" %>
+    <div class="flex-grow flex flex-col bg-customblue">
+      <%= render "shared/header" %>
+      <%= render "devise/shared/flash_messages" %>
+      <main class="flex-grow flex flex-col">
+        <%= yield %>
+      </main>
+      <%= render "shared/footer" %>
+    </div>
   </body>
 </html>

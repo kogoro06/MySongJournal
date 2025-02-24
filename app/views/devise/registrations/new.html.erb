@@ -1,7 +1,7 @@
-<div class="flex justify-center items-center bg-customblue">
-  <div class="rounded-lg p-8" style="aspect-ratio: 1 / 1; width: 90%; max-width: 400px;">
+<div class="flex-grow flex justify-center items-center">
+  <div class="rounded-lg p-8 shadow-md" style="width: 90%; max-width: 400px;">
     <%= render "devise/shared/form_layout" do %>
-      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-6 h-full" }) do |form| %>
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-6" }) do |form| %>
         <!-- Title -->
         <h2 class="text-2xl font-bold text-gray-700 text-center mb-6">
           <%= t('devise.registrations.new.sign_up', default: 'アカウント登録') %>
