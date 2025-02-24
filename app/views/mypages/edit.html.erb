@@ -1,57 +1,62 @@
 <div class="bg-customblue min-h-screen overflow-auto">
-  <div class="flex flex-col justify-center items-center mt-8 mb-8 mx-4 md:mx-24 lg:mx-72">
-    <h1 class="text-3xl md:text-3xl lg:text-4xl font-bold text-accent text-center">
+  <div class="flex flex-col justify-center items-center mt-4 sm:mt-8 mb-4 sm:mb-8 mx-4 md:mx-24 lg:mx-72">
+    <h1 class="text-2xl sm:text-3xl md:text-3xl lg:text-4xl font-bold text-accent text-center">
       <% content_for(:title, 'プロフィール編集') %>
     </h1>
   </div>
 
-  <div class="h-max m-5 p-10 flex flex-col">
+  <div class="mx-4 sm:mx-5 p-4 sm:p-10">
     <div class="flex flex-col justify-center items-center">
-      <div class="bg-white w-[600px] p-8 rounded-lg shadow-sm">
+      <div class="bg-white w-full sm:w-[600px] p-4 sm:p-8 rounded-lg shadow-sm">
         <%= form_with(model: @profile_form, url: mypage_path, local: true, data: {turbo: false}, method: :patch, multipart: true) do |f| %>
           <%# エラーメッセージ %>
           <% if @user.errors.any? || @profile_form.errors.any? %>
-            <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded mb-6">
+            <div class="bg-red-50 border border-red-200 text-red-600 px-3 sm:px-4 py-2 sm:py-3 rounded mb-4 sm:mb-6">
               <% @user.errors.full_messages.each do |error| %>
-                <p class="text-sm"><%= error %></p>
+                <p class="text-xs sm:text-sm"><%= error %></p>
               <% end %>
               <% @profile_form.errors.full_messages.each do |error| %>
-                <p class="text-sm"><%= error %></p>
+                <p class="text-xs sm:text-sm"><%= error %></p>
               <% end %>
             </div>
           <% end %>
 
-          <div class="flex flex-col justify-center items-center mt-6 mb-6 mx-auto">
-            <h1 class="text-3xl font-bold text-gray-800 text-center">ユーザープロフィール編集</h1>
+          <div class="flex flex-col justify-center items-center mt-4 sm:mt-6 mb-4 sm:mb-6 mx-auto">
+            <h1 class="text-xl sm:text-3xl font-bold text-gray-800 text-center">ユーザープロフィール編集</h1>
           </div>
 
           <%# 名前 %>
-          <div class="mb-6">
-            <%= f.label :name, t("activerecord.attributes.profile.name"), class: "block text-lg font-medium text-gray-800 mb-3" %>
-            <%= f.text_field :name, value: @user.name, placeholder: t("activerecord.attributes.profile.name"), class: "w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary dark-mode-text" %>
+          <div class="mb-4 sm:mb-6">
+            <%= f.label :name, t("activerecord.attributes.profile.name"), class: "block text-base sm:text-lg font-medium text-primary mb-2 sm:mb-3" %>
+            <%= f.text_field :name, value: @user.name, placeholder: t("activerecord.attributes.profile.name"), 
+                class: "w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary dark-mode-text" %>
           </div>
 
           <%# アバター画像 %>
-          <div class="mb-6">
-            <%= f.label :avatar, t("activerecord.attributes.profile.avatar"), class: "block text-lg font-medium text-primary mb-3" %>
-            <%= f.file_field :avatar, class: "w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" %>
+          <div class="mb-4 sm:mb-6">
+            <%= f.label :avatar, t("activerecord.attributes.profile.avatar"), class: "block text-base sm:text-lg font-medium text-primary mb-2 sm:mb-3" %>
+            <%= f.file_field :avatar, 
+                class: "w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" %>
           </div>
 
           <%# 自己紹介 %>
-      <div class="mb-6">
-        <%= f.label :bio, t("activerecord.attributes.profile.bio"), class: "block text-lg font-medium text-primary mb-3" %>
-        <%= f.text_area :bio, value: @user.bio, placeholder: t("activerecord.attributes.profile.bio"), class: "w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary h-32 dark-mode-text" %>
-      </div>
+          <div class="mb-4 sm:mb-6">
+            <%= f.label :bio, t("activerecord.attributes.profile.bio"), class: "block text-base sm:text-lg font-medium text-primary mb-2 sm:mb-3" %>
+            <%= f.text_area :bio, value: @user.bio, placeholder: t("activerecord.attributes.profile.bio"), 
+                class: "w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary h-24 sm:h-32 dark-mode-text" %>
+          </div>
 
           <%# SNSリンク %>
-          <div class="mb-6">
-            <%= f.label :x_link, t("activerecord.attributes.profile.x_link"), class: "block text-lg font-medium text-primary mb-3" %>
-            <%= f.text_field :x_link, value: @user.x_link, placeholder: t("activerecord.attributes.profile.x_link"), class: "w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary dark-mode-text" %>
+          <div class="mb-4 sm:mb-6">
+            <%= f.label :x_link, t("activerecord.attributes.profile.x_link"), class: "block text-base sm:text-lg font-medium text-primary mb-2 sm:mb-3" %>
+            <%= f.text_field :x_link, value: @user.x_link, placeholder: t("activerecord.attributes.profile.x_link"), 
+                class: "w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary dark-mode-text" %>
           </div>
 
           <%# 更新ボタン %>
-          <div class="flex flex-col items-center gap-4">
-            <%= f.submit t("activerecord.attributes.profile.update"), class: "btn btn-accent text-white bg-accent hover:bg-accent-dark w-full max-w-md text-lg font-bold" %>
+          <div class="flex flex-col items-center gap-3 sm:gap-4">
+            <%= f.submit t("activerecord.attributes.profile.update"), 
+                class: "btn btn-accent text-white bg-accent hover:bg-accent-dark w-full max-w-md text-base sm:text-lg font-bold py-2 sm:py-3" %>
           </div>
         <% end %>
       </div>
