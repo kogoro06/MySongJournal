@@ -11,35 +11,29 @@
 
     <div class="space-y-4">
       <% @users.each do |user| %>
-        <%= link_to other_user_path(user), class: "block" do %>
-          <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-            <div class="flex items-center gap-4">
-              <!-- アイコン -->
-              <div class="w-12 h-12 rounded-full bg-gray-200 overflow-hidden">
-                <% if user.avatar&.attached? %>
-                  <%= image_tag user.avatar, class: "w-full h-full object-cover" %>
-                <% else %>
-                  <div class="w-full h-full flex items-center justify-center bg-gray-300">
-                    <%= image_tag 'profile_sample.png', class: "w-full h-full object-cover" %>
-                  </div>
-                <% end %>
-              </div>
-              
-              <!-- ユーザー情報 -->
-              <div>
-                <div class="font-bold"><%= user.name %></div>
-                <div class="text-sm text-gray-600">
-                  <%= user.bio.present? ? user.bio.truncate(50) : "自己紹介はまだありません" %>
+        <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+          <%= link_to other_user_path(user), class: "flex items-center gap-4" do %>
+            <!-- アイコン -->
+            <div class="w-12 h-12 rounded-full bg-gray-200 overflow-hidden">
+              <% if user.avatar&.attached? %>
+                <%= image_tag user.avatar, class: "w-full h-full object-cover" %>
+              <% else %>
+                <div class="w-full h-full flex items-center justify-center bg-gray-300">
+                  <%= image_tag 'profile_sample.png', class: "w-full h-full object-cover" %>
                 </div>
-              </div>
+              <% end %>
             </div>
+            <!-- ユーザー情報 -->
+            <div>
+              <div class="font-bold"><%= user.name %></div>
+            </div>
+          <% end %>
 
-            <!-- フォローボタン（自分以外のユーザーの場合） -->
-            <% if user_signed_in? && current_user != user %>
-              <%= render 'follows/button', user: user %>
-            <% end %>
-          </div>
-        <% end %>
+          <!-- フォローボタン（自分以外のユーザーの場合） -->
+          <% if user_signed_in? && current_user != user %>
+            <%= render 'follows/button', user: user %>
+          <% end %>
+        </div>
       <% end %>
     </div>
 
