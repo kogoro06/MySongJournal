@@ -5,8 +5,8 @@
       <%= journal.title %>
     </h3>
     <div class="flex items-center gap-4 mt-2">
-      <span class="text-base">by <%= link_to journal.user.name, other_user_path(journal.user) %></span>
-      <%= link_to other_user_path(journal.user) do %>
+      <span class="text-base whitespace-nowrap">by <%= link_to journal.user.name, other_user_path(journal.user), data: { turbo: false } %></span>
+      <%= link_to other_user_path(journal.user), data: { turbo: false } do %>
         <%= image_tag journal.user.avatar.presence || 'profile_sample.png',
             class: "h-12 w-12 rounded-full object-cover mr-4",
             alt: "プロフィール画像" %>
