@@ -5,8 +5,8 @@
       <%= journal.title %>
     </h3>
     <div class="flex items-center gap-4 mt-2">
-      <span class="text-base">by <%= link_to journal.user.name, other_user_path(journal.user) %></span>
-      <%= link_to other_user_path(journal.user) do %>
+      <span class="text-base whitespace-nowrap">by <%= link_to journal.user.name, other_user_path(journal.user), data: { turbo: false } %></span>
+      <%= link_to other_user_path(journal.user), data: { turbo: false } do %>
         <%= image_tag journal.user.avatar.presence || 'profile_sample.png',
             class: "h-12 w-12 rounded-full object-cover mr-4",
             alt: "プロフィール画像" %>
@@ -68,8 +68,9 @@
   </div>
 
   <!-- アクションボタン -->
-  <div class="flex gap-3">
-    <% if user_signed_in? && journal.user == current_user %>
+  <% if user_signed_in? && journal.user == current_user %>
+    <!-- PC View -->
+    <div class="hidden sm:flex gap-3">
       <%= link_to '詳細', journal_path(journal), data: { turbo: false },
           class: "flex-1 text-center py-3 px-6 bg-gray-500 text-white text-base rounded hover:bg-gray-600" %>
       <%= link_to "編集", edit_journal_path(journal), data: { turbo: false },
@@ -82,12 +83,27 @@
           削除
         </button>
       <% end %>
-    <% else %>
+    </div>
+
+    <!-- Mobile View -->
+    <div class="flex sm:hidden gap-2 h-12 items-center justify-center">
+      <%= link_to '詳細', journal_path(journal), data: { turbo: false },
+          class: "w-20 h-12 flex items-center justify-center bg-gray-500 text-white text-sm rounded hover:bg-gray-600" %>
+      <%= link_to "編集", edit_journal_path(journal), data: { turbo: false },
+          class: "w-20 h-12 flex items-center justify-center bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600" %>
+      <%= button_to "削除",
+          journal_path(journal),
+          method: :delete,
+          data: { turbo: false, confirm: "本当に削除しますか？" },
+          class: "w-20 h-12 flex items-center justify-center bg-red-500 text-white text-sm rounded hover:bg-red-600" %>
+    </div>
+  <% else %>
+    <div class="flex gap-3">
       <%= link_to '詳細', journal_path(journal), data: { turbo: false },
           class: "flex-1 text-center py-3 px-6 bg-gray-500 text-white text-base rounded hover:bg-gray-600" %>
       <% if user_signed_in? %>
         <%= render 'journals/favorite_button', journal: journal %>
       <% end %>
-    <% end %>
-  </div>
+    </div>
+  <% end %>
 </div>

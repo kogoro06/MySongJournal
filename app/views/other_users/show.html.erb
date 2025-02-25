@@ -1,50 +1,51 @@
 <div class="bg-customblue min-h-screen overflow-auto">
   <div class="flex flex-col justify-center items-center mt-8 mb-8 mx-4 md:mx-24 lg:mx-72">
-    <h1 class="text-3xl md:text-3xl lg:text-4xl font-bold text-accent text-center">
+    <h1 class="text-2xl sm:text-3xl md:text-3xl lg:text-4xl font-bold text-accent text-center">
       <% content_for(:title, "#{@user.name}さんのページ") %>
     </h1>
   </div>
 
   <%# プロフィールセクション %>
-  <div class=" mx-5 p-10">
+  <div class="mx-4 sm:mx-5 p-4 sm:p-10">
     <div class="flex flex-col justify-center items-center">
-      <div class="bg-white w-[800px] p-8 rounded-lg shadow-sm">
+      <div class="bg-white w-full sm:w-[800px] p-4 sm:p-8 rounded-lg shadow-sm">
         <%# プロフィール上部：アバターと名前とXアイコン %>
-        <div class="flex space-x-8 items-center mb-8 justify-center">
-          <div class="text-center">
+        <div class="flex flex-col sm:flex sm:flex-row sm:space-x-8 items-center mb-6 sm:mb-8 justify-center">
+          <div class="text-center mb-4 sm:mb-0">
             <% if @user.avatar&.attached? %>
-              <%= image_tag @user.avatar, class: 'w-24 h-24 rounded-full object-cover border-2 border-primary shadow-sm' %>
+              <%= image_tag @user.avatar, class: 'w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-primary shadow-sm' %>
             <% else %>
-              <%= image_tag 'profile_sample.png', class: 'w-24 h-24 rounded-full object-cover border-2 border-primary shadow-sm' %>
+              <%= image_tag 'profile_sample.png', class: 'w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-primary shadow-sm' %>
             <% end %>
           </div>
           <div class="text-accent">
-            <div class="flex items-center space-x-8">
-              <p class="text-4xl font-bold"><%= @user.name %></p>
-              <% if @user.x_link.present? %>
-                <%= link_to x_redirect_other_user_path(@user), target: "_blank", rel: "noopener noreferrer", data: { turbo: false } do %>
-                  <i class="fa-brands fa-x-twitter text-gray-400 text-4xl hover:text-gray-600"></i>
+            <div class="flex flex-col sm:flex sm:flex-row sm:items-center sm:space-x-8">
+              <p class="text-2xl sm:text-4xl font-bold text-center mb-2 sm:mb-0"><%= @user.name %></p>
+              <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
+                <% if @user.x_link.present? %>
+                  <%= link_to x_redirect_other_user_path(@user), target: "_blank", rel: "noopener noreferrer", data: { turbo: false } do %>
+                    <i class="fa-brands fa-x-twitter text-gray-400 text-3xl sm:text-4xl hover:text-gray-600"></i>
+                  <% end %>
+                <% else %>
+                  <%= link_to other_user_path(@user, show_notice: true), class: "cursor-not-allowed" do %>
+                    <i class="fa-brands fa-x-twitter text-gray-400 text-3xl sm:text-4xl"></i>
+                  <% end %>
                 <% end %>
-              <% else %>
-                <%= link_to other_user_path(@user, show_notice: true), class: "cursor-not-allowed" do %>
-                  <i class="fa-brands fa-x-twitter text-gray-400 text-4xl"></i>
+
+                <!-- フォロー/フォロワー -->
+                <div id="follow-stats" class="flex items-center">
+                  <%= render 'follows/stats', user: @user %>
+                </div>
+                <!-- フォローボタン -->
+                <% if user_signed_in? && current_user != @user %>
+                  <%= render 'follows/button', user: @user %>
                 <% end %>
-              <% end %>
-
-
-              <!-- フォロー/フォロワー -->
-              <div id="follow-stats" class="flex items-center space-x-4">
-                <%= render 'follows/stats', user: @user %>
               </div>
-              <!-- フォローボタン -->
-              <% if user_signed_in? && current_user != @user %>
-                <%= render 'follows/button', user: @user %>
-              <% end %>
             </div>
           </div>
         </div>
         <%# プロフィール文 %>
-        <div class="bg-gray-200 rounded-lg text-base mb-8 p-6 text-gray-700">
+        <div class="bg-gray-200 rounded-lg text-sm sm:text-base mb-6 sm:mb-8 p-4 sm:p-6 text-gray-700">
           <% if @user.bio.present? %>
             <p class="text-center text-gray-700"><%= @user.bio %></p>
           <% else %>
@@ -55,9 +56,9 @@
     </div>
   </div>
 
-  <%# 投稿セクション - 上部にマージンを追加 %>
-  <div class="mx-5 mt-8 p-10">
-    <div class="bg-gray-200 p-6 rounded-lg shadow-sm">
+  <%# 投稿セクション %>
+  <div class="mx-4 sm:mx-5 p-4 sm:p-10">
+    <div class="bg-gray-200 p-4 sm:p-6 rounded-lg shadow-sm">
       <%# タブナビゲーション %>
       <div class="border-b border-gray-200 mb-6">
         <nav class="flex space-x-8" aria-label="Tabs">

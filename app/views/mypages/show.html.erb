@@ -1,44 +1,46 @@
 <div class="bg-customblue min-h-screen overflow-auto">
   <div class="flex flex-col justify-center items-center mt-8 mb-8 mx-4 md:mx-24 lg:mx-72">
-    <h1 class="text-3xl md:text-3xl lg:text-4xl font-bold text-accent text-center">
+    <h1 class="text-2xl sm:text-3xl md:text-3xl lg:text-4xl font-bold text-accent text-center">
       <% content_for(:title, 'マイページ') %>
     </h1>
   </div>
 
   <%# プロフィールセクション %>
-  <div class=" mx-5 p-10">
+  <div class="mx-4 sm:mx-5 p-4 sm:p-10">
     <div class="flex flex-col justify-center items-center">
-      <div class="bg-white w-[800px] p-8 rounded-lg shadow-sm">
+      <div class="bg-white w-full sm:w-[800px] p-4 sm:p-8 rounded-lg shadow-sm">
         <%# プロフィール上部：アバターと名前とXアイコン %>
-        <div class="flex space-x-8 items-center mb-8 justify-center">
-          <div class="text-center">
+        <div class="flex flex-col sm:flex sm:flex-row sm:space-x-8 items-center mb-6 sm:mb-8 justify-center">
+          <div class="text-center mb-4 sm:mb-0">
             <% if current_user.avatar.attached? %>
-              <%= image_tag current_user.avatar, class: 'w-24 h-24 rounded-full object-cover border-2 border-primary shadow-sm' %>
+              <%= image_tag current_user.avatar, class: 'w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-primary shadow-sm' %>
             <% else %>
-              <%= image_tag 'profile_sample.png', class: 'w-24 h-24 rounded-full object-cover border-2 border-primary shadow-sm' %>
+              <%= image_tag 'profile_sample.png', class: 'w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-primary shadow-sm' %>
             <% end %>
           </div>
           <div class="text-accent">
-            <div class="flex items-center space-x-8">
-              <p class="text-4xl font-bold"><%= current_user.name %></p>
-              <% if current_user.x_link.present? %>
-                <%= link_to current_user.x_link, target: "_blank", rel: "noopener noreferrer", data: { turbo: false } do %>
-                  <i class="fa-brands fa-x-twitter text-gray-400 text-4xl hover:text-gray-600"></i>
+            <div class="flex flex-col sm:flex sm:flex-row sm:items-center sm:space-x-8">
+              <p class="text-2xl sm:text-4xl font-bold text-center mb-2 sm:mb-0"><%= current_user.name %></p>
+              <div class="flex items-center justify-center space-x-4 sm:space-x-8">
+                <% if current_user.x_link.present? %>
+                  <%= link_to current_user.x_link, target: "_blank", rel: "noopener noreferrer", data: { turbo: false } do %>
+                    <i class="fa-brands fa-x-twitter text-gray-400 text-3xl sm:text-4xl hover:text-gray-600"></i>
+                  <% end %>
+                <% else %>
+                  <%= link_to mypage_path(show_notice: true), class: "cursor-not-allowed" do %>
+                    <i class="fa-brands fa-x-twitter text-gray-400 text-3xl sm:text-4xl"></i>
+                  <% end %>
                 <% end %>
-              <% else %>
-                <%= link_to mypage_path(show_notice: true), class: "cursor-not-allowed" do %>
-                  <i class="fa-brands fa-x-twitter text-gray-400 text-4xl"></i>
-                <% end %>
-              <% end %>
-              <!-- フォロー/フォロワー -->
-              <div id="follow-stats" class="flex items-center space-x-4">
-                <%= render 'follows/stats', user: current_user %>
+                <!-- フォロー/フォロワー -->
+                <div id="follow-stats" class="flex items-center space-x-4">
+                  <%= render 'follows/stats', user: current_user %>
+                </div>
               </div>
             </div>
           </div>
         </div>
         <%# プロフィール文 %>
-        <div class="bg-gray-200 rounded-lg text-base mb-8 p-6 text-gray-700">
+        <div class="bg-gray-200 rounded-lg text-sm sm:text-base mb-6 sm:mb-8 p-4 sm:p-6 text-gray-700">
           <% if @user.bio.present? %>
             <p class="text-center text-gray-400"><%= @user.bio %></p>
           <% else %>
@@ -48,22 +50,22 @@
         <%# プロフィール編集ボタン %>
         <div class="flex justify-center">
           <%= link_to edit_mypage_path, 
-              class: "flex items-center space-x-2 px-6 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg text-primary transition duration-200" do %>
-            <span class="material-symbols-outlined text-base">edit</span>
-            <span class="text-base">プロフィール編集</span>
+              class: "flex items-center space-x-2 px-4 sm:px-6 py-2 sm:py-3 bg-gray-50 hover:bg-gray-100 rounded-lg text-primary transition duration-200" do %>
+            <span class="material-symbols-outlined text-sm sm:text-base">edit</span>
+            <span class="text-sm sm:text-base">プロフィール編集</span>
           <% end %>
         </div>
       </div>
     </div>
   </div>
 
-  <%# 投稿セクション - 上部にマージンを追加 %>
-  <div class="mx-5 mt-8 p-10">
-    <div class="bg-gray-200 p-6 rounded-lg shadow-sm">
+  <%# 投稿セクション %>
+  <div class="mx-4 sm:mx-5 mt-4 sm:mt-8 p-4 sm:p-10">
+    <div class="bg-gray-200 p-4 sm:p-6 rounded-lg shadow-sm">
       <%# タブナビゲーション %>
-      <div class="border-b border-gray-200 mb-6">
-        <nav class="flex space-x-8" aria-label="Tabs">
-          <ul class="tab-list list-unstyled">
+      <div class="border-b border-gray-200 mb-4 sm:mb-6">
+        <nav class="flex space-x-4 sm:space-x-8" aria-label="Tabs">
+          <ul class="tab-list list-unstyled text-sm sm:text-base">
             <li class="tab <%= 'tab-active' if session[:mypage_tab] != 'liked_posts' %>">
               <%= link_to "自分の投稿", mypage_path(tab: "my_posts"), data: { turbo_frame: "posts_content" } %>
             </li>
@@ -80,11 +82,12 @@
             journals: @journals,
             liked_journals: @liked_journals %>
       <% end %>
-         <!-- 新規作成ボタン -->
-    <div class="mt-6">
-      <%= link_to "新しい日記を作成", new_journal_path, 
-          class: "w-full block text-center py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors" %>
-    </div>
+
+      <!-- 新規作成ボタン -->
+      <div class="mt-4 sm:mt-6">
+        <%= link_to "新しい日記を作成", new_journal_path, 
+            class: "w-full block text-center py-2 sm:py-3 text-sm sm:text-base bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors" %>
+      </div>
     </div>
   </div>
 </div>
