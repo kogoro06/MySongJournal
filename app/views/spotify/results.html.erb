@@ -1,4 +1,9 @@
 <div class="min-h-screen bg-customblue text-black flex flex-col items-center pt-8 pb-8">
+<div>
+    <h1 class="text-3xl md:text-3xl lg:text-4xl font-bold text-accent text-center">
+      <% content_for(:title, "検索結果") %>
+    </h1>
+  </div>
   <div class="bg-white p-6 rounded shadow-md w-full max-w-7xl">
     <!-- ページタイトル -->
     <div class="flex justify-between items-center mb-6">
@@ -36,7 +41,8 @@
                       loading="lazy"
                       class="w-full rounded-lg">
               </iframe>
-
+            </div>
+            
             <%= render 'shared/spotify_fallback', track_id: track[:spotify_track_id] %>
 
             <!-- 曲情報 -->

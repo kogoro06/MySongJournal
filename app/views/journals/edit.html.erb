@@ -1,5 +1,10 @@
 <!-- 📖 日記フォーム -->
 <div class="min-h-screen bg-customred text-white flex items-center justify-center py-10">
+<div>
+    <h1 class="text-3xl md:text-3xl lg:text-4xl font-bold text-accent text-center">
+      <% content_for(:title, "日記編集") %>
+    </h1>
+  </div>
   <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl space-y-6">
     <%= form_with(model: @journal, local: false, id: "journal-form", class: "space-y-6") do |form| %>
       

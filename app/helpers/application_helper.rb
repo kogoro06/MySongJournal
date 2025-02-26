@@ -28,4 +28,9 @@ module ApplicationHelper
       }
     }
   end
+
+  def page_title(title = "")
+    base_title = "MY SONG JOURNAL"
+    title.present? ? "#{title} | #{base_title}" : base_title
+  end
 end

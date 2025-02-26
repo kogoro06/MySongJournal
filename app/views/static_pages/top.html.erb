@@ -1,4 +1,10 @@
 <div class="relative">
+  <div>
+    <h1 class="text-3xl md:text-3xl lg:text-4xl font-bold text-accent text-center">
+      <% content_for(:title, "トップページ") %>
+    </h1>
+  </div>
+
   <!-- モバイル向け画像 -->
   <%= image_tag 'Smartphone_Responsive.Top.png', alt: 'モバイル画像', class: 'block md:hidden w-full h-auto ' %>
 
