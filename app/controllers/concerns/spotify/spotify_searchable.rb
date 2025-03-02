@@ -156,29 +156,34 @@ module Spotify::SpotifySearchable
   end
 
   def process_search_results(results, page)
-    if results["tracks"] && results["tracks"]["items"].any?
-      @tracks = results["tracks"]["items"].map do |track|
+    return [] unless results && results["tracks"]
+
+    # ページネーション情報を追加
+    @total_count = results["tracks"]["total"]
+    @total_pages = (@total_count.to_f / @per_page).ceil
+    @current_page = page
+    @offset_value = (page - 1) * @per_page
+    
+    @tracks = Kaminari.paginate_array(
+      results["tracks"]["items"].map do |track|
         {
           spotify_track_id: track["id"],
           song_name: track["name"],
-          artist_name: track["artists"].first["name"],
-          album_image: track["album"]["images"].first["url"]
+          artist_name: track["artists"]&.first&.dig("name") || "Unknown Artist",
+          album_image: track["album"]["images"]&.first&.dig("url")
         }
-      end
-
-      @total_count = results["tracks"]["total"]
-      @tracks = Kaminari.paginate_array(@tracks, total_count: @total_count)
-                      .page(page).per(@per_page)
-    else
-      @tracks = []
-      flash.now[:alert] = "検索結果が見つかりませんでした。"
-    end
+      end,
+      total_count: @total_count
+    ).page(@current_page).per(@per_page)
+    
+    Rails.logger.info "📝 Processed #{@tracks.size} tracks"
+    @tracks
   end
 
   def handle_search_error(error)
     Rails.logger.error "🚨 Search Error: #{error.message}"
     flash.now[:alert] = "検索中にエラーが発生しました。"
-    render partial: "spotify/search"
+    render partial: "spotify/search" and return
   end
 
   def format_query_for_display(query)
