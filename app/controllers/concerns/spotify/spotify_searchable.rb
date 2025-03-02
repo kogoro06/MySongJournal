@@ -163,7 +163,7 @@ module Spotify::SpotifySearchable
     @total_pages = (@total_count.to_f / @per_page).ceil
     @current_page = page
     @offset_value = (page - 1) * @per_page
-    
+
     @tracks = Kaminari.paginate_array(
       results["tracks"]["items"].map do |track|
         {
@@ -175,7 +175,7 @@ module Spotify::SpotifySearchable
       end,
       total_count: @total_count
     ).page(@current_page).per(@per_page)
-    
+
     Rails.logger.info "📝 Processed #{@tracks.size} tracks"
     @tracks
   end
