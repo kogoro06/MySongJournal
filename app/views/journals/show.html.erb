@@ -3,7 +3,7 @@
     
     <!-- 📅 日付表示 -->
       <div class="text-2xl font-semibold text-gray-700 text-center">
-        <%= @journal.created_at.strftime('%Y年%m月%d日') %>
+        <%= @journal.created_at.in_time_zone('Asia/Tokyo').strftime('%Y年%m月%d日') %>
       </div>
 
     <!-- 📝 タイトル表示 -->
