@@ -75,14 +75,15 @@
           song_tag = @journal.song_name&.gsub(/\s+/, '') || ''
           
           # 本文をシンプルに
-          share_text = "♬ Today's Song ♬\n" \
+          share_text = "🎧️ Today's Song 🎧️\n" \
             "#{@journal.artist_name} - #{@journal.song_name}\n" \
             "\n" \
-            "#MySongJournal ##{artist_tag} ##{song_tag}"
+            "#MySongJournal ##{artist_tag} ##{song_tag}\n" \
+            "\n" \
+            "#{journal_url(@journal)}"
           
           twitter_share_url = "https://twitter.com/intent/tweet?" \
-            "text=#{CGI.escape(share_text)}&" \
-            "url=#{CGI.escape(journal_url(@journal))}"
+            "text=#{CGI.escape(share_text)}"
         %>
         <%= link_to twitter_share_url, 
             target: '_blank', 
