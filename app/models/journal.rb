@@ -2,7 +2,7 @@ class Journal < ApplicationRecord
   extend FriendlyId
 
   # スラグの生成ルールを設定
-  friendly_id :slug_candidates, use: [ :slugged, :history ]
+  friendly_id :slug_candidates, use: :slugged
 
   belongs_to :user
   has_many :favorites, dependent: :destroy
@@ -54,11 +54,11 @@ class Journal < ApplicationRecord
   def slug_candidates
     [
       # 曲名とアーティスト名が両方ある場合
-      -> { "#{normalized_song_name}-#{normalized_artist_name}-#{generated_suffix}" },
+      [ :song_name, :artist_name, :generated_suffix ],
       # 曲名のみの場合
-      -> { "#{normalized_song_name}-#{generated_suffix}" },
+      [ :song_name, :generated_suffix ],
       # どちらもない場合
-      -> { generated_suffix }
+      [ :generated_suffix ]
     ]
   end
 
