@@ -2,7 +2,7 @@ class Journal < ApplicationRecord
   extend FriendlyId
 
   # スラグの生成ルールを設定
-  friendly_id :slug_candidates, use: :slugged
+  friendly_id :slug_candidates, use: [ :slugged, :history ]
 
   belongs_to :user
   has_many :favorites, dependent: :destroy
@@ -53,12 +53,12 @@ class Journal < ApplicationRecord
 
   def slug_candidates
     [
-      # 曲名とアーティスト名が両方ある場合のスラグ
-      "#{song_name}-#{artist_name}-#{generated_suffix}",
-      # 曲名のみの場合のスラグ
-      "#{song_name}-#{generated_suffix}",
+      # 曲名とアーティスト名と作成時刻を含むスラグ
+      "#{song_name}-#{artist_name}-#{time_suffix}",
+      # 曲名と作成時刻を含むスラグ
+      "#{song_name}-#{time_suffix}",
       # デフォルトのスラグ
-      generated_suffix
+      time_suffix
     ].map { |slug| normalize_slug(slug) }
   end
 
@@ -72,9 +72,9 @@ class Journal < ApplicationRecord
         .gsub(/-+/, "-")
   end
 
-  def generated_suffix
-    date_str = created_at&.strftime("%Y%m%d") || Time.current.strftime("%Y%m%d")
-    "mysongjournal-#{date_str}"
+  def time_suffix
+    timestamp = created_at&.strftime("%Y%m%d%H%M%S") || Time.current.strftime("%Y%m%d%H%M%S")
+    "mysongjournal-#{timestamp}"
   end
 
   def should_generate_new_friendly_id?
