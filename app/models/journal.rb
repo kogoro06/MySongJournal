@@ -56,8 +56,9 @@ class Journal < ApplicationRecord
   end
 
   def generated_suffix
-    # 日付とランダムな文字列を組み合わせたサフィックス
-    "mysongjournal-#{created_at.strftime('%Y%m%d')}"
+    # 現在時刻を使用（created_atがない場合）
+    date_str = created_at&.strftime("%Y%m%d") || Time.current.strftime("%Y%m%d")
+    "mysongjournal-#{date_str}"
   end
 
   def should_generate_new_friendly_id?
