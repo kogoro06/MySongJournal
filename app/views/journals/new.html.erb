@@ -7,7 +7,7 @@
       <!-- 📅 日付表示 -->
       <div class="text-center mb-4">
         <span class="text-xl font-semibold text-gray-700">
-          <%= Time.now.strftime('%Y年%m月%d日') %>
+          <%= Time.current.in_time_zone('Asia/Tokyo').strftime('%Y年%m月%d日') %>
         </span>
       </div>
 
