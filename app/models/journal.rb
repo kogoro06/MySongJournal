@@ -51,13 +51,16 @@ class Journal < ApplicationRecord
 
   def slug_candidates
     [
-      [ :song_name, :artist_name, "MySongJournal" ],  # 曲名とアーティスト名を使用
-      [ :song_name, :artist_name, "MySongJournal", -> { (created_at || Time.current).strftime("%Y%m%d") } ],  # 日付を加える
-      [ :song_name, :artist_name, "MySongJournal", -> { (created_at || Time.current).strftime("%Y%m%d%H%M") } ]  # 分単位まで加える
+      [ :song_name, :artist_name, :generated_suffix ]
     ]
   end
 
+  def generated_suffix
+    # 日付とランダムな文字列を組み合わせたサフィックス
+    "mysongjournal-#{created_at.strftime('%Y%m%d')}"
+  end
+
   def should_generate_new_friendly_id?
-    title_changed? || artist_name_changed? || super
+    song_name_changed? || artist_name_changed? || slug.blank?
   end
 end
