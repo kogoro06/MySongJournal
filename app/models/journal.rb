@@ -53,25 +53,23 @@ class Journal < ApplicationRecord
 
   def slug_candidates
     [
-      # 曲名とアーティスト名が両方ある場合
-      [ :song_name, :artist_name, :generated_suffix ],
-      # 曲名のみの場合
-      [ :song_name, :generated_suffix ],
-      # どちらもない場合
-      [ :generated_suffix ]
-    ]
+      # 曲名とアーティスト名が両方ある場合のスラグ
+      "#{song_name}-#{artist_name}-#{generated_suffix}",
+      # 曲名のみの場合のスラグ
+      "#{song_name}-#{generated_suffix}",
+      # デフォルトのスラグ
+      generated_suffix
+    ].map { |slug| normalize_slug(slug) }
   end
 
-  def normalized_song_name
-    return nil if song_name.blank?
-    # 日本語はそのまま使用し、空白はハイフンに
-    song_name.strip.gsub(/\s+/, "-")
-  end
-
-  def normalized_artist_name
-    return nil if artist_name.blank?
-    # 日本語はそのまま使用し、空白はハイフンに
-    artist_name.strip.gsub(/\s+/, "-")
+  def normalize_slug(text)
+    return nil if text.blank?
+    # 日本語を含むテキストを正規化
+    text.to_s
+        .strip
+        .gsub(/\s+/, "-")
+        .gsub(/[^\p{Han}\p{Hiragana}\p{Katakana}A-Za-z0-9\-]/, "")
+        .gsub(/-+/, "-")
   end
 
   def generated_suffix
