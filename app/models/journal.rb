@@ -73,7 +73,8 @@ class Journal < ApplicationRecord
   end
 
   def time_suffix
-    timestamp = created_at&.strftime("%Y%m%d%H%M%S") || Time.current.strftime("%Y%m%d%H%M%S")
+    time = (created_at || Time.current).in_time_zone("Asia/Tokyo")
+    timestamp = time.strftime("%Y%m%d%H%M%S")
     "mysongjournal-#{timestamp}"
   end
 
