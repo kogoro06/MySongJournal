@@ -1,6 +1,8 @@
 class Journal < ApplicationRecord
   extend FriendlyId
-  friendly_id :slug_candidates, use: :slugged
+
+  # スラグの生成ルールを設定
+  friendly_id :slug_candidates, use: [ :slugged, :history ]
 
   belongs_to :user
   has_many :favorites, dependent: :destroy
@@ -51,13 +53,32 @@ class Journal < ApplicationRecord
 
   def slug_candidates
     [
-      [ :song_name, :artist_name, "MySongJournal" ],  # 曲名とアーティスト名を使用
-      [ :song_name, :artist_name, "MySongJournal", -> { (created_at || Time.current).strftime("%Y%m%d") } ],  # 日付を加える
-      [ :song_name, :artist_name, "MySongJournal", -> { (created_at || Time.current).strftime("%Y%m%d%H%M") } ]  # 分単位まで加える
-    ]
+      # 曲名とアーティスト名と作成時刻を含むスラグ
+      "#{song_name}-#{artist_name}-#{time_suffix}",
+      # 曲名と作成時刻を含むスラグ
+      "#{song_name}-#{time_suffix}",
+      # デフォルトのスラグ
+      time_suffix
+    ].map { |slug| normalize_slug(slug) }
+  end
+
+  def normalize_slug(text)
+    return nil if text.blank?
+    # 日本語を含むテキストを正規化
+    text.to_s
+        .strip
+        .gsub(/\s+/, "-")
+        .gsub(/[^\p{Han}\p{Hiragana}\p{Katakana}A-Za-z0-9\-]/, "")
+        .gsub(/-+/, "-")
+  end
+
+  def time_suffix
+    time = (created_at || Time.current).in_time_zone("Asia/Tokyo")
+    timestamp = time.strftime("%Y%m%d%H%M%S")
+    "mysongjournal-#{timestamp}"
   end
 
   def should_generate_new_friendly_id?
-    title_changed? || artist_name_changed? || super
+    slug.blank? || song_name_changed? || artist_name_changed? || saved_change_to_created_at?
   end
 end

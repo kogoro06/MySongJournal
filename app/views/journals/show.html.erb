@@ -3,7 +3,7 @@
     
     <!-- 📅 日付表示 -->
       <div class="text-2xl font-semibold text-gray-700 text-center">
-        <%= @journal.created_at.strftime('%Y年%m月%d日') %>
+        <%= @journal.created_at.in_time_zone('Asia/Tokyo').strftime('%Y年%m月%d日') %>
       </div>
 
     <!-- 📝 タイトル表示 -->
@@ -68,8 +68,24 @@
         <%= link_to edit_journal_path(@journal), class: "px-4 py-2 bg-yellow-500 text-white font-medium rounded-md hover:bg-yellow-600 transition flex items-center" do %>
           <span>✏️ 編集</span>
         <% end %>
-        
-        <%= link_to "https://twitter.com/share?url=#{CGI.escape(journal_url(@journal))}", 
+
+        <% 
+          # アーティスト名と曲名からハッシュタグ用の文字列を作成（空白を削除）
+          artist_tag = @journal.artist_name&.gsub(/\s+/, '') || ''
+          song_tag = @journal.song_name&.gsub(/\s+/, '') || ''  # 空白のみ削除
+          
+          # 本文をシンプルに
+          share_text = "🎧️ Today's Song 🎧️\n" \
+            "#{@journal.artist_name} - #{@journal.song_name}\n" \
+            "\n" \
+            "#MySongJournal ##{artist_tag} ##{song_tag}\n" \
+            "\n" \
+            "#{journal_url(@journal)}"  # journal_urlを使用
+          
+          twitter_share_url = "https://twitter.com/intent/tweet?" \
+            "text=#{CGI.escape(share_text)}"
+        %>
+        <%= link_to twitter_share_url, 
             target: '_blank', 
             class: "px-4 py-2 bg-black text-white font-medium rounded-md hover:bg-gray-800 transition flex items-center",
             rel: "nofollow",
