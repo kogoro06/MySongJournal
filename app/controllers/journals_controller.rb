@@ -255,7 +255,10 @@ class JournalsController < ApplicationController
   # 編集・更新・削除用の日記取得
   # 例えば、set_journalは、日記を取得するメソッド
   def set_journal
-    @journal = current_user.journals.friendly.find(params[:id])
+    @journal = Journal.friendly.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    flash[:alert] = "指定された日記が見つかりませんでした"
+    redirect_to journals_path
   end
 
   # 詳細表示用の日記取得
