@@ -72,13 +72,13 @@
         <% 
           # アーティスト名と曲名からハッシュタグ用の文字列を作成（空白を削除）
           artist_tag = @journal.artist_name&.gsub(/\s+/, '') || ''
-          song_tag = @journal.song_name&.gsub(/\s+/, '') || ''
+          song_tag = @journal.song_name || ''  # 曲名はそのまま使用
           
           # 本文をシンプルに
           share_text = "🎧️ Today's Song 🎧️\n" \
             "#{@journal.artist_name} - #{@journal.song_name}\n" \
             "\n" \
-            "#MySongJournal ##{artist_tag} ##{song_tag}\n" \
+            "#MySongJournal ##{artist_tag} ##{song_tag.gsub(/\s+/, '')}\n" \
             "\n" \
             "#{journal_url(@journal)}"
           
