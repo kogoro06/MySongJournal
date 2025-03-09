@@ -51,16 +51,25 @@ class Journal < ApplicationRecord
 
   def slug_candidates
     [
-      [ :song_name, :artist_name, :generated_suffix ]
+      # アーティスト名と曲名を含むスラグを生成
+      [ :normalized_song_name, :normalized_artist_name, :generated_suffix ]
     ]
   end
 
+  def normalized_song_name
+    song_name&.downcase&.gsub(/\s+/, "-")&.gsub(/[^\w-]/, "")
+  end
+
+  def normalized_artist_name
+    artist_name&.downcase&.gsub(/\s+/, "-")&.gsub(/[^\w-]/, "")
+  end
+
   def generated_suffix
-    # 現在時刻を使用（created_atがない場合）
     date_str = created_at&.strftime("%Y%m%d") || Time.current.strftime("%Y%m%d")
     "mysongjournal-#{date_str}"
   end
 
+  # スラグを再生成する条件
   def should_generate_new_friendly_id?
     song_name_changed? || artist_name_changed? || slug.blank?
   end
