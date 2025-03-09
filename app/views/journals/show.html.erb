@@ -80,7 +80,7 @@
             "\n" \
             "#MySongJournal ##{artist_tag} ##{song_tag}\n" \
             "\n" \
-            "#{request.base_url}/journals/#{@journal.id}"  # 完全なURLを指定
+            "#{journal_url(@journal)}"  # journal_urlを使用
           
           twitter_share_url = "https://twitter.com/intent/tweet?" \
             "text=#{CGI.escape(share_text)}"
