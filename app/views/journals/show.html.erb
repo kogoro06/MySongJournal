@@ -75,14 +75,14 @@
           song_tag = @journal.song_name&.gsub(/\s+/, '') || ''
           
           # 本文を絵文字で装飾し、改行を入れて整形
-          share_text = "🎵 Today's Song%0A" \
-            "🎤 #{@journal.artist_name}%0A" \
-            "💿 #{@journal.song_name}%0A" \
-            "%0A" \
-            "#MySongJournal%0A" \
-            "%0A" \
-            "##{artist_tag}%0A" \
-            "%0A" \
+          share_text = "�� Today's Song\n" \
+            "🎤 #{@journal.artist_name}\n" \
+            "💿 #{@journal.song_name}\n" \
+            "\n" \
+            "#MySongJournal\n" \
+            "\n" \
+            "##{artist_tag}\n" \
+            "\n" \
             "##{song_tag}"
           
           twitter_share_url = "https://twitter.com/share?url=#{CGI.escape(journal_url(@journal))}" \
