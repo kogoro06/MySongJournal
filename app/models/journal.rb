@@ -1,6 +1,8 @@
 class Journal < ApplicationRecord
   extend FriendlyId
-  friendly_id :slug_candidates, use: :slugged
+
+  # スラグの生成ルールを設定
+  friendly_id :slug_candidates, use: [ :slugged, :history ]
 
   belongs_to :user
   has_many :favorites, dependent: :destroy
@@ -51,17 +53,25 @@ class Journal < ApplicationRecord
 
   def slug_candidates
     [
-      # 正規化されたメソッドを使用
-      [ normalized_song_name, normalized_artist_name, generated_suffix ].join("-")
+      # 曲名とアーティスト名が両方ある場合
+      -> { "#{normalized_song_name}-#{normalized_artist_name}-#{generated_suffix}" },
+      # 曲名のみの場合
+      -> { "#{normalized_song_name}-#{generated_suffix}" },
+      # どちらもない場合
+      -> { generated_suffix }
     ]
   end
 
   def normalized_song_name
-    song_name.to_s.downcase.gsub(/\s+/, "-").gsub(/[^\w-]/, "")
+    return nil if song_name.blank?
+    # 日本語はそのまま使用し、空白はハイフンに
+    song_name.strip.gsub(/\s+/, "-")
   end
 
   def normalized_artist_name
-    artist_name.to_s.downcase.gsub(/\s+/, "-").gsub(/[^\w-]/, "")
+    return nil if artist_name.blank?
+    # 日本語はそのまま使用し、空白はハイフンに
+    artist_name.strip.gsub(/\s+/, "-")
   end
 
   def generated_suffix
@@ -70,6 +80,6 @@ class Journal < ApplicationRecord
   end
 
   def should_generate_new_friendly_id?
-    song_name_changed? || artist_name_changed? || slug.blank?
+    slug.blank? || song_name_changed? || artist_name_changed? || saved_change_to_created_at?
   end
 end
