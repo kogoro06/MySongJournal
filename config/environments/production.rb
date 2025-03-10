@@ -129,6 +129,6 @@ Rails.application.configure do
     }
   }
 
-  config.time_zone = "UTC"
+  config.time_zone = "Asia/Tokyo"
   config.active_record.default_timezone = :utc
 end

@@ -62,7 +62,7 @@
         <%= t("activerecord.attributes.journal.genre.#{journal.genre}") %>
       </div>
       <div class="inline-flex px-3 md:px-4 py-1 md:py-2 bg-green-500 text-white rounded-full text-sm md:text-sm">
-        <%= journal.created_at.strftime("%m/%d %H:%M") %>
+        <%= journal.created_at.in_time_zone('Asia/Tokyo').strftime("%m/%d %H:%M") %>
       </div>
     <% end %>
   </div>
