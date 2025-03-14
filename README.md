@@ -130,5 +130,5 @@ Figma（面接前に再作成必至）：
 
 ### ER図
 db:diagram:
-![image](https://github.com/user-attachments/assets/eca3ef10-3535-4951-86af-4c2472637831)
+https://dbdiagram.io/d/6713406d97a66db9a3868632
 
