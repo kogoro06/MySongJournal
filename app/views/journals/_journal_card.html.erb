@@ -1,9 +1,12 @@
 <div class="bg-gray-300 rounded-lg shadow p-6 text-gray-700">
   <!-- ヘッダー情報（タイトル、投稿者） -->
   <div class="flex flex-col mb-6">
-    <h3 class="font-bold text-xl">
-      <%= journal.title %>
-    </h3>
+    <div class="flex items-center gap-2">
+      <h3 class="text-lg font-bold text-gray-900">
+        <%= journal.title %>
+      </h3>
+      <%= render 'journals/favorite_count', journal: journal %>
+    </div>
     <div class="flex items-center gap-4 mt-2">
       <span class="text-base whitespace-nowrap">by <%= link_to journal.user.name, other_user_path(journal.user), data: { turbo: false } %></span>
       <%= link_to other_user_path(journal.user), data: { turbo: false } do %>
