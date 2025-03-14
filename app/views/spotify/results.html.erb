@@ -15,7 +15,7 @@
           <br>
           検索条件:
           <span class="text-blue-500 font-bold">
-            <%= query_string.presence.truncate(20) || '特になし' %>
+            <%= query_string.presence.truncate(30) || '特になし' %>
           </span>
         </div>
       <% end %>
@@ -83,8 +83,7 @@
         <%= render 'spotify/search' %>
       </div>
     </div>
-
-
+     <div class="text-gray-600 text-sm mb-4">※APIの使用上、単独検索では、お探しの曲が見つからない場合があります。条件を組み合わせて検索することで、任意の曲を取得できます。</div>
       <!-- ページネーション -->
       <% if @tracks.total_pages > 1 %>
         <div class="mt-6">
