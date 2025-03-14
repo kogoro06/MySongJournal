@@ -83,8 +83,7 @@
         <%= render 'spotify/search' %>
       </div>
     </div>
-
-
+     <div class="text-gray-600 text-sm mb-4">※APIの使用上、取得できる曲数に限りがあり、曲数が多いアーティストの場合、お探しの曲が見つからない場合があります。条件を組み合わせて検索することで、任意の曲を取得できます。</div>
       <!-- ページネーション -->
       <% if @tracks.total_pages > 1 %>
         <div class="mt-6">
