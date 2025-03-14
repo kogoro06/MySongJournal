@@ -8,7 +8,18 @@ class FavoritesController < ApplicationController
     if @favorite.persisted? || @favorite.save
       @journal.reload
       respond_to do |format|
-        format.turbo_stream
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace("favorite_button_#{@journal.id}",
+              partial: "journals/favorite_button",
+              locals: { journal: @journal }
+            ),
+            turbo_stream.replace("favorite_count_#{@journal.id}",
+              partial: "journals/favorite_count",
+              locals: { journal: @journal }
+            )
+          ]
+        end
       end
     else
       render_error_response
@@ -25,7 +36,18 @@ class FavoritesController < ApplicationController
     if @favorite&.destroy
       @journal.reload
       respond_to do |format|
-        format.turbo_stream
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace("favorite_button_#{@journal.id}",
+              partial: "journals/favorite_button",
+              locals: { journal: @journal }
+            ),
+            turbo_stream.replace("favorite_count_#{@journal.id}",
+              partial: "journals/favorite_count",
+              locals: { journal: @journal }
+            )
+          ]
+        end
       end
     else
       render_error_response

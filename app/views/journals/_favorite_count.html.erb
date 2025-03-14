@@ -1,0 +1,6 @@
+<%= turbo_frame_tag "favorite_count_#{journal.id}" do %>
+  <div class="flex items-center bg-pink-100 px-3 py-1 rounded-full">
+    <i class="<%= journal.favorited_by?(current_user) ? 'fas' : 'far' %> fa-heart text-red-500 mr-2"></i>
+    <span class="text-gray-700 font-bold"><%= journal.favorites.count %></span>
+  </div>
+<% end %> 
