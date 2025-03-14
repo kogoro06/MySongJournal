@@ -1,10 +1,9 @@
 <div class="min-h-screen bg-customred text-white flex items-center justify-center py-10">
   <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl space-y-8">
-    
     <!-- 📅 日付表示 -->
-      <div class="text-2xl font-semibold text-gray-700 text-center">
-        <%= @journal.created_at.in_time_zone('Asia/Tokyo').strftime('%Y年%m月%d日') %>
-      </div>
+    <div class="text-2xl font-semibold text-gray-700 text-center">
+      <%= @journal.created_at.in_time_zone('Asia/Tokyo').strftime('%Y年%m月%d日') %>
+    </div>
 
     <!-- 📝 タイトル表示 -->
     <div class="text-center">
@@ -21,8 +20,7 @@
           <p class="text-lg font-medium text-gray-800">
             🎼 曲名: <%= truncate(@journal.song_name, length: 25) %>
           </p>
-      <% end %>
-      
+        <% end %>
         
         <% if @journal.artist_name.present? %>
           <p class="text-lg font-medium text-gray-800">
@@ -62,25 +60,28 @@
         <%= @journal.emotion %>
       </p>
     </div>
+
     <!-- ✏️ アクションボタン -->
     <div class="flex justify-between items-center mt-6 space-x-4">
-      <% if @journal.user == current_user %>
-        <%= link_to edit_journal_path(@journal), class: "px-4 py-2 bg-yellow-500 text-white font-medium rounded-md hover:bg-yellow-600 transition flex items-center" do %>
-          <span>✏️ 編集</span>
+      <div>
+        <% if @journal.user == current_user %>
+          <%= link_to edit_journal_path(@journal), class: "px-4 py-2 bg-yellow-500 text-white font-medium rounded-md hover:bg-yellow-600 transition flex items-center" do %>
+            <span>✏️ 編集</span>
+          <% end %>
         <% end %>
+      </div>
 
+      <div>
         <% 
-          # アーティスト名と曲名からハッシュタグ用の文字列を作成（空白を削除）
           artist_tag = @journal.artist_name&.gsub(/\s+/, '') || ''
-          song_tag = @journal.song_name&.gsub(/\s+/, '') || ''  # 空白のみ削除
+          song_tag = @journal.song_name&.gsub(/\s+/, '') || ''
           
-          # 本文をシンプルに
           share_text = "🎧️ Today's Song 🎧️\n" \
             "#{@journal.artist_name} - #{@journal.song_name}\n" \
             "\n" \
             "#MySongJournal ##{artist_tag} ##{song_tag}\n" \
             "\n" \
-            "#{journal_url(@journal)}"  # journal_urlを使用
+            "#{journal_url(@journal)}"
           
           twitter_share_url = "https://twitter.com/intent/tweet?" \
             "text=#{CGI.escape(share_text)}"
@@ -96,14 +97,18 @@
           </svg>
           <span>共有</span>
         <% end %>
+      </div>
 
-        <%= button_to journal_path(@journal), 
-            method: :delete, 
-            data: { confirm: "本当に削除しますか？" }, 
-            class: "px-4 py-2 bg-red-500 text-white font-medium rounded-md hover:bg-red-600 transition flex items-center" do %>
-          <span>🗑️ 削除</span>
+      <div>
+        <% if @journal.user == current_user %>
+          <%= button_to journal_path(@journal), 
+              method: :delete, 
+              data: { confirm: "本当に削除しますか？" }, 
+              class: "px-4 py-2 bg-red-500 text-white font-medium rounded-md hover:bg-red-600 transition flex items-center" do %>
+            <span>🗑️ 削除</span>
+          <% end %>
         <% end %>
-      <% end %>
+      </div>
     </div>
 
     <!-- 🔙 戻るボタン -->
