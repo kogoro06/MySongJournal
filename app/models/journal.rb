@@ -9,7 +9,7 @@ class Journal < ApplicationRecord
   has_many :favorited_users, through: :favorites, source: :user
 
   # バリデーション
-  validates :title, presence: { message: "日記のタイトルを入力してください" }, length: { maximum: 20, message: "タイトルは20文字以内で入力してください" }
+  validates :title, presence: { message: "日記のタイトルを入力してください" }, length: { maximum: 30, message: "タイトルは30文字以内で入力してください" }
   validates :content, presence: { message: "日記の本文を入力してください" }, length: { maximum: 500, message: "内容は500文字以内で入力してください" }
   validates :emotion, presence: { message: "本日の気持ちを選んでください" }
   validates :song_name, presence: { message: "本日の1曲を選んでください" }, length: { maximum: 100, message: "曲名は100文字以内で入力してください" }
