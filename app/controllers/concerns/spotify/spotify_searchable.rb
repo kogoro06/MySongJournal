@@ -3,31 +3,12 @@ module Spotify::SpotifySearchable
   include Spotify::SpotifyApiRequestable
 
   def search
-    Rails.logger.info "🔍 Search called"
-    Rails.logger.info "🎯 Current URL: #{request.url}"
-    Rails.logger.info "🔙 Referer: #{request.referer}"
-    Rails.logger.info "📝 Search params: #{params.inspect}"
-
-    p "========== Spotify Search Debug =========="
-    p "Params: #{params}"
-    p "Journal Params: #{params[:journal]}"
-    p "Current Session: #{session[:journal_form]}"
-    p "========================================"
-
-    save_journal_form
-
-    p "========== After Save Debug =========="
-    p "Updated Session: #{session[:journal_form]}"
-    p "===================================="
-
     # 検索時のみsessionを設定
     if params[:search_conditions].present? || params[:search_values].present?
       if request.referer&.include?("/edit")
         session[:return_to] = request.referer
-        Rails.logger.info "💾 Saved return path: #{session[:return_to]}"
       else
         session[:return_to] = new_journal_path
-        Rails.logger.info "💾 Saved return path: #{session[:return_to]}"
       end
     end
 
@@ -59,12 +40,7 @@ module Spotify::SpotifySearchable
       end
     end
 
-    # 検索条件をログに出力
-    Rails.logger.info "🎵 Search conditions: #{params[:search_conditions]}"
-    Rails.logger.info "🎯 Search values: #{params[:search_values]}"
-
     perform_spotify_search
-    Rails.logger.info "✅ Search completed with #{@tracks&.size || 0} results"
 
     respond_to do |format|
       if @tracks.any?
@@ -87,8 +63,6 @@ module Spotify::SpotifySearchable
   end
 
   def search_spotify
-    Rails.logger.debug "🔍 Search params: #{params.inspect}"
-
     save_journal_form if params[:journal].present?
 
     @query = params[:query]
@@ -137,8 +111,16 @@ module Spotify::SpotifySearchable
     page = (params[:page] || 1).to_i
     offset = (page - 1) * @per_page
 
-    results = spotify_get("search", search_params(offset))
-    process_search_results(results, page)
+    # アーティスト検索の場合は特別な処理
+    if params[:search_conditions]&.include?("artist") && params[:search_values].present?
+      artist_index = params[:search_conditions].index("artist")
+      artist_name = params[:search_values][artist_index]
+      enhanced_artist_search(artist_name, page)
+    else
+      # 通常の検索（アーティスト検索以外）
+      results = spotify_get("search", search_params(offset))
+      process_search_results(results, page)
+    end
   rescue StandardError => e
     handle_search_error(e)
   end
@@ -175,8 +157,6 @@ module Spotify::SpotifySearchable
       end,
       total_count: @total_count
     ).page(@current_page).per(@per_page)
-
-    Rails.logger.info "📝 Processed #{@tracks.size} tracks"
     @tracks
   end
 
@@ -210,5 +190,92 @@ module Spotify::SpotifySearchable
     Rails.logger.info "✅ Form data saved in session: #{session[:journal_form]}"
   rescue => e
     Rails.logger.error "⚠️ Error saving form data: #{e.message}"
+  end
+
+  # フィルタリングされたトラック結果を処理するメソッド
+  def process_filtered_tracks(filtered_tracks, page)
+    # ページネーション情報を設定
+    @total_count = filtered_tracks.size
+    @total_pages = (@total_count.to_f / @per_page).ceil
+    @current_page = page
+    @offset_value = (page - 1) * @per_page
+
+    # 現在のページに表示すべきトラックを抽出
+    start_index = @offset_value
+    end_index = [ @offset_value + @per_page - 1, @total_count - 1 ].min
+    current_page_tracks = filtered_tracks[start_index..end_index] || []
+
+    @tracks = Kaminari.paginate_array(
+      current_page_tracks.map do |track|
+        {
+          spotify_track_id: track["id"],
+          song_name: track["name"],
+          artist_name: track["artists"]&.first&.dig("name") || "Unknown Artist",
+          album_image: track["album"]["images"]&.first&.dig("url")
+        }
+      end,
+      total_count: @total_count
+    ).page(@current_page).per(@per_page)
+
+    Rails.logger.info "📝 Processed #{@tracks.size} filtered tracks (total: #{@total_count})"
+    @tracks
+  end
+
+  # すべてのアーティスト向けの拡張検索
+  def enhanced_artist_search(artist_name, page)
+    all_tracks = []
+
+    # 1. 基本的なアーティスト検索
+    results = spotify_get("search", {
+      params: {
+        q: "artist:\"#{artist_name}\"",
+        type: "track",
+        market: "JP",
+        limit: 50
+      }
+    })
+
+    if results && results["tracks"] && results["tracks"]["items"].present?
+      filtered_tracks = results["tracks"]["items"].select do |track|
+        track["artists"].any? { |artist| artist["name"].downcase == artist_name.downcase }
+      end
+      all_tracks.concat(filtered_tracks)
+    end
+
+    # 2. アーティストIDを使った検索
+    begin
+      artist_results = spotify_get("search", {
+        params: {
+          q: "artist:\"#{artist_name}\"",
+          type: "artist",
+          limit: 5
+        }
+      })
+
+      if artist_results && artist_results["artists"] && artist_results["artists"]["items"].present?
+        exact_artist = artist_results["artists"]["items"].find do |artist|
+          artist["name"].downcase == artist_name.downcase
+        end
+
+        if exact_artist
+          top_tracks = spotify_get("artists/#{exact_artist['id']}/top-tracks", {
+            params: { market: "JP" }
+          })
+
+          if top_tracks && top_tracks["tracks"].present?
+            top_tracks["tracks"].each do |track|
+              unless all_tracks.any? { |t| t["id"] == track["id"] }
+                all_tracks << track
+              end
+            end
+          end
+        end
+      end
+    rescue => e
+      Rails.logger.error "トップトラック取得エラー (#{artist_name}): #{e.message}"
+    end
+
+    Rails.logger.info "🎸 Found #{all_tracks.size} tracks for artist: #{artist_name}"
+    process_filtered_tracks(all_tracks, page)
   end
 end
