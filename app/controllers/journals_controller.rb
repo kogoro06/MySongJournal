@@ -13,6 +13,7 @@ class JournalsController < ApplicationController
   def index
     # ログインユーザーの日記を取得
     @journals = current_user.journals
+                            .includes(:favorites, user: { avatar_attachment: :blob })
 
     # 感情でフィルタリング
     @journals = @journals.where(emotion: params[:emotion]) if params[:emotion].present?
@@ -23,12 +24,21 @@ class JournalsController < ApplicationController
     # 作成日時で並び替えとページネーション
     sort_direction = params[:sort] == "asc" ? :asc : :desc
     @journals = @journals.order(created_at: sort_direction).page(params[:page]).per(6)
+
+    # N+1問題を解消しながら、お気に入り数を取得
+    @favorite_counts = @journals.each_with_object({}) do |journal, hash|
+      hash[journal.id] = journal.favorites.size
+    end
+
+    # ユーザーがお気に入りしたジャーナルを取得
+    favorite_journal_ids = Favorite.where(journal_id: @journals.map(&:id), user_id: current_user.id).pluck(:journal_id)
+    @user_favorites = @journals.map { |journal| [ journal.id, favorite_journal_ids.include?(journal.id) ] }.to_h if current_user
   end
 
   # 公開された日記のタイムラインを表示
   def timeline
     # 公開された日記のみを取得
-    base_query = Journal.where(public: true)
+    base_query = Journal.where(public: true) .includes(:favorites, user: { avatar_attachment: :blob })
 
     if user_signed_in?
       following_user_ids = current_user.following.pluck(:id)

@@ -42,8 +42,9 @@ class Journal < ApplicationRecord
   scope :by_genre, ->(genre) { where(genre: genre) if genre.present? }
 
   def favorited_by?(user)
-    return false if user.nil?  # userがnilならfalseを返す
-    favorites.exists?(user_id: user.id)
+    return false if user.nil?
+    @user_favorites ||= favorites.pluck(:user_id)
+    @user_favorites.include?(user.id)
   end
 
   def genre_display_name
