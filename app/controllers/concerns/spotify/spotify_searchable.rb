@@ -3,6 +3,7 @@ module Spotify::SpotifySearchable
   include Spotify::SpotifyApiRequestable
 
   def search
+    save_journal_form
     # 検索時のみsessionを設定
     if params[:search_conditions].present? || params[:search_values].present?
       if request.referer&.include?("/edit")
