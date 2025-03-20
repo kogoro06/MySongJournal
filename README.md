@@ -98,7 +98,7 @@
 
 | カテゴリ | 技術 |
 |----------|----------------------------------|
-| **フロントエンド** | Rails 7.2.2 (Turbo, Stimulus) |
+| **フロントエンド** | Tailwind DaisyUI |
 | **バックエンド** | Ruby on Rails 7.2.2 |
 | **データベース** | PostgreSQL |
 | **インフラ** | Render・Docker |
